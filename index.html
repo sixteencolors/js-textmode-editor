@@ -15,90 +15,15 @@
 
 	<canvas id="editor">
 	</canvas>
-		<div id="cursor">&nbsp;</div>
 </body>
 <script type="text/javascript">
 	var cursorWidth = 8, cursorHeight = 16, editor, ctx;
-/*	var Cursor = Class.extend({
-		init: function(width, height) {
-			this.top = 0;
-			this.left = 0;
-			this.width = width;
-			this.height = height;
-			this.on = true;
-			this.onColor = "#ababab";
-			this.offColor = "#000000";
-		}
-	});
 
-	var cursor = new Cursor(cursorWidth, cursorHeight);
-
-	$('body').bind('keydown', function(e) {
-		key = {left:37, up:38, right:39, down:40, f1:112, f2:113, f3:114, f4:115, f5:116, f6:117, f7:118, f8:119, f9:120, f10:121, f11:122, f12:123};
-		switch (e.which) {
-			case key.left:
-				if (cursor.left > cursorWidth) {
-					eraseCursor(cursor.left, cursor.top);
-					cursor.left = cursor.left - cursorWidth;
-				}
-				break;
-			case key.right:
-				if (cursor.left < $("#editor").width()) {
-					eraseCursor(cursor.left, cursor.top);					
-					cursor.left = cursor.left + cursorWidth;
-				}
-				break;
-			case key.down:
-				if (cursor.top < $("#editor").height() - cursorHeight) { // For now act on a fixed size canvas
-					eraseCursor(cursor.left, cursor.top);
-					cursor.top = cursor.top + cursorHeight;
-				}
-				break;
-			case key.up:
-				if (cursor.top > cursorHeight) {
-					eraseCursor(cursor.left, cursor.top);
-					cursor.top = cursor.top - cursorHeight ;
-				}
-				break;
-			case key.f5:
-				alert("f5!");
-				break;
-		}
-	});
-*/
 
 	$(document).ready(function()
 	{
-/*		editor = document.getElementById('editor');
-		editor.setAttribute('width', 640);
-		editor.setAttribute('height', 400);
-		if (editor.getContext) {
-			ctx = editor.getContext('2d');
-			//ctx.scale(.5,.5);
-		}
-		setInterval("cursorAnimation()", 300);
-*/		
 		editor = new Editor(640, 400, "editor");
 	});
-
-	function drawCursor(left, top, color) {
-		ctx.fillStyle = color;
-		ctx.fillRect(left, top, cursorWidth, cursorHeight);
-		ctx.fill();
-	}
-
-	function eraseCursor(left, top) {
-		ctx.fillStyle = cursor.offColor;
-		ctx.fillRect(left, top, cursorWidth, cursorHeight);
-		ctx.fill();
-	}
-
-	function cursorAnimation() {
-		drawCursor(cursor.left, cursor.top, cursor.on ? cursor.onColor : cursor.offColor);
-
-		cursor.on = !cursor.on;
-		//$("#editor #cursor").animate({opacity: 0}, "fast", "swing").animate({opacity:1}, "fast", "swing");		
-	}
 
 
 </script>

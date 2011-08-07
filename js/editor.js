@@ -73,23 +73,13 @@
 
     };
     Editor.prototype.draw = function() {
-      this.ctx.fillStyle = "#ffffff";
+      this.ctx.fillStyle = "#ababab";
       this.ctx.fillRect(this.cursor.x,this.cursor.y,this.cursor.width,this.cursor.height);
       this.ctx.fill();
       return true;
     };
 
 
-/*    ImageTextModeSAUCE.prototype.parseUrl = function(url) {
-      var content, req;
-      req = new XMLHttpRequest;
-      req.open('GET', url, false);
-      req.overrideMimeType('text/plain; charset=x-user-defined');
-      req.send(null);
-      content = req.status === 200 || req.status === 0 ? req.responseText : '';
-      return this.parse(content);
-    };
-*/
     return Editor;
   })();
 }).call(this);
