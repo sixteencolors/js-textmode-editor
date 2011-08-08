@@ -17,9 +17,9 @@ if( !$arg ) {
     File::Copy::Recursive::dircopy( "$src", "$outdir" );
 }
 elsif( $arg eq 'server' ) {
-  require Plack::Loader;
-  require Plack::App::Directory;
-  my $app = Plack::App::Directory->new( { root => "$outdir" } )->to_app;
-  print STDERR 'browse to http://localhost:1337/index.html', "\n";
-  Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
+    require Plack::Loader;
+    require Plack::App::Directory;
+    my $app = Plack::App::Directory->new( { root => "$outdir" } )->to_app;
+    print STDERR 'browse to http://localhost:1337/index.html', "\n";
+    Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
 }
