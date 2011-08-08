@@ -9,12 +9,26 @@ require Path::Class::Dir;
 my $outdir = Path::Class::Dir->new( 'output' );
 
 if( !$arg ) {
+    # clean out any existing build files
     $outdir->rmtree;
     $outdir->mkpath;
 
-    require File::Copy::Recursive;
     my $src = $outdir->parent->subdir( 'src' );
-    File::Copy::Recursive::dircopy( "$src", "$outdir" );
+
+    require Template;
+    my $tmpl = Template->new;
+
+    my %vars;
+    $vars{ css } = _gather_css( $src );
+
+    $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, $outdir->file( 'index.html' )->stringify );
+
+    require File::Copy::Recursive;
+    for( qw( js img ) ) {
+        my $d = $outdir->subdir( $_ );
+        $d->mkpath;
+        File::Copy::Recursive::dircopy( $src->subdir( $_ ), $d );
+    }
 }
 elsif( $arg eq 'server' ) {
     require Plack::Loader;
@@ -22,4 +36,18 @@ elsif( $arg eq 'server' ) {
     my $app = Plack::App::Directory->new( { root => "$outdir" } )->to_app;
     print STDERR 'browse to http://localhost:1337/index.html', "\n";
     Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
+}
+
+sub _gather_css {
+    my $src = shift;
+    $src = $src->subdir( 'css' );
+    my $css = '';
+
+    while ( my $file = $src->next ) {
+        next unless -f $file;
+        my $fh = $file->open('r') or die "Can't read $file: $!";
+        $css .= do { local $/; <$fh> } . "\n";
+    }
+
+    return $css;
 }

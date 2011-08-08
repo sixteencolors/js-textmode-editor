@@ -5,16 +5,10 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script> 
 	<script src="js/editor.js"></script>
 	<script src="js/ansi.min.js"></script>
-	<style>
-		#editor {
-			background-color: #000;
-			color: #fff;
-		}
-	</style>
+	<style>[% css %]</style>
 </head>
 <body>
-	<canvas id=editor>
-	</canvas>
+	<canvas id=editor></canvas>
 </body>
 <script>
 	var cursorWidth = 8, cursorHeight = 16, editor, ctx;
