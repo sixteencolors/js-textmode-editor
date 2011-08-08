@@ -9,7 +9,12 @@ require Path::Class::Dir;
 my $outdir = Path::Class::Dir->new( 'output' );
 
 if( !$arg ) {
+    $outdir->rmtree;
     $outdir->mkpath;
+
+    require File::Copy::Recursive;
+    my $src = $outdir->parent->subdir( 'src' );
+    File::Copy::Recursive::dircopy( "$src", "$outdir" );
 }
 elsif( $arg eq 'server' ) {
   require Plack::Loader;

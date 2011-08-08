@@ -5,6 +5,7 @@ BUILDING THE PROJECT
 
  * Perl
    * Path::Class
+   * File::Copy::Recursive
  * CoffeeScript
 
 ### Optional Dependencies
