@@ -1,9 +1,10 @@
+<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Sixteen Colors ANSI Editor</title>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script> 
-	<script type="text/javascript" src="js/editor.js"></script>
-	<script type="text/javascript" src="js/ansi.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script> 
+	<script src="js/editor.js"></script>
+	<script src="js/ansi.min.js"></script>
 	<style>
 		#editor {
 			background-color: #000;
@@ -12,11 +13,10 @@
 	</style>
 </head>
 <body>
-
-	<canvas id="editor">
+	<canvas id=editor>
 	</canvas>
 </body>
-<script type="text/javascript">
+<script>
 	var cursorWidth = 8, cursorHeight = 16, editor, ctx;
 
 
@@ -24,7 +24,5 @@
 	{
 		editor = new Editor(640, 400, "editor");
 	});
-
-
 </script>
 </html>
