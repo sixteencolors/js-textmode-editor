@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $arg = shift;
+
+require Path::Class::Dir;
+my $outdir = Path::Class::Dir->new( 'output' );
+
+if( !$arg ) {
+    $outdir->mkpath;
+}
+elsif( $arg eq 'server' ) {
+  require Plack::Loader;
+  require Plack::App::Directory;
+  my $app = Plack::App::Directory->new( { root => "$outdir" } )->to_app;
+  print STDERR 'browse to http://localhost:1337/index.html', "\n";
+  Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
+}
