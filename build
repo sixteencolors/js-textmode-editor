@@ -42,10 +42,10 @@ if( !$arg ) {
     $fh->close;
 
     require File::Copy::Recursive;
-    for( qw( js img ) ) {
+    for( qw( js/ img ) ) {
         my $d = $outdir->subdir( $_ );
         $d->mkpath;
-        File::Copy::Recursive::dircopy( $src->subdir( $_ ), $d );
+        File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );
     }
 }
 elsif( $arg eq 'server' ) {
