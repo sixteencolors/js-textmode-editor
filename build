@@ -58,10 +58,11 @@ sub _gather_css {
     while ( my $file = $src->next ) {
         next unless -f $file;
         my $fh = $file->open('r') or die "Can't read $file: $!";
-        $css .= do { local $/; <$fh> } . "\n";
+        $css .= do { local $/; <$fh> };
     }
 
-    return $css;
+    require CSS::Minifier::XS;
+    return CSS::Minifier::XS::minify( $css );
 }
 
 sub _gen_font {

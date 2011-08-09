@@ -7,6 +7,7 @@ BUILDING THE PROJECT
    * Path::Class
    * File::Copy::Recursive
    * Template
+   * CSS::Minifier::XS
  * CoffeeScript
 
 ### Optional Dependencies
