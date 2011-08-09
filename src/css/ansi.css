@@ -3,6 +3,7 @@ body {
 }
 #cursor {
 	background-image: url(../img/cursor_ovr.gif);
+    background-position: bottom;
     z-index: 10;
     position: absolute;
     left: 0;

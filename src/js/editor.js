@@ -8,21 +8,28 @@
     return child;
   };
   this.Editor = (function() {
+    this.Block = (function(){
+      function Block(char, attr) {
+        this.char = char;
+        this.attr = attr;
+      }
+      return Block;
+    })();
     this.Cursor = (function(){
 
       function Cursor(w, h) {
         this.width = w;
         this.height = h;
-        this.x = 1;
-        this.y = 1;
+        this.x = 0;
+        this.y = 0;
         this.dom = $("#cursor");
         this.dom.width(this.width);
         this.dom.height(this.height);
-        this.move();
+        this.draw();
       };
-      Cursor.prototype.move = function() {
-        this.dom.animate({left: this.x*this.width}, 10);
-        this.dom.animate({top: this.y*this.height}, 10);
+      Cursor.prototype.draw = function() {
+        this.dom.animate({left: (this.x + 1)*this.width}, 10);
+        this.dom.animate({top: (this.y + 1)*this.height}, 10);
         return true;
       };
       return Cursor;
@@ -36,28 +43,42 @@
       this.canvas.setAttribute('height', this.height);
 
       this.cursor = new Cursor(8, 16);
+      this.grid = new Array();
+      // initialize block grid
+      // for each column
+      for (i = 0; i < this.width/this.cursor.width; i++) {
+        var row = new Array();
+        //for each row in column
+        for (j = 0; j < this.height/this.cursor.height; j++) {
+          row.push(new Block(' ', 0));
+        }
+        this.grid.push(row);
+      }
 
       if (this.canvas.getContext) {
         this.ctx = this.canvas.getContext('2d');
         //ctx.scale(.5,.5);
       }
-//      setInterval("editor.draw()", 9);
+      setInterval("editor.draw()", 10);
+      //this.draw();
 
       $('body').bind('keydown', function(e) {
         key = {left:37, up:38, right:39, down:40, f1:112, f2:113, f3:114, f4:115, f5:116, f6:117, f7:118, f8:119, f9:120, f10:121, f11:122, f12:123};
+        //if (e.which >= 48 && e.which < )
+        console.log("keydown: " + e.which);
         switch (e.which) {
           case key.left:
             if (editor.cursor.x > editor.cursor.width/editor.cursor.width) {
               //eraseeditor.cursor(editor.cursor.x, editor.cursor.top);
               editor.cursor.x--;
-              editor.cursor.dom.animate({left: editor.cursor.x*editor.cursor.width}, 10)
+              editor.cursor.draw();
             }
             break;
           case key.right:
             if (editor.cursor.x < editor.width/editor.cursor.width) {
               //eraseeditor.cursor(editor.cursor.left, editor.cursor.top);         
               editor.cursor.x++;
-              editor.cursor.move();
+              editor.cursor.draw();
               //editor.cursor.dom.animate({left: (editor.cursor.x*editor.cursor.width)}, 10)
             }
             break;
@@ -65,28 +86,39 @@
             if (editor.cursor.y < (editor.height - editor.cursor.height)/editor.cursor.height) { // For now act on a fixed size canvas
               //eraseeditor.cursor(editor.cursor.left, editor.cursor.top);
               editor.cursor.y++;
-              editor.cursor.dom.animate({top: editor.cursor.y*editor.cursor.height}, 10)
+              editor.cursor.draw();
             }
             break;
           case key.up:
             if (editor.cursor.y > 0) {
               //eraseeditor.cursor(editor.cursor.left, editor.cursor.top);
               editor.cursor.y--;
-              editor.cursor.dom.animate({top: editor.cursor.y*editor.cursor.height}, 10)
+              editor.cursor.draw();
             }
             break;
-          case key.f5:
-            alert("f5!");
+          default:
+            //console.log(e.which);
             break;
         }
       });
-
+      $('body').bind('keypress', function(e) {
+        var letter = String.fromCharCode(e.which);
+        console.log("keypress: " + e.which + "/" + letter);
+        var block = new Block(letter, 0);
+        editor.grid[editor.cursor.x][editor.cursor.y] = block;
+        // draw cursor right, wrap if end of line
+      });
     };
     Editor.prototype.draw = function() {
       this.ctx.fillStyle = "#000000";
       this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
       this.ctx.fillStyle = "#ababab";
-      this.ctx.fillRect(this.cursor.x*this.cursor.width,this.cursor.y*this.cursor.height,this.cursor.width,this.cursor.height);
+      for (var x = 0; x < this.grid.length;x++) {
+        for (var y = 0; y < this.grid[x].length;y++) {
+          if (this.grid[x][y].char != ' ')
+            this.ctx.fillRect(x*this.cursor.width,y*this.cursor.height,this.cursor.width, this.cursor.height);
+        }
+      }
       this.ctx.fill();
       return true;
     };
