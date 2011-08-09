@@ -15,6 +15,8 @@ if( !$arg ) {
 
     my $src = $outdir->parent->subdir( 'src' );
 
+    _gen_font( $src, $outdir );
+
     require Template;
     my $tmpl = Template->new;
 
@@ -60,4 +62,19 @@ sub _gather_css {
     }
 
     return $css;
+}
+
+sub _gen_font {
+    my $srcdir = shift;
+    my $outdir = shift;
+    my $font   = do $srcdir->file( qw( font 8x16.pl ) )->stringify;
+
+    $outdir->subdir( 'js' )->mkpath;
+    my $fh = $outdir->file( qw( js 8x16.dat ) )->open( 'w' );
+
+    for my $x ( @$font ) {
+        print $fh chr $_ for @$x;
+    }
+
+    $fh->close;
 }
