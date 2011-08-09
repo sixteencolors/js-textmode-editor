@@ -23,7 +23,23 @@ if( !$arg ) {
     my %vars;
     $vars{ css } = _gather_css( $src );
 
-    $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, $outdir->file( 'index.html' )->stringify );
+    my $output;
+    $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, \$output );
+
+    if( eval "require HTML::Packer;" ) {
+        my $packer = HTML::Packer->init();
+        $packer->minify( \$output, { 
+            remove_comments => 1,
+            remove_newlines => 1,
+            do_javascript   => 'best',
+            do_stylesheet   => 'minify',
+            html5           => 1,
+        } );
+    }
+
+    my $fh = $outdir->file( 'index.html' )->open( 'w' );
+    print $fh $output;
+    $fh->close;
 
     require File::Copy::Recursive;
     for( qw( js img ) ) {
@@ -58,11 +74,11 @@ sub _gather_css {
     while ( my $file = $src->next ) {
         next unless -f $file;
         my $fh = $file->open('r') or die "Can't read $file: $!";
-        $css .= do { local $/; <$fh> };
+        $css .= do { local $/; <$fh> } . "\n";
     }
 
-    require CSS::Minifier::XS;
-    return CSS::Minifier::XS::minify( $css );
+    chop( $css );
+    return $css;
 }
 
 sub _gen_font {

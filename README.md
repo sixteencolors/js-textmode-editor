@@ -7,12 +7,14 @@ BUILDING THE PROJECT
    * Path::Class
    * File::Copy::Recursive
    * Template
-   * CSS::Minifier::XS
  * CoffeeScript
 
 ### Optional Dependencies
 
  * Plack (to run a local server)
+ * HTML::Packer (minify HTML)
+ * JavaScript::Packer (minify JavaScript)
+ * CSS::Packer (minify CSS)
 
 Generate the project
 --------------------
