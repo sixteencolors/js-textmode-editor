@@ -37,6 +37,16 @@ elsif( $arg eq 'server' ) {
     print STDERR 'browse to http://localhost:1337/index.html', "\n";
     Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
 }
+elsif( $arg eq 'zip' ) {
+    require Cwd;
+    my $cur = Cwd::cwd();
+    chdir( 'output' );
+    $outdir->parent->file( '16c-editor.zip' )->remove;
+
+    `zip -r ../16c-editor.zip .`;
+
+    chdir( $cur );
+}
 
 sub _gather_css {
     my $src = shift;
