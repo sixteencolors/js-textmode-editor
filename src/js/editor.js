@@ -32,6 +32,25 @@
         this.dom.animate({top: (this.y + 1)*this.height}, 10);
         return true;
       };
+      Cursor.prototype.moveRight = function() {
+        if (editor.cursor.x < editor.width/editor.cursor.width - 1) { // if within the bounds of the editor, move right
+          editor.cursor.x++;
+        } else if (editor.cursor.y < editor.height/editor.cursor.height - 1) { // if outside the bounds of the editor, and not on the last row, move the cursor down one row and to the first column
+          editor.cursor.x = 0;
+          editor.cursor.y++;
+        }
+        editor.cursor.draw();
+      };   
+      Cursor.prototype.moveLeft = function() {
+        
+        if (editor.cursor.x > 0) { // if within the bounds of the editor, move left
+          editor.cursor.x--;          
+        } else if (editor.cursor.y > 0) { // if outside the bounds of the editor, and not on the top row, move up one row and to the last column
+          editor.cursor.y--
+          editor.cursor.x = editor.width/editor.cursor.width - 1;
+        }
+        editor.cursor.draw();
+      };      
       return Cursor;
     })();
     function Editor(w, h, id) {
@@ -68,19 +87,10 @@
         console.log("keydown: " + e.which);
         switch (e.which) {
           case key.left:
-            if (editor.cursor.x > editor.cursor.width/editor.cursor.width) {
-              //eraseeditor.cursor(editor.cursor.x, editor.cursor.top);
-              editor.cursor.x--;
-              editor.cursor.draw();
-            }
+            editor.cursor.moveLeft();
             break;
           case key.right:
-            if (editor.cursor.x < editor.width/editor.cursor.width) {
-              //eraseeditor.cursor(editor.cursor.left, editor.cursor.top);         
-              editor.cursor.x++;
-              editor.cursor.draw();
-              //editor.cursor.dom.animate({left: (editor.cursor.x*editor.cursor.width)}, 10)
-            }
+            editor.cursor.moveRight();
             break;
           case key.down:
             if (editor.cursor.y < (editor.height - editor.cursor.height)/editor.cursor.height) { // For now act on a fixed size canvas
@@ -106,7 +116,7 @@
         console.log("keypress: " + e.which + "/" + letter);
         var block = new Block(letter, 0);
         editor.grid[editor.cursor.x][editor.cursor.y] = block;
-        // draw cursor right, wrap if end of line
+        editor.cursor.moveRight();
       });
     };
     Editor.prototype.draw = function() {
