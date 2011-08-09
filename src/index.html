@@ -1,23 +1,22 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Sixteen Colors ANSI Editor</title>
-	<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.min.js"></script> 
-	<script src="js/editor.js"></script>
-	<script src="js/ansi.min.js"></script>
-	<style type=text/css>[% css %]</style>
+    <title>Sixteen Colors ANSI Editor</title>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.min.js"></script> 
+    <script src="js/editor.js"></script>
+    <script src="js/ansi.min.js"></script>
+    <style type=text/css>[% css %]</style>
 </head>
 <body>
-	<div id=cursor></div>
-	<canvas id=editor></canvas>
+    <div id=cursor></div>
+    <canvas id=editor></canvas>
 </body>
 <script>
-	var cursorWidth = 8, cursorHeight = 16, editor, ctx;
+    var cursorWidth = 8, cursorHeight = 16, editor, ctx;
 
-
-	$(document).ready(function()
-	{
-		editor = new Editor(640, 400, "editor");
-	});
+    $(document).ready(function()
+    {
+        editor = new Editor(640, 400, "editor");
+    });
 </script>
 </html>
