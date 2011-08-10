@@ -3,12 +3,18 @@
 use strict;
 use warnings;
 
-my $arg = shift;
+my @args = @ARGV;
 
 require Path::Class::Dir;
 my $outdir = Path::Class::Dir->new( 'output' );
 
-if( !$arg ) {
+my %opts;
+for ( 0..@args - 1 ) {
+    next unless $args[ $_ ] =~ m{^-};
+    $opts{ delete $args[ $_ ] }++;
+}
+
+if( !@args ) {
     # clean out any existing build files
     $outdir->rmtree;
     $outdir->mkpath;
@@ -27,8 +33,7 @@ if( !$arg ) {
     my $output;
     $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, \$output );
 
-    # XXX: no minify for now
-    if( 0 && eval "require HTML::Packer;" ) {
+    if( !$opts{ '--no-minify' } && eval "require HTML::Packer;" ) {
         my $packer = HTML::Packer->init();
         $packer->minify( \$output, { 
             remove_comments => 1,
@@ -51,14 +56,14 @@ if( !$arg ) {
         File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );
     }
 }
-elsif( $arg eq 'server' ) {
+elsif( $args[ 0 ] eq 'server' ) {
     require Plack::Loader;
     require Plack::App::Directory;
     my $app = Plack::App::Directory->new( { root => "$outdir" } )->to_app;
     print STDERR 'browse to http://localhost:1337/index.html', "\n";
     Plack::Loader->load( 'Standalone', port => 1337 )->run( $app );
 }
-elsif( $arg eq 'zip' ) {
+elsif( $args[ 0 ] eq 'zip' ) {
     require Cwd;
     my $cur = Cwd::cwd();
     chdir( 'output' );
