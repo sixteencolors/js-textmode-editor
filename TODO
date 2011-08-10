@@ -1,1 +1,3 @@
-* use actual 8x16 font chars
+* use the palette
+* allow the user to switch colors
+* allow the user to switch special char sets
