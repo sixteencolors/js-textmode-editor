@@ -69,7 +69,7 @@ elsif( $args[ 0 ] eq 'zip' ) {
     chdir( 'output' );
     $outdir->parent->file( '16c-editor.zip' )->remove;
 
-    `zip -r ../16c-editor.zip .`;
+    `zip -9 -r ../16c-editor.zip .`;
 
     chdir( $cur );
 }
