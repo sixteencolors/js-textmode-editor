@@ -6,8 +6,8 @@ class @Editor
         this[k] = v for own k, v of options
         @canvas = document.getElementById(@id)
         @canvas.style.cursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
-        @width = @canvas.clientWidth
-        @height = @canvas.clientHeight
+        @width = @canvas.clientWidth if !@width?
+        @height = @canvas.clientHeight if !@height?
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
