@@ -14,8 +14,10 @@ class @Editor
         @cursor = new Cursor 8, 16, @
         @grid = []
         @ctx = @canvas.getContext '2d' if @canvas.getContext
-        setInterval 'editor.draw()', 10
-        $("body").bind "keydown", (e) ->
+        setInterval( () =>
+            @draw()
+        , 10 )
+        $("body").bind "keydown", (e) =>
             key = 
               left: 37
               up: 38
@@ -37,26 +39,26 @@ class @Editor
             console.log "keydown: " + e.which
             switch e.which
               when key.left
-                editor.cursor.moveLeft()
+                @cursor.moveLeft()
               when key.right
-                editor.cursor.moveRight()
+                @cursor.moveRight()
               when key.down
-                if editor.cursor.y < (editor.height - editor.cursor.height) / editor.cursor.height
-                  editor.cursor.y++
-                  editor.cursor.draw()
+                if @cursor.y < (@height - @cursor.height) / @cursor.height
+                  @cursor.y++
+                  @cursor.draw()
               when key.up
-                if editor.cursor.y > 0
-                  editor.cursor.y--
-                  editor.cursor.draw()
+                if @cursor.y > 0
+                  @cursor.y--
+                  @cursor.draw()
               else
 
-        $("body").bind "keypress", (e) ->
+        $("body").bind "keypress", (e) =>
             letter = String.fromCharCode(e.which)
             console.log "keypress: " + e.which + "/" + letter
             block = new Block(letter, 0)
-            editor.grid[editor.cursor.x] = [] if !editor.grid[editor.cursor.x]            
-            editor.grid[editor.cursor.x][editor.cursor.y] = block
-            editor.cursor.moveRight()
+            @grid[@cursor.x] = [] if !@grid[@cursor.x]            
+            @grid[@cursor.x][@cursor.y] = block
+            @cursor.moveRight()
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
