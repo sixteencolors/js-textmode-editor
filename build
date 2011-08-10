@@ -22,6 +22,7 @@ if( !$arg ) {
 
     my %vars;
     $vars{ css } = _gather_css( $src );
+    $vars{ javascript } = _gather_js( $src );
 
     my $output;
     $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, \$output );
@@ -41,8 +42,9 @@ if( !$arg ) {
     print $fh $output;
     $fh->close;
 
+    # static folders, 1-to-1 copy
     require File::Copy::Recursive;
-    for( qw( js/ img ) ) {
+    for( qw( img ) ) {
         my $d = $outdir->subdir( $_ );
         $d->mkpath;
         File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );
@@ -81,13 +83,23 @@ sub _gather_css {
     return $css;
 }
 
+sub _gather_js {
+    my $src = shift;
+    $src = $src->subdir( 'coffee' );
+
+    require File::Temp;
+    my $temp;
+    ( undef, $temp ) = File::Temp::tempfile();
+    my $js = `coffee -p -j $temp $src/*.coffee`;
+    return $js;
+}
+
 sub _gen_font {
     my $srcdir = shift;
     my $outdir = shift;
     my $font   = do $srcdir->file( qw( font 8x16.pl ) )->stringify;
 
-    $outdir->subdir( 'js' )->mkpath;
-    my $fh = $outdir->file( qw( js 8x16.dat ) )->open( 'w' );
+    my $fh = $outdir->file( '8x16.dat' )->open( 'w' );
 
     for my $x ( @$font ) {
         print $fh chr $_ for @$x;
