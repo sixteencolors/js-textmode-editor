@@ -6,13 +6,12 @@ class @Editor
         this[k] = v for own k, v of options
         @canvas = document.getElementById(@id)
         @canvas.style.cursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
-        @canvas.setAttribute 'width', this.width
-        @canvas.setAttribute 'height', this.height
         @width = @canvas.clientWidth
         @height = @canvas.clientHeight
+        @canvas.setAttribute 'width', @width
+        @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
         @grid = []
-        @grid[x].push new Block " ", 0 for x in [0..@width/@cursor.width] for y in [0..@height/@cursor.height]
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval 'editor.draw()', 10
         $("body").bind "keydown", (e) ->
@@ -54,6 +53,7 @@ class @Editor
             letter = String.fromCharCode(e.which)
             console.log "keypress: " + e.which + "/" + letter
             block = new Block(letter, 0)
+            editor.grid[editor.cursor.x] = [] if !editor.grid[editor.cursor.x]            
             editor.grid[editor.cursor.x][editor.cursor.y] = block
             editor.cursor.moveRight()
 
@@ -61,12 +61,12 @@ class @Editor
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
         @ctx.fillStyle = "#ababab"
-        for x in @grid 
-            do (x) ->
-                for y in @grid[x] 
-                    do (y) -> 
-                        @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height 
-        @ctx.fill
+        for x in [0..@grid.length]
+            continue if !@grid[x]?
+            for y in [0..@grid[x].length]
+                continue if !@grid[x][y]?
+                @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height 
+        @ctx.fill()
         return true
 
     class Block
@@ -78,7 +78,7 @@ class @Editor
         constructor: (@width, @height, @editor) ->
             @x = 0
             @y = 0
-            @dom = document.getElementById("cursor")
+            @dom = $("#cursor")
             @dom.width @width
             @dom.height @height
             @draw()
@@ -95,8 +95,7 @@ class @Editor
                 @x =0;
                 @y++
             @draw()
-            return true
-                
+            return true                
         moveLeft: ->
             if @x > 0
                 @x--
@@ -105,4 +104,3 @@ class @Editor
                 @x = @editor.width/@width - 1
             @draw()
             return true
-            
