@@ -131,3 +131,7 @@ class @Editor
                 @x = @editor.width/@width - 1
             @draw()
             return true
+
+$(document).ready ->
+    new Editor "editor", {width: 640, height: 400}
+

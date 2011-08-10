@@ -1,4 +1,3 @@
-###
 class @ANSI
 
     constructor: ( ) ->
@@ -216,4 +215,3 @@ class @ANSI
         if ++@x >= @linewrap
             @x = 0
             @y++
-###
