@@ -13,6 +13,7 @@ class @Editor
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
         @grid = []
+        @attr = 7
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
             @draw()
@@ -55,9 +56,8 @@ class @Editor
         $("body").bind "keypress", (e) =>
             letter = String.fromCharCode(e.which)
             console.log "keypress: " + e.which + "/" + letter
-            block = new Block(letter, 0)
             @grid[@cursor.x] = [] if !@grid[@cursor.x]            
-            @grid[@cursor.x][@cursor.y] = block
+            @grid[@cursor.x][@cursor.y] = { char: letter, attr: @attr }
             @cursor.moveRight()
 
     loadUrl: ( url ) ->
@@ -99,10 +99,6 @@ class @Editor
 
         @ctx.fill()
         return true
-
-    class Block
-
-        constructor: (@char, @attr) ->
 
     class Cursor
 
