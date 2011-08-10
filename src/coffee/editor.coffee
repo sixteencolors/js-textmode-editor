@@ -13,6 +13,24 @@ class @Editor
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
         @grid = []
+        @palette = [
+            [ 0, 0, 0 ],
+            [ 170, 0, 0 ],
+            [ 0, 170, 0 ],
+            [ 170, 85, 0 ],
+            [ 0, 0, 170 ],
+            [ 170, 0, 170 ],
+            [ 0, 170, 170 ],
+            [ 170, 170, 170 ],
+            [ 85, 85, 85 ],
+            [ 255, 85, 85 ],
+            [ 85, 255, 85 ],
+            [ 255, 255, 85 ],
+            [ 85, 85, 255 ],
+            [ 255, 85, 255 ],
+            [ 85, 255, 255 ],
+            [ 255, 255, 255 ]
+        ]
         @attr = 7
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
@@ -81,15 +99,17 @@ class @Editor
     draw: ->
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
-        @ctx.fillStyle = "#ababab"
         for y in [0..@grid.length]
             continue if !@grid[y]?
             for x in [0..@grid[y].length]
                 continue if !@grid[y][x]?
-                # @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height
                 px = x * @cursor.width
                 py = y * @cursor.height
 
+                @ctx.fillStyle = @toRgbaString( @palette[ ( @grid[y][x].attr & 240 ) >> 4 ] )
+                @ctx.fillRect px, py, 8, 16
+
+                @ctx.fillStyle = @toRgbaString( @palette[ @grid[y][x].attr & 15 ] )
                 chr = @font[ @grid[y][x].char.charCodeAt( 0 ) & 255 ]
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
@@ -99,6 +119,9 @@ class @Editor
 
         @ctx.fill()
         return true
+
+    toRgbaString: ( color ) ->
+        return 'rgba(' + color.join( ',' ) + ',1)';
 
     class Cursor
 
