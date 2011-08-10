@@ -8,6 +8,7 @@ body {
 
 #cursor {
     background-image: url(../img/cursor_ovr.gif);
+    background-position: bottom;
     position: absolute;
     left: 0;
     top: 0;
