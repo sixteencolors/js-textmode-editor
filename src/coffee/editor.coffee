@@ -84,8 +84,8 @@ class @Editor
             @draw()
         draw: ->
             @dom.animate
-                left: (@x+1)*@width
-                top: (@y+1)*@height
+                left: @x*@width
+                top: @y*@height
                 10
             return true
         moveRight: ->

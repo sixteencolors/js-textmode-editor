@@ -1,2 +1,1 @@
-* Fix cursor position (wrap canvas+cursor in div)
 * use actual 8x16 font chars

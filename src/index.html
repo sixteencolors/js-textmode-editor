@@ -7,8 +7,10 @@
     <style type=text/css>[% css %]</style>
 </head>
 <body>
-    <div id=cursor></div>
-    <canvas id=editor></canvas>
+    <div id=wrapper>
+        <div id=cursor></div>
+        <canvas id=editor></canvas>
+    </div>
 </body>
 <script>
     var cursorWidth = 8, cursorHeight = 16, editor, ctx;
