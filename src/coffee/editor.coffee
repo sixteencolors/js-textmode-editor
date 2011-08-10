@@ -4,6 +4,7 @@ class @Editor
         @tabstop  = 8
         @linewrap = 80
         this[k] = v for own k, v of options
+        @font = @loadFont()
         @canvas = document.getElementById(@id)
         @canvas.style.cursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
         @width = @canvas.clientWidth if !@width?
@@ -57,6 +58,24 @@ class @Editor
             editor.grid[editor.cursor.x][editor.cursor.y] = block
             editor.cursor.moveRight()
 
+    loadUrl: ( url ) ->
+        req = new XMLHttpRequest
+        req.open 'GET', url, false
+        req.overrideMimeType 'text/plain; charset=x-user-defined'
+        req.send null
+        content = if req.status is 200 or req.status is 0 then req.responseText else ''
+        return content
+
+    loadFont: ->
+        data = @loadUrl '8x16.dat'
+        chars = []
+        for i in [ 0 .. 255 ]
+            chr = []
+            for j in [ 0 .. 15 ]
+                chr.push data.charCodeAt( i * 16 + j ) & 255
+            chars.push chr 
+        return chars
+
     draw: ->
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
@@ -65,7 +84,17 @@ class @Editor
             continue if !@grid[x]?
             for y in [0..@grid[x].length]
                 continue if !@grid[x][y]?
-                @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height 
+                # @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height
+                px = x * @cursor.width
+                py = y * @cursor.height
+
+                chr = @font[ @grid[x][y].char.charCodeAt( 0 ) & 255 ]
+                for i in [ 0 .. 15 ]
+                    line = chr[ i ]
+                    for j in [ 0 .. 7 ]
+                        if line & ( 1 << 7 - j )
+                            @ctx.fillRect px + j, py + i, 1, 1
+
         @ctx.fill()
         return true
 
