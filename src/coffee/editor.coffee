@@ -10,7 +10,7 @@ class Editor
         @canvas.setAttribute 'height', this.height
         @width = @canvas.clientWidth
         @height = @canvas.clientHeight
-        @cursor = new Cursor 8, 16
+        @cursor = new Cursor 8, 16, @
         @grid = []
         @grid[x].push new Block " ", 0 for x in [0..@width/@cursor.width] for y in [0..@height/@cursor.height]
         @ctx = @canvas.getContext '2d' if @canvas.getContext
@@ -66,6 +66,8 @@ class Editor
                 for y in @grid[x] 
                     do (y) -> 
                         @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height 
+        @ctx.fill
+        return true
 
     class Block
 
@@ -73,6 +75,26 @@ class Editor
 
     class Cursor
 
-        constructor: (@wdith, @height) ->
-
+        constructor: (@wdith, @height, @editor) ->
+            @x = 0
+            @y = 0
+            @dom = $("#cursor")
+            @dom.width @width
+            @dom.height @height
+            @draw()
+        draw: ->
+            @dom.animate
+                left: (@x+1)*@width
+                top: (@y+1)*@height
+                10
+            return true
+        moveRight: ->
+            if @x < @editor.width/@width - 1
+                @x++
+            else if @y < @editor.height/@height - 1
+                @x =0;
+                @y++
+            @draw()
+            return true
+                
     
