@@ -54,10 +54,10 @@ class @Editor
               else
 
         $("body").bind "keypress", (e) =>
-            letter = String.fromCharCode(e.which)
-            console.log "keypress: " + e.which + "/" + letter
-            @grid[@cursor.x] = [] if !@grid[@cursor.x]            
-            @grid[@cursor.x][@cursor.y] = { char: letter, attr: @attr }
+            char = String.fromCharCode(e.which)
+            console.log "keypress: " + e.which + "/" + char
+            @grid[@cursor.y] = [] if !@grid[@cursor.y]
+            @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
             @cursor.moveRight()
 
     loadUrl: ( url ) ->
@@ -82,15 +82,15 @@ class @Editor
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
         @ctx.fillStyle = "#ababab"
-        for x in [0..@grid.length]
-            continue if !@grid[x]?
-            for y in [0..@grid[x].length]
-                continue if !@grid[x][y]?
+        for y in [0..@grid.length]
+            continue if !@grid[y]?
+            for x in [0..@grid[y].length]
+                continue if !@grid[y][x]?
                 # @ctx.fillRect x * @cursor.width, y*@cursor.height, @cursor.width, @cursor.height
                 px = x * @cursor.width
                 py = y * @cursor.height
 
-                chr = @font[ @grid[x][y].char.charCodeAt( 0 ) & 255 ]
+                chr = @font[ @grid[y][x].char.charCodeAt( 0 ) & 255 ]
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
                     for j in [ 0 .. 7 ]
