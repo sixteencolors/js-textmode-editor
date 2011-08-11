@@ -6,7 +6,9 @@ class @Editor
         this[k] = v for own k, v of options
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        @canvas.style.cursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
+        nullCursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
+        $('#cursor').css( 'cursor', nullCursor )
+        $('#' + @id).css( 'cursor', nullCursor )
         @width = @canvas.clientWidth if !@width?
         @height = @canvas.clientHeight if !@height?
         @canvas.setAttribute 'width', @width
@@ -78,6 +80,11 @@ class @Editor
             @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
             @cursor.moveRight()
 
+        $('#' + @id).mousemove ( e ) =>
+            @cursor.x = Math.floor( e.pageX / @cursor.width )
+            @cursor.y = Math.floor( e.pageY / @cursor.height )
+            @cursor.draw()
+
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
         req.open 'GET', url, false
@@ -133,11 +140,8 @@ class @Editor
             @dom.height @height
             @draw()
         draw: ->
-            @dom.animate
-                left: @x*@width
-                top: @y*@height
-                10
-            return true
+            @dom.css( 'top', @y * @height )
+            @dom.css( 'left', @x * @width )
         moveRight: ->
             if @x < @editor.width/@width - 1
                 @x++
