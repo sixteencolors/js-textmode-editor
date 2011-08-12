@@ -33,7 +33,8 @@ class @Editor
             [ 85, 255, 255 ],
             [ 255, 255, 255 ]
         ]
-        @attr = 7
+        @fg = 7
+        @bg = 0
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
             @draw()
@@ -63,23 +64,28 @@ class @Editor
               when key.left
                 if (!mod)
                     @cursor.moveLeft()
+                else if e.ctrlKey || e.shiftKey
+                    if @bg > 0 then @bg-- else @bg = 7
               when key.right
                 if (!mod)
                     @cursor.moveRight()
+                else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
+                    if @bg < 7 then @bg++ else @bg = 0
+                    
               when key.down
                 if (!mod)
                     if @cursor.y < (@height - @cursor.height) / @cursor.height
                       @cursor.y++
                       @cursor.draw()
                 else if e.ctrlKey
-                    if @attr <= 15 then @attr++ else @attr = 0
+                    if @fg > 0 then @fg-- else @fg = 15
               when key.up
                 if (!mod)
                     if @cursor.y > 0
                       @cursor.y--
                       @cursor.draw()
                 else if (e.ctrlKey)
-                    if @attr > 0 then @attr-- else @attr = 15 # less hard coding when we are done with 10k
+                    if @fg < 15 then @fg++ else @fg = 0
               else
 
         $("body").bind "keypress", (e) =>            
@@ -90,7 +96,7 @@ class @Editor
             ///
             if char.match(pattern) && e.which <= 255
                 @grid[@cursor.y] = [] if !@grid[@cursor.y]
-                @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
+                @grid[@cursor.y][@cursor.x] = { char: char, attr: ( @bg << 4 ) | @fg }
                 @cursor.moveRight()
                     
 
