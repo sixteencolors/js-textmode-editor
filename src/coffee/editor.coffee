@@ -3,7 +3,7 @@ class @Editor
     constructor: ( options ) ->
         @tabstop  = 8
         @linewrap = 80
-        @id = 'editor'
+        @id = 'canvas'
         this[k] = v for own k, v of options
         @font = @loadFont()
         @canvas = document.getElementById(@id)

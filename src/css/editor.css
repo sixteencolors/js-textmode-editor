@@ -38,7 +38,7 @@ html, body {
     display: block;
 }
 
-#editorwrapper {
+#canvaswrapper {
     margin-left: 100px;
     position: relative;
 }
@@ -51,7 +51,7 @@ html, body {
     top: 0;
 }
 
-#editor {
+#canvas {
     background-color: #000;
     width: 100%;
     height: 100%;
