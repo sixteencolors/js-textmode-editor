@@ -192,5 +192,9 @@ class @Editor
             return true
 
 $(document).ready ->
+    $('#close').click ->
+        $('#splash').hide()
+        return false
+
     new Editor "editor", {width: 640, height: 400}
 

@@ -7,11 +7,15 @@
     <style type=text/css>[% css %]</style>
 </head>
 <body>
+    <div id=splash>
+        <a id=close href=#>Close</a>
+        SPLASH!
+    </div>
     <div id=toolbar>
         <ul id=menu>
-            <li>Save</li>
-            <li>Load</li>
-            <li>Clear</li>
+            <li id=save><a href=#>Save</a></li>
+            <li id=load><a href=#>Load</a></li>
+            <li id=clear><a href=#>Clear</a></li>
         </ul>
         <div id=palette></div>
         <div id=charset></div>
