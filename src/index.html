@@ -7,7 +7,16 @@
     <style type=text/css>[% css %]</style>
 </head>
 <body>
-    <div id=wrapper>
+    <div id=toolbar>
+        <ul id=menu>
+            <li>Save</li>
+            <li>Load</li>
+            <li>Clear</li>
+        </ul>
+        <div id=palette></div>
+        <div id=charset></div>
+    </div>
+    <div id=editorwrapper>
         <div id=cursor></div>
         <canvas id=editor></canvas>
     </div>

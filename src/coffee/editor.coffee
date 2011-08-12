@@ -101,7 +101,7 @@ class @Editor
                     
 
         $('#' + @id).mousemove ( e ) =>
-            @cursor.x = Math.floor( e.pageX / @cursor.width )
+            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
             @cursor.draw()
 

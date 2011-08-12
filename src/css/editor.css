@@ -1,9 +1,25 @@
-body {
-    background-color: #fff;
+* {
     margin: 0;
+    padding: 0;
 }
 
-#wrapper {
+html, body {
+    height: 100%;
+}
+
+#toolbar {
+    float: left;
+    width: 100px;
+    height: 100%;
+    background: #555;
+}
+
+#menu {
+    list-style-type: none;
+}
+
+#editorwrapper {
+    margin-left: 100px;
     position: relative;
 }
 
@@ -17,11 +33,10 @@ body {
 
 #editor {
     background-color: #000;
-    color: #fff;
-    padding: 0;
-    margin: 0;
+/* TEMPORARY */
     width: 640px;
     height: 400px;
+/* --- */
 }
 
 .palette {
