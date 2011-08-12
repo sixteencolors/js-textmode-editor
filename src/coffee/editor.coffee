@@ -34,6 +34,11 @@ class @Editor
             [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
             [ 47, 92, 40, 41, 123, 125, 91, 93, 96, 39, ]
         ]
+        # WORK IN PROGRESS
+        @pal2 = new Palette
+        @pal2.draw @
+        # WORK IN PROGRESS
+        
         @palette = [
             [ 0, 0, 0 ],
             [ 170, 0, 0 ],
@@ -216,6 +221,41 @@ class @Editor
                 @x = @editor.width/@width - 1
             @draw()
             return true
+
+class Palette
+
+    constructor: ->
+        @colors = [
+            [ 0, 0, 0 ],
+            [ 170, 0, 0 ],
+            [ 0, 170, 0 ],
+            [ 170, 85, 0 ],
+            [ 0, 0, 170 ],
+            [ 170, 0, 170 ],
+            [ 0, 170, 170 ],
+            [ 170, 170, 170 ],
+            [ 85, 85, 85 ],
+            [ 255, 85, 85 ],
+            [ 85, 255, 85 ],
+            [ 255, 255, 85 ],
+            [ 85, 85, 255 ],
+            [ 255, 85, 255 ],
+            [ 85, 255, 255 ],
+            [ 255, 255, 255 ]
+        ]
+        @fg = 7
+        @bg = 0
+        @element = $('#palette')
+
+    draw: ( editor ) ->
+        for i in @colors
+            block = $('<div>')
+            block.css 'background-color', @toRgbaString( i )
+            block.css 'height', '15px'
+            @element.append( block )
+
+    toRgbaString: ( color ) ->
+        return 'rgba(' + color.join( ',' ) + ',1)';
 
 $(document).ready ->
     $('#close').click ->
