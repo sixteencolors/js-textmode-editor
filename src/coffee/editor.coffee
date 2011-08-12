@@ -58,32 +58,49 @@ class @Editor
               f12: 123
 
             console.log "keydown: " + e.which
-            switch e.which
-              when key.left
-                @cursor.moveLeft()
-              when key.right
-                @cursor.moveRight()
-              when key.down
-                if @cursor.y < (@height - @cursor.height) / @cursor.height
-                  @cursor.y++
-                  @cursor.draw()
-              when key.up
-                if @cursor.y > 0
-                  @cursor.y--
-                  @cursor.draw()
-              else
+            if (!e.shiftKey && !e.ctrlKey && !e.altKey)
+                switch e.which
+                  when key.left
+                    @cursor.moveLeft()
+                  when key.right
+                    @cursor.moveRight()
+                  when key.down
+                    if @cursor.y < (@height - @cursor.height) / @cursor.height
+                      @cursor.y++
+                      @cursor.draw()
+                  when key.up
+                    if @cursor.y > 0
+                      @cursor.y--
+                      @cursor.draw()
+                  else
 
-        $("body").bind "keypress", (e) =>
+        $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
             console.log "keypress: " + e.which + "/" + char
-            @grid[@cursor.y] = [] if !@grid[@cursor.y]
-            @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
-            @cursor.moveRight()
+            pattern = ///
+                [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-]
+            ///
+            if char.match(pattern)
+                @grid[@cursor.y] = [] if !@grid[@cursor.y]
+                @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
+                @cursor.moveRight()
 
         $('#' + @id).mousemove ( e ) =>
             @cursor.x = Math.floor( e.pageX / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
             @cursor.draw()
+
+        @drawPalette('fg')
+        @drawPalette('bg')
+
+    drawPalette: (type) ->
+        if type == 'fg' then palette = @palette else palette = @palette[0..7]
+        container = $('<div class=palette>');
+        for p in palette
+            block = $('<span>')
+            block.css "background-color", @toRgbaString(p)
+            container.append(block)
+        $(@canvas.parentElement).append(container);
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
@@ -139,6 +156,7 @@ class @Editor
             @dom.width @width
             @dom.height @height
             @draw()
+            @color = 7
         draw: ->
             @dom.css( 'top', @y * @height )
             @dom.css( 'left', @x * @width )
