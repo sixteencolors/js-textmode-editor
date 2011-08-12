@@ -95,11 +95,8 @@ class @Editor
             pattern = ///
                 [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-]
             ///
-            if char.match(pattern) && e.which <= 255
-                @grid[@cursor.y] = [] if !@grid[@cursor.y]
-                @grid[@cursor.y][@cursor.x] = { char: char, attr: ( @bg << 4 ) | @fg }
-                @cursor.moveRight()
-                    
+            if char.match(pattern) && e.which <= 255 && !e.ctrlKey
+                @putChar(char.charCodeAt( 0 ) & 255);                    
 
         $('#' + @id).mousemove ( e ) =>
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
@@ -108,6 +105,10 @@ class @Editor
 
         @drawPalette('fg')
         @drawPalette('bg')
+    putChar: (charCode) ->
+        @grid[@cursor.y] = [] if !@grid[@cursor.y]
+        @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @bg << 4 ) | @fg }
+        @cursor.moveRight()
 
     drawPalette: (type) ->
         if type == 'fg' then palette = @palette else palette = @palette[0..7]
@@ -150,7 +151,7 @@ class @Editor
                 @ctx.fillRect px, py, 8, 16
 
                 @ctx.fillStyle = @toRgbaString( @palette[ @grid[y][x].attr & 15 ] )
-                chr = @font[ @grid[y][x].char.charCodeAt( 0 ) & 255 ]
+                chr = @font[ @grid[y][x].char ]
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
                     for j in [ 0 .. 7 ]
