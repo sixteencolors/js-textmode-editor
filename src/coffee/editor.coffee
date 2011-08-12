@@ -58,21 +58,29 @@ class @Editor
               f12: 123
 
             console.log "keydown: " + e.which
-            if (!e.shiftKey && !e.ctrlKey && !e.altKey)
-                switch e.which
-                  when key.left
+            mod = e.shiftKey || e.altKey || e.ctrlKey
+            switch e.which
+              when key.left
+                if (!mod)
                     @cursor.moveLeft()
-                  when key.right
+              when key.right
+                if (!mod)
                     @cursor.moveRight()
-                  when key.down
+              when key.down
+                if (!mod)
                     if @cursor.y < (@height - @cursor.height) / @cursor.height
                       @cursor.y++
                       @cursor.draw()
-                  when key.up
+                else if e.ctrlKey
+                    if @attr <= 15 then @attr++ else @attr = 0
+              when key.up
+                if (!mod)
                     if @cursor.y > 0
                       @cursor.y--
                       @cursor.draw()
-                  else
+                else if (e.ctrlKey)
+                    if @attr > 0 then @attr-- else @attr = 15 # less hard coding when we are done with 10k
+              else
 
         $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
@@ -80,10 +88,11 @@ class @Editor
             pattern = ///
                 [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-]
             ///
-            if char.match(pattern)
+            if char.match(pattern) && e.which <= 255
                 @grid[@cursor.y] = [] if !@grid[@cursor.y]
                 @grid[@cursor.y][@cursor.x] = { char: char, attr: @attr }
                 @cursor.moveRight()
+                    
 
         $('#' + @id).mousemove ( e ) =>
             @cursor.x = Math.floor( e.pageX / @cursor.width )
@@ -156,7 +165,6 @@ class @Editor
             @dom.width @width
             @dom.height @height
             @draw()
-            @color = 7
         draw: ->
             @dom.css( 'top', @y * @height )
             @dom.css( 'left', @x * @width )

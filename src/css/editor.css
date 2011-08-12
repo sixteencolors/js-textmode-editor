@@ -23,3 +23,17 @@ body {
     width: 640px;
     height: 400px;
 }
+
+.palette {
+    background-color: #000;
+    float: right;
+    padding: 0 1px;
+    margin: 3px;
+}
+
+.palette span {
+    display: block;
+    margin: 1px 0;
+    width: 16px;
+    height: 16px;
+}
