@@ -1,16 +1,17 @@
 class @Editor
 
-    constructor: ( @id, options ) ->
+    constructor: ( options ) ->
         @tabstop  = 8
         @linewrap = 80
+        @id = 'editor'
         this[k] = v for own k, v of options
         @font = @loadFont()
         @canvas = document.getElementById(@id)
         nullCursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
         $('#cursor').css( 'cursor', nullCursor )
         $('#' + @id).css( 'cursor', nullCursor )
-        @width = @canvas.clientWidth if !@width?
-        @height = @canvas.clientHeight if !@height?
+        @width = @canvas.clientWidth
+        @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
@@ -196,5 +197,5 @@ $(document).ready ->
         $('#splash').hide()
         return false
 
-    new Editor "editor", {width: 640, height: 400}
+    new Editor
 
