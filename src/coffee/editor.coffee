@@ -132,9 +132,9 @@ class @Editor
     draw: ->
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
-        for y in [0..@grid.length]
+        for y in [0..@grid.length - 1]
             continue if !@grid[y]?
-            for x in [0..@grid[y].length]
+            for x in [0..@grid[y].length - 1]
                 continue if !@grid[y][x]?
                 px = x * @cursor.width
                 py = y * @cursor.height
