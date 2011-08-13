@@ -7,9 +7,9 @@ class @Editor
         this[k] = v for own k, v of options
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        nullCursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
-        $('#cursor').css( 'cursor', nullCursor )
-        $('#' + @id).css( 'cursor', nullCursor )
+        # nullCursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
+        # $('#cursor').css( 'cursor', nullCursor )
+        # $('#' + @id).css( 'cursor', nullCursor )
         @width = @canvas.clientWidth
         @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
@@ -126,7 +126,7 @@ class @Editor
             if char.match(pattern) && e.which <= 255 && !e.ctrlKey
                 @putChar(char.charCodeAt( 0 ) & 255);                    
 
-        $('#' + @id).mousemove ( e ) =>
+        $('#' + @id).click ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
             @cursor.draw()
@@ -220,6 +220,7 @@ class @Editor
                 @x = @editor.width/@width - 1
             @draw()
             return true
+        
 
 class Palette
 
