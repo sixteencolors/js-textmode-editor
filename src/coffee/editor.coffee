@@ -143,7 +143,7 @@ class @Editor
         container = $('<div class=palette>');
         for p in palette
             block = $('<span>')
-            block.css "background-color", @toRgbaString(p)
+            block.css "background-color", toRgbaString(p)
             container.append(block)
         $(@canvas.parentElement).append(container);
 
@@ -175,10 +175,10 @@ class @Editor
                 px = x * @cursor.width
                 py = y * @cursor.height
 
-                @ctx.fillStyle = @toRgbaString( @palette[ ( @grid[y][x].attr & 240 ) >> 4 ] )
+                @ctx.fillStyle = toRgbaString( @palette[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
                 @ctx.fillRect px, py, 8, 16
 
-                @ctx.fillStyle = @toRgbaString( @palette[ @grid[y][x].attr & 15 ] )
+                @ctx.fillStyle = toRgbaString( @palette[ @grid[y][x].attr & 15 ] ) #fg
                 chr = @font[ @grid[y][x].char ]
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
@@ -189,8 +189,6 @@ class @Editor
         @ctx.fill()
         return true
 
-    toRgbaString: ( color ) ->
-        return 'rgba(' + color.join( ',' ) + ',1)';
 
     class Cursor
 
@@ -221,7 +219,6 @@ class @Editor
             @draw()
             return true
         
-
 class Palette
 
     constructor: ->
@@ -250,12 +247,13 @@ class Palette
     draw: ( editor ) ->
         for i in @colors
             block = $('<div>')
-            block.css 'background-color', @toRgbaString( i )
+            block.css 'background-color', toRgbaString( i )
             block.css 'height', '15px'
             @element.append( block )
 
-    toRgbaString: ( color ) ->
-        return 'rgba(' + color.join( ',' ) + ',1)';
+
+toRgbaString = ( color ) ->
+    return 'rgba(' + color.join( ',' ) + ',1)';
 
 $(document).ready ->
     $('#close').click ->
