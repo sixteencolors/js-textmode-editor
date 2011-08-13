@@ -132,6 +132,7 @@ class @Editor
         $('#' + @id).click ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
+            @putChar(@chars[@charset][0]) if @locked
             @cursor.draw()
 
         @drawPalette('fg')
