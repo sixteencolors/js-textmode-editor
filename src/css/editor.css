@@ -73,3 +73,26 @@ html, body {
     width: 16px;
     height: 16px;
 }
+
+#charsets .set .char {
+    display: block;
+    padding: 4px 0;
+    padding: 0 8px 0 32px;
+    border: 1px solid #000;
+    border-width: 1px 1px 1px 0;
+    margin: 8px 0;
+    width: 40%;
+}
+
+#charsets .set .char canvas {
+    height: 24px;
+    width: 12px;
+}
+#charsets {
+    text-align: center;
+    margin: 16px 0;
+}
+
+#charsets .set {
+    display: none;
+}

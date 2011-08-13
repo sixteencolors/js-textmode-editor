@@ -118,7 +118,7 @@ class @Editor
                     if !e.altKey && !e.shiftKey && !e.ctrlKey
                         @putChar(@chars[@charset][e.which-112])
                     else if e.altKey
-                        @charset = e.which - 112
+                        @sets.swap(@charset, @charset = e.which - 112)
 
         $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
@@ -228,12 +228,11 @@ class CharacterSets
         @element = $('#charsets')
 
     draw: ( editor )->
-        for row in @chars            
-            charSet = $('<div class=set>')
-            for c in row
-                chr = editor.font[ c ]
+        for row in [0..@chars.length - 1]
+            charSet = $('<div class=set id=set' + row + '>')
+            for c in [0..@chars[row].length - 1]
+                chr = editor.font[ @chars[row][ c ] ]
                 char = document.createElement('canvas')
-                char.className = 'char'
                 char.setAttribute 'width', @width
                 char.setAttribute 'height', @height
                 ctx = char.getContext '2d' if char.getContext
@@ -244,8 +243,14 @@ class CharacterSets
                         if line & ( 1 << 7 - j )
                             ctx.fillRect j, i, 1, 1
                 ctx.fill()
-                charSet.append(char)
+                charSet.append($('<span class=char>').append(char))
                 @element.append( charSet )
+        $('#set' + editor.charset).fadeIn()
+        return true
+    swap: (oldset, newset) ->
+        duration = 300
+        $('#set' + oldset).fadeOut(duration)
+        $('#set' + newset).delay(duration+100).fadeIn()
 
 class Palette
 
