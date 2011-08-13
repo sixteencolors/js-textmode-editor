@@ -15,6 +15,7 @@ class @Editor
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
+        @locked = false
         @grid = []
         @chars = [
             [ 218, 191, 192, 217, 196, 179, 195, 180, 193, 194, ]
@@ -32,7 +33,6 @@ class @Editor
             [ 131, 132, 133, 160, 166, 134, 142, 143, 145, 146, ]
             [ 136, 137, 138, 130, 144, 140, 139, 141, 161, 158, ]
             [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
-            [ 47, 92, 40, 41, 123, 125, 91, 93, 96, 39, ]
         ]
         @palette = [
             [ 0, 0, 0 ],
@@ -247,10 +247,14 @@ class CharacterSets
                 @element.append( charSet )
         $('#set' + editor.charset).fadeIn()
         @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
+        @element.parent().append('<div id=locker>Lock</div>')
         $('#next').click ( e ) =>
             @swap(editor.charset, editor.charset = if editor.charset < @chars.length - 1 then editor.charset = editor.charset + 1 else editor.charset = 0)
         $('#prev').click ( e ) =>
             @swap(editor.charset, editor.charset = if editor.charset > 0 then editor.charset = editor.charset - 1 else editor.charset = @chars.length - 1)
+        $('#locker').click ( e ) =>
+            editor.locked = !editor.locked
+            $('#locker').css 'color', if editor.locked then '#fff' else '#000'
         return true
     swap: (oldset, newset) ->
         duration = 150

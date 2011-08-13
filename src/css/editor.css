@@ -6,6 +6,7 @@
 html, body {
     height: 100%;
     overflow: hidden;
+    font-family: sans-serif;
 }
 
 #splash {
@@ -110,5 +111,14 @@ html, body {
     display: inline-block;
 }
 #charnavigator #next:hover, #charnavigator #prev:hover {
+    cursor: pointer;
+}
+
+#locker {
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#locker:hover {
     cursor: pointer;
 }
