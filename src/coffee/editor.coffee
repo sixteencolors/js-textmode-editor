@@ -246,11 +246,16 @@ class CharacterSets
                 charSet.append($('<span class=char>').append(char))
                 @element.append( charSet )
         $('#set' + editor.charset).fadeIn()
+        @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
+        $('#next').click ( e ) =>
+            @swap(editor.charset, editor.charset = if editor.charset < @chars.length then editor.charset = editor.charset + 1 else editor.charset = 0)
+        $('#prev').click ( e ) =>
+            @swap(editor.charset, editor.charset = if editor.charset > 0 then editor.charset = editor.charset - 1 else editor.charset = @chars.length - 1)
         return true
     swap: (oldset, newset) ->
-        duration = 300
+        duration = 150
         $('#set' + oldset).fadeOut(duration)
-        $('#set' + newset).delay(duration+100).fadeIn()
+        $('#set' + newset).delay(duration+duration*.1).fadeIn()
 
 class Palette
 
