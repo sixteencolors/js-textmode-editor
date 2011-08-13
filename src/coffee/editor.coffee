@@ -34,11 +34,6 @@ class @Editor
             [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
             [ 47, 92, 40, 41, 123, 125, 91, 93, 96, 39, ]
         ]
-        # WORK IN PROGRESS
-        @pal2 = new Palette
-        @pal2.draw @
-        # WORK IN PROGRESS
-        
         @palette = [
             [ 0, 0, 0 ],
             [ 170, 0, 0 ],
@@ -60,6 +55,14 @@ class @Editor
         @charset = 5
         @fg = 7
         @bg = 0
+
+        # WORK IN PROGRESS
+        @pal2 = new Palette
+        @pal2.draw @
+        @sets = new CharacterSets @chars
+        @sets.draw @
+        # WORK IN PROGRESS
+        
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
             @draw()
@@ -189,7 +192,6 @@ class @Editor
         @ctx.fill()
         return true
 
-
     class Cursor
 
         constructor: (@width, @height, @editor) ->
@@ -219,6 +221,32 @@ class @Editor
             @draw()
             return true
         
+class CharacterSets 
+    constructor: (@chars) ->
+        @width = 8
+        @height = 16
+        @element = $('#charsets')
+
+    draw: ( editor )->
+        for row in @chars            
+            charSet = $('<div class=set>')
+            for c in row
+                chr = editor.font[ c ]
+                char = document.createElement('canvas')
+                char.className = 'char'
+                char.setAttribute 'width', @width
+                char.setAttribute 'height', @height
+                ctx = char.getContext '2d' if char.getContext
+                ctx.fillStyle =  toRgbaString(editor.palette[ 15 ] )
+                for i in [ 0 .. 15 ]
+                    line = chr[ i ]
+                    for j in [ 0 .. 7 ]
+                        if line & ( 1 << 7 - j )
+                            ctx.fillRect j, i, 1, 1
+                ctx.fill()
+                charSet.append(char)
+                @element.append( charSet )
+
 class Palette
 
     constructor: ->
