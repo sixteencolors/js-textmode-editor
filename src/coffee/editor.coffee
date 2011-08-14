@@ -323,10 +323,11 @@ class Palette
         @element = $('#palette')
 
     draw: ( editor ) ->
-        for i in @colors
+        for i in @colors[0..@colors/2]
             block = $('<div>')
             block.css 'background-color', toRgbaString( i )
-            block.css 'height', '15px'
+            block.css 'height', '32px'
+            block.css 'width', '32px'
             @element.append( block )
 
 

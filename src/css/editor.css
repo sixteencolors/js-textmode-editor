@@ -23,7 +23,7 @@ html, body {
 
 #toolbar {
     float: left;
-    width: 100px;
+    width: 64px;
     height: 100%;
     background: #555;
 }
@@ -40,7 +40,7 @@ html, body {
 }
 
 #canvaswrapper {
-    margin-left: 100px;
+    margin-left: 64px;
     position: relative;
 }
 
@@ -59,20 +59,21 @@ html, body {
 }
 
 /* TEMP PAL STUFF */
-.palette {
+#palette {
     background-color: #000;
-    position: absolute;
     right: 0;
     top: 0;
-    padding: 0 1px;
-    margin: 3px;
+    margin: 0;
+    padding: 1px 0;
+    column-count: 2;
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    -webkit-column-gap: 1px;
 }
 
-.palette span {
+#palette div {
     display: block;
-    margin: 1px 0;
-    width: 16px;
-    height: 16px;
+    margin: 1px 0 0 0;
 }
 
 #charsets .set .char {
@@ -82,7 +83,7 @@ html, body {
     border: 1px solid #000;
     border-width: 1px 1px 1px 0;
     margin: 8px 0;
-    width: 40%;
+    width: 12px;
 }
 
 #charsets .set .char canvas {
@@ -107,10 +108,10 @@ html, body {
 }
 
 #charnavigator #next, #charnavigator #prev {
-    margin: 8px;
+    margin: 8px 0px 8px 1px;
     background-color: #fff;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     position: relative;
     display: inline-block;
 }
