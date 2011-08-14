@@ -147,21 +147,10 @@ class @Editor
         $('#' + @id).mouseup ( e ) =>
             @cursor.mousedown = false
 
-        @drawPalette('fg')
-        @drawPalette('bg')
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @bg << 4 ) | @fg }
         @cursor.moveRight()
-
-    drawPalette: (type) ->
-        if type == 'fg' then palette = @palette else palette = @palette[0..7]
-        container = $('<div class=palette>');
-        for p in palette
-            block = $('<span>')
-            block.css "background-color", toRgbaString(p)
-            container.append(block)
-        $(@canvas.parentElement).append(container);
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
