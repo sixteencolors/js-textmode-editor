@@ -99,6 +99,10 @@ html, body {
     display: none;
 }
 
+.char.selected {
+    background: #ababab;
+}
+
 #charnavigator {
 }
 

@@ -53,6 +53,7 @@ class @Editor
             [ 255, 255, 255 ]
         ]
         @charset = 5
+        @char = 0
         @fg = 7
         @bg = 0
 
@@ -132,7 +133,7 @@ class @Editor
         $('#' + @id).click ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
-            @putChar(@chars[@charset][0]) if @locked
+            @putChar(@chars[@charset][@char]) if @locked
             @cursor.draw()
 
         @drawPalette('fg')
@@ -244,8 +245,18 @@ class CharacterSets
                         if line & ( 1 << 7 - j )
                             ctx.fillRect j, i, 1, 1
                 ctx.fill()
-                charSet.append($('<span class=char>').append(char))
+                charSet.append($('<span class=char id=set' + row + 'char' + c + '>').append(char))
                 @element.append( charSet )
+                charContainer = $('#set' + row + 'char' + c)
+                charContainer.addClass('selected') if editor.charset == row && editor.char == c
+                charContainer.click ( e ) =>
+                    pattern = ///
+                        set(\d+)char(\d+)
+                    ///
+                    matches = e.currentTarget.id.match(pattern)
+                    $('#set' + editor.charset + 'char' + editor.char).removeClass('selected')
+                    $('#set' + (editor.charset = matches[1] )+ 'char' + (editor.char = matches[2])).addClass('selected')
+
         $('#set' + editor.charset).fadeIn()
         @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
         @element.parent().append('<div id=locker>Lock</div>')
