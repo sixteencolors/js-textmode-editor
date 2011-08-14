@@ -86,40 +86,61 @@ class @Editor
               f10: 121
               f11: 122
               f12: 123
+              backspace: 8
+              delete: 46
+              end: 35
+              home: 36
+              enter: 13
 
             console.log "keydown: " + e.which
             mod = e.shiftKey || e.altKey || e.ctrlKey
             switch e.which
-              when key.left
-                if (!mod)
+                when key.left
+                    if (!mod)
+                        @cursor.moveLeft()
+                    else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
+                        if @bg < 7 then @bg++ else @bg = 0
+                when key.right
+                    if (!mod)
+                        @cursor.moveRight()
+                    else if e.ctrlKey || e.shiftKey
+                        if @bg > 0 then @bg-- else @bg = 7
+                when key.down
+                    if (!mod)
+                        if @cursor.y < (@height - @cursor.height) / @cursor.height
+                          @cursor.y++
+                    else if (e.ctrlKey)
+                        if @fg < 15 then @fg++ else @fg = 0
+                when key.up
+                    if (!mod)
+                        if @cursor.y > 0
+                          @cursor.y--
+                          @cursor.draw()
+                    else if e.ctrlKey
+                        if @fg > 0 then @fg-- else @fg = 15
+                when key.backspace
                     @cursor.moveLeft()
-                else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
-                    if @bg < 7 then @bg++ else @bg = 0
-              when key.right
-                if (!mod)
-                    @cursor.moveRight()
-                else if e.ctrlKey || e.shiftKey
-                    if @bg > 0 then @bg-- else @bg = 7
-              when key.down
-                if (!mod)
-                    if @cursor.y < (@height - @cursor.height) / @cursor.height
-                      @cursor.y++
-                      @cursor.draw()
-                else if (e.ctrlKey)
-                    if @fg < 15 then @fg++ else @fg = 0
-              when key.up
-                if (!mod)
-                    if @cursor.y > 0
-                      @cursor.y--
-                      @cursor.draw()
-                else if e.ctrlKey
-                    if @fg > 0 then @fg-- else @fg = 15
-              else 
-                if e.which >= 112 && e.which <= 123
-                    if !e.altKey && !e.shiftKey && !e.ctrlKey
-                        @putChar(@chars[@charset][e.which-112])
-                    else if e.altKey
-                        @sets.swap(@charset, @charset = e.which - 112)
+                    @putChar(32)
+                    @cursor.moveLeft()
+                    return false;
+                when key.delete
+                    oldrow = @grid[@cursor.y]
+                    @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                when key.end
+                    @cursor.x = @width / @cursor.width - 1
+                when key.home
+                    @cursor.x = 0
+                when key.enter
+                    @cursor.x = 0
+                    @cursor.y++
+                else 
+                    if e.which >= 112 && e.which <= 123
+                        if !e.altKey && !e.shiftKey && !e.ctrlKey
+                            @putChar(@chars[@charset][e.which-112])
+                        else if e.altKey
+                            @sets.swap(@charset, @charset = e.which - 112)
+                        return false
+            @cursor.draw()
 
         $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
@@ -142,10 +163,12 @@ class @Editor
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
             @putChar(@chars[@charset][@char]) if @locked
+            @cursor.draw()
             return true
 
         $('#' + @id).mouseup ( e ) =>
             @cursor.mousedown = false
+            @cursor.draw()
 
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
