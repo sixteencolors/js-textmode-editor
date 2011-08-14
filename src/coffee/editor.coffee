@@ -67,7 +67,7 @@ class @Editor
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
             @draw()
-        , 10 )
+        , 1 )
         $("body").bind "keydown", (e) =>
             key = 
               left: 37
@@ -130,11 +130,22 @@ class @Editor
             if char.match(pattern) && e.which <= 255 && !e.ctrlKey
                 @putChar(char.charCodeAt( 0 ) & 255);                    
 
-        $('#' + @id).click ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
+        $('#' + @id).mousemove ( e ) =>
+            if @cursor.mousedown
+                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
+                @cursor.y = Math.floor( e.pageY / @cursor.height )
+                @putChar(@chars[@charset][@char]) if @locked
+                return true
+
+        $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
+            @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
             @putChar(@chars[@charset][@char]) if @locked
-            @cursor.draw()
+            return true
+
+        $('#' + @id).mouseup ( e ) =>
+            @cursor.mousedown = false
 
         @drawPalette('fg')
         @drawPalette('bg')
@@ -203,6 +214,7 @@ class @Editor
             @dom.width @width
             @dom.height @height
             @draw()
+            @mousedown = false
         draw: ->
             @dom.css( 'top', @y * @height )
             @dom.css( 'left', @x * @width )
