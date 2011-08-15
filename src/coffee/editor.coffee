@@ -36,8 +36,6 @@ class @Editor
         ]
         @charset = 5
         @char = 0
-        @fg = 7
-        @bg = 0
 
         # WORK IN PROGRESS
         @pal = new Palette
@@ -84,25 +82,25 @@ class @Editor
                     if (!mod)
                         @cursor.moveLeft()
                     else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
-                        if @bg < 7 then @bg++ else @bg = 0
+                        if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
                 when key.right
                     if (!mod)
                         @cursor.moveRight()
                     else if e.ctrlKey || e.shiftKey
-                        if @bg > 0 then @bg-- else @bg = 7
+                        if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
                 when key.down
                     if (!mod)
                         if @cursor.y < (@height - @cursor.height) / @cursor.height
                           @cursor.y++
                     else if (e.ctrlKey)
-                        if @fg < 15 then @fg++ else @fg = 0
+                        if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
                 when key.up
                     if (!mod)
                         if @cursor.y > 0
                           @cursor.y--
                           @cursor.draw()
                     else if e.ctrlKey
-                        if @fg > 0 then @fg-- else @fg = 15
+                        if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
                 when key.backspace
                     @cursor.moveLeft()
                     @putChar(32)
@@ -157,7 +155,7 @@ class @Editor
 
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
-        @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @bg << 4 ) | @fg }
+        @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @cursor.moveRight()
 
     loadUrl: ( url ) ->
