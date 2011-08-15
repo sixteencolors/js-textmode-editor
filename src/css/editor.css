@@ -79,7 +79,6 @@ p {
 
 #toolbar {
     float: left;
-    width: 64px;
     height: 100%;
     background: #555;
 }
@@ -98,7 +97,6 @@ p {
 }
 
 #canvaswrapper {
-    margin-left: 64px;
     position: relative;
 }
 
@@ -160,23 +158,24 @@ p {
 #charsets .set .char {
     display: block;
     padding: 4px 0;
-    padding: 0 8px 0 32px;
+    padding: 0 8px 0 40%;
     border: 1px solid #000;
     border-width: 1px 1px 1px 0;
     margin: 4px 0;
-    width: 12px;
+    width: 10px;
 }
 
 #charsets .set .char:hover {
     cursor: pointer;
 }
 #charsets .set .char canvas {
-    height: 24px;
-    width: 12px;
+    height: 22px;
+    width: 10px;
 }
 #charsets {
     text-align: center;
     margin: 16px 0;
+    height: 295px;
 }
 
 #charsets .set {
@@ -193,8 +192,6 @@ p {
 #charnavigator #next, #charnavigator #prev {
     margin: 8px 0px 8px 1px;
     background-color: #fff;
-    width: 30px;
-    height: 30px;
     position: relative;
     display: inline-block;
 }

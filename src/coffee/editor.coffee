@@ -42,6 +42,8 @@ class @Editor
         @pal.draw @
         @sets = new CharacterSets @chars
         @sets.draw @
+        $('#toolbar').width @pal.width*2 + 'px'
+        $('#canvaswrapper').css 'margin-left', @pal.width * 2 + 'px'
         # WORK IN PROGRESS
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
@@ -266,7 +268,7 @@ class CharacterSets
                     $('#set' + (editor.charset = matches[1] )+ 'char' + (editor.char = matches[2])).addClass('selected')
 
         $('#set' + editor.charset).fadeIn()
-        @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
+        @element.parent().append('<div id=charnavigator><span id=prev style="width: ' + (editor.pal.width - 2) + 'px;height: ' + (editor.pal.width - 2) + 'px;")></span><span id=next style="width: ' + (editor.pal.width - 2) + 'px;height: ' + (editor.pal.width - 2) + 'px;"></span></span></div>')
         @element.parent().append('<div id=locker>Lock</div>')
         $('#next').click ( e ) =>
             @swap(editor.charset, editor.charset = if editor.charset < @chars.length - 1 then editor.charset = editor.charset + 1 else editor.charset = 0)
@@ -283,7 +285,7 @@ class CharacterSets
 
 class Palette
 
-    constructor: ->
+    constructor: (options) ->
         @colors = [
             [ 0, 0, 0 ],
             [ 170, 0, 0 ],
@@ -304,8 +306,10 @@ class Palette
         ]
         @fg = 7
         @bg = 0
+        @width = 26
         @active = 0 # 0 = fg, 1 = bg
         @element = $('#palette')
+        this[k] = v for own k, v of options
 
     draw: ( editor ) ->
         @element.before $('<div id=fore class=selected>FG</div>')
@@ -326,8 +330,8 @@ class Palette
         for i in [0..@colors.length-1]
             block = $('<div id=color' + i + '>')
             block.css 'background-color', @toRgbaString( @colors[ i ] )
-            block.css 'height', '32px'
-            block.css 'width', '32px'
+            block.css 'height', @width + 'px'
+            block.css 'width', @width + 'px'
             block.click ( e ) =>
                 pattern = ///
                     color(\d+)
