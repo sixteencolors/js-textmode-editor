@@ -80,6 +80,17 @@ html, body {
     margin: 1px 0 0 0;
 }
 
+#fg, #bg {
+    padding: .25em 0;
+    color: #fff;    
+    text-align: center;
+    margin: .25em 0;
+}
+
+#fg.selected, #bg.selected {
+    text-align: right;
+}
+
 #charsets .set .char {
     display: block;
     padding: 4px 0;
