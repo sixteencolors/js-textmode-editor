@@ -123,6 +123,7 @@ class @Editor
                         else if e.altKey
                             @sets.swap(@charset, @charset = e.which - 112)
                         return false
+            @pal.setIndicatorColors()
             @cursor.draw()
 
         $("body").bind "keypress", (e) =>            
@@ -303,18 +304,44 @@ class Palette
         ]
         @fg = 7
         @bg = 0
+        @active = 0 # 0 = fg, 1 = bg
         @element = $('#palette')
 
     draw: ( editor ) ->
-        fg = @element.before($('<div id=fg>FG</div>').css 'background-color', @toRgbaString( @colors[@fg] ))
-        bg = @element.before($('<div id=bg>BG</div>').css 'background-color', @toRgbaString( @colors[@bg] ))
-        for i in @colors[0..@colors/2]
-            block = $('<div>')
-            block.css 'background-color', @toRgbaString( i )
+        @element.before $('<div id=fore class=selected>FG</div>')
+        fg = $('#fore')
+        fg.click ( e ) =>
+            if @active == 1
+                fg.addClass('selected')
+                bg.removeClass('selected')
+                @active = 0
+        @element.before $('<div id=back>BG</div>')
+        bg = $('#back')
+        bg.click ( e ) =>
+            if @active == 0
+                bg.addClass 'selected'
+                fg.removeClass 'selected'
+                @active = 1
+        @setIndicatorColors()
+        for i in [0..@colors.length-1]
+            block = $('<div id=color' + i + '>')
+            block.css 'background-color', @toRgbaString( @colors[ i ] )
             block.css 'height', '32px'
             block.css 'width', '32px'
+            block.click ( e ) =>
+                pattern = ///
+                    color(\d+)
+                ///
+                color = e.currentTarget.id.match(pattern)[1]
+                @fg = color if @active == 0
+                @bg = color if @active == 1
+                @setIndicatorColors()
             @element.append( block )
-
+    setIndicatorColors: ->
+        $('#fore').css 'background-color', @toRgbaString( @colors[@fg] )
+        $('#fore').css 'color', @toRgbaString if @fg > 8 then @colors[ 0 ] else @colors[ 15 ]
+        $('#back').css 'background-color', @toRgbaString( @colors[@bg] )
+        $('#back').css 'color', @toRgbaString if @bg > 8 then @colors[ 0 ] else @colors[ 15 ]
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)';
 
