@@ -7,9 +7,6 @@ class @Editor
         this[k] = v for own k, v of options
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        # nullCursor = "url('data:image/cur;base64,AAACAAEAICAAAAAAAAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8%3D'), auto"
-        # $('#cursor').css( 'cursor', nullCursor )
-        # $('#' + @id).css( 'cursor', nullCursor )
         @width = @canvas.clientWidth
         @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
