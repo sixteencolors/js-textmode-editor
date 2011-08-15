@@ -33,8 +33,7 @@ html, body {
     margin-top: 1em;
 }
 
-#menu a {
-    text-decoration: none;
+#menu li {
     color: #fff;
     width: 100%;
     display: block;
@@ -141,6 +140,6 @@ html, body {
     text-align: center;
 }
 
-#locker:hover {
+#locker:hover, #menu li {
     cursor: pointer;
 }
