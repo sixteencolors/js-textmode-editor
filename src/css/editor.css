@@ -30,6 +30,7 @@ html, body {
 
 #menu {
     list-style-type: none;
+    margin-top: 1em;
 }
 
 #menu a {
@@ -39,6 +40,7 @@ html, body {
     display: block;
     font-size: 13px;
     text-align: center;
+    margin: .75em 0 1em 0;
 }
 
 #canvaswrapper {
@@ -88,6 +90,9 @@ html, body {
     width: 12px;
 }
 
+#charsets .set .char:hover {
+    cursor: pointer;
+}
 #charsets .set .char canvas {
     height: 24px;
     width: 12px;
@@ -123,7 +128,6 @@ html, body {
 
 #locker {
     text-align: center;
-    text-transform: uppercase;
 }
 
 #locker:hover {
