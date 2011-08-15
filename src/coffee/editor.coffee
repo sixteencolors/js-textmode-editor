@@ -34,32 +34,14 @@ class @Editor
             [ 136, 137, 138, 130, 144, 140, 139, 141, 161, 158, ]
             [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
         ]
-        @palette = [
-            [ 0, 0, 0 ],
-            [ 170, 0, 0 ],
-            [ 0, 170, 0 ],
-            [ 170, 85, 0 ],
-            [ 0, 0, 170 ],
-            [ 170, 0, 170 ],
-            [ 0, 170, 170 ],
-            [ 170, 170, 170 ],
-            [ 85, 85, 85 ],
-            [ 255, 85, 85 ],
-            [ 85, 255, 85 ],
-            [ 255, 255, 85 ],
-            [ 85, 85, 255 ],
-            [ 255, 85, 255 ],
-            [ 85, 255, 255 ],
-            [ 255, 255, 255 ]
-        ]
         @charset = 5
         @char = 0
         @fg = 7
         @bg = 0
 
         # WORK IN PROGRESS
-        @pal2 = new Palette
-        @pal2.draw @
+        @pal = new Palette
+        @pal.draw @
         @sets = new CharacterSets @chars
         @sets.draw @
         # WORK IN PROGRESS
@@ -206,10 +188,10 @@ class @Editor
                 px = x * @cursor.width
                 py = y * @cursor.height
 
-                @ctx.fillStyle = toRgbaString( @palette[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
+                @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
                 @ctx.fillRect px, py, 8, 16
 
-                @ctx.fillStyle = toRgbaString( @palette[ @grid[y][x].attr & 15 ] ) #fg
+                @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ @grid[y][x].attr & 15 ] ) #fg
                 chr = @font[ @grid[y][x].char ]
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
@@ -265,7 +247,7 @@ class CharacterSets
                 char.setAttribute 'width', @width
                 char.setAttribute 'height', @height
                 ctx = char.getContext '2d' if char.getContext
-                ctx.fillStyle =  toRgbaString(editor.palette[ 15 ] )
+                ctx.fillStyle =  '#ffffff'
                 for i in [ 0 .. 15 ]
                     line = chr[ i ]
                     for j in [ 0 .. 7 ]
@@ -328,14 +310,13 @@ class Palette
     draw: ( editor ) ->
         for i in @colors[0..@colors/2]
             block = $('<div>')
-            block.css 'background-color', toRgbaString( i )
+            block.css 'background-color', @toRgbaString( i )
             block.css 'height', '32px'
             block.css 'width', '32px'
             @element.append( block )
 
-
-toRgbaString = ( color ) ->
-    return 'rgba(' + color.join( ',' ) + ',1)';
+    toRgbaString: ( color ) ->
+        return 'rgba(' + color.join( ',' ) + ',1)';
 
 $(document).ready ->
     $('#close').click ->
