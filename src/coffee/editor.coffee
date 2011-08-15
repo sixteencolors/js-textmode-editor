@@ -68,6 +68,9 @@ class @Editor
         setInterval( () =>
             @draw()
         , 1 )
+        $('#clear').click =>
+            @grid = []
+            return false
         $("body").bind "keydown", (e) =>
             key = 
               left: 37

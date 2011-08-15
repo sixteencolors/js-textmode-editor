@@ -37,6 +37,7 @@ html, body {
     color: #fff;
     width: 100%;
     display: block;
+    text-align: center;
 }
 
 #canvaswrapper {
