@@ -77,7 +77,7 @@ a:hover {
 
 #toolbar {
     float: left;
-    width: 90px;
+    width: 51px;
     height: 100%;
     background: #555;
 }
@@ -108,8 +108,8 @@ a:hover {
 }
 
 #colors li {
-    width: 44px;
-    height: 44px;
+    width: 25px;
+    height: 25px;
     margin-bottom: 1px;
 }
 
@@ -145,14 +145,14 @@ a:hover {
 
 #sets ul li {
     cursor: pointer;
-    height: 44px;
+    height: 24px;
     padding: 4px 0;
     border-bottom: 1px solid #000;
 }
 
 #sets ul li canvas {
     position: relative;
-    margin-top: -22px;
+    margin-top: -12px;
     top: 50%;
 }
 
@@ -190,7 +190,7 @@ a:hover {
 
 #canvaswrapper {
     position: relative;
-    margin-left: 90px;
+    margin-left: 51px;
 }
 
 #cursor {
