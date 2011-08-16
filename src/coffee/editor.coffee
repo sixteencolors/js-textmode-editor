@@ -109,7 +109,7 @@ class @Editor
             char = String.fromCharCode(e.which)
             console.log "keypress: " + e.which + "/" + char
             pattern = ///
-                [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-]
+                [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-\s]
             ///
             if char.match(pattern) && e.which <= 255 && !e.ctrlKey
                 @putChar(char.charCodeAt( 0 ) & 255);                    
