@@ -12,33 +12,13 @@ class @Editor
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @cursor = new Cursor 8, 16, @
-        @locked = false
         @grid = []
-        @chars = [
-            [ 218, 191, 192, 217, 196, 179, 195, 180, 193, 194, ]
-            [ 201, 187, 200, 188, 205, 186, 204, 185, 202, 203, ]
-            [ 213, 184, 212, 190, 205, 179, 198, 181, 207, 209, ]
-            [ 214, 183, 211, 189, 196, 186, 199, 182, 208, 210, ]
-            [ 197, 206, 216, 215, 232, 232, 155, 156, 153, 239, ]
-            [ 176, 177, 178, 219, 223, 220, 221, 222, 254, 250, ]
-            [ 1, 2, 3, 4, 5, 6, 240, 14, 15, 32, ]
-            [ 24, 25, 30, 31, 16, 17, 18, 29, 20, 21, ]
-            [ 174, 175, 242, 243, 169, 170, 253, 246, 171, 172, ]
-            [ 227, 241, 244, 245, 234, 157, 228, 248, 251, 252, ]
-            [ 224, 225, 226, 229, 230, 231, 235, 236, 237, 238, ]
-            [ 128, 135, 165, 164, 152, 159, 247, 249, 173, 168, ]
-            [ 131, 132, 133, 160, 166, 134, 142, 143, 145, 146, ]
-            [ 136, 137, 138, 130, 144, 140, 139, 141, 161, 158, ]
-            [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
-        ]
-        @charset = 5
-        @char = 0
 
         # WORK IN PROGRESS
         @pal = new Palette
         @pal.init @
-        @sets = new CharacterSets @chars
-        @sets.draw @
+        @sets = new CharacterSets
+        @sets.init @
         # WORK IN PROGRESS
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
@@ -116,9 +96,10 @@ class @Editor
                 else 
                     if e.which >= 112 && e.which <= 123
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
-                            @putChar(@chars[@charset][e.which-112])
+                            @putChar(@sets.sets[ @sets.set ][e.which-112])
                         else if e.altKey
-                            @sets.swap(@charset, @charset = e.which - 112)
+                            @sets.set = e.which - 112
+                            @sets.fadeSet()
                         return false
             @pal.draw()
             @cursor.draw()
@@ -136,14 +117,14 @@ class @Editor
             if @cursor.mousedown
                 @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
                 @cursor.y = Math.floor( e.pageY / @cursor.height )
-                @putChar(@chars[@charset][@char]) if @locked
+                @putChar(@sets.char) if @sets.locked
                 return true
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
             @cursor.y = Math.floor( e.pageY / @cursor.height )
-            @putChar(@chars[@charset][@char]) if @locked
+            @putChar(@sets.char) if @sets.locked
             @cursor.draw()
             return true
 
@@ -229,54 +210,94 @@ class @Editor
             return true
         
 class CharacterSets 
-    constructor: (@chars) ->
-        @width = 8
-        @height = 16
-        @element = $('#charsets')
+    constructor: (options) ->
+        @sets = [
+            [ 218, 191, 192, 217, 196, 179, 195, 180, 193, 194, ]
+            [ 201, 187, 200, 188, 205, 186, 204, 185, 202, 203, ]
+            [ 213, 184, 212, 190, 205, 179, 198, 181, 207, 209, ]
+            [ 214, 183, 211, 189, 196, 186, 199, 182, 208, 210, ]
+            [ 197, 206, 216, 215, 232, 232, 155, 156, 153, 239, ]
+            [ 176, 177, 178, 219, 223, 220, 221, 222, 254, 250, ]
+            [ 1, 2, 3, 4, 5, 6, 240, 14, 15, 32, ]
+            [ 24, 25, 30, 31, 16, 17, 18, 29, 20, 21, ]
+            [ 174, 175, 242, 243, 169, 170, 253, 246, 171, 172, ]
+            [ 227, 241, 244, 245, 234, 157, 228, 248, 251, 252, ]
+            [ 224, 225, 226, 229, 230, 231, 235, 236, 237, 238, ]
+            [ 128, 135, 165, 164, 152, 159, 247, 249, 173, 168, ]
+            [ 131, 132, 133, 160, 166, 134, 142, 143, 145, 146, ]
+            [ 136, 137, 138, 130, 144, 140, 139, 141, 161, 158, ]
+            [ 147, 148, 149, 162, 167, 150, 129, 151, 163, 154, ]
+        ]
+        @set = 5
+        @charpos = 0
+        @char = @sets[ @set ][ @charpos ]
+        @locked = false
+        this[k] = v for own k, v of options
 
-    draw: ( editor )->
-        for row in [0..@chars.length - 1]
-            charSet = $('<div class=set id=set' + row + '>')
-            for c in [0..@chars[row].length - 1]
-                chr = editor.font[ @chars[row][ c ] ]
-                char = document.createElement('canvas')
-                char.setAttribute 'width', @width
-                char.setAttribute 'height', @height
-                ctx = char.getContext '2d' if char.getContext
-                ctx.fillStyle =  '#ffffff'
-                for i in [ 0 .. 15 ]
-                    line = chr[ i ]
-                    for j in [ 0 .. 7 ]
-                        if line & ( 1 << 7 - j )
-                            ctx.fillRect j, i, 1, 1
-                ctx.fill()
-                charSet.append($('<span class=char id=set' + row + 'char' + c + '>').append(char))
-                @element.append( charSet )
-                charContainer = $('#set' + row + 'char' + c)
-                charContainer.addClass('selected') if editor.charset == row && editor.char == c
-                charContainer.click ( e ) =>
-                    pattern = ///
-                        set(\d+)char(\d+)
-                    ///
-                    matches = e.currentTarget.id.match(pattern)
-                    $('#set' + editor.charset + 'char' + editor.char).removeClass('selected')
-                    $('#set' + (editor.charset = matches[1] )+ 'char' + (editor.char = matches[2])).addClass('selected')
+    init: ( editor ) ->
+        for i in [ 0 .. @sets.length - 1 ]
+            set = $( '<li>' )
+            set.data 'set', i
+            chars = $( '<ul>' )
 
-        $('#set' + editor.charset).fadeIn()
-        @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
-        @element.parent().append('<div id=locker>Lock</div>')
-        $('#next').click ( e ) =>
-            @swap(editor.charset, editor.charset = if editor.charset < @chars.length - 1 then editor.charset = editor.charset + 1 else editor.charset = 0)
-        $('#prev').click ( e ) =>
-            @swap(editor.charset, editor.charset = if editor.charset > 0 then editor.charset = editor.charset - 1 else editor.charset = @chars.length - 1)
-        $('#locker').click ( e ) =>
-            editor.locked = !editor.locked
-            $('#locker').css 'color', if editor.locked then '#fff' else '#000'
-        return true
-    swap: (oldset, newset) ->
-        duration = 150
-        $('#set' + oldset).fadeOut(duration)
-        $('#set' + newset).delay(duration+duration*.1).fadeIn()
+            for j in [ 0 .. @sets[ i ].length - 1 ]
+                c = @sets[ i ][ j ]
+                char = $( '<canvas>' )
+                char.attr 'width', 8
+                char.attr 'height', 16
+
+                ctx = char[ 0 ].getContext '2d'
+                ctx.fillStyle = '#fff'
+                for y in [ 0 .. 15 ]
+                    line = editor.font[ c ][ y ]
+                    for x in [ 0 .. 7 ]
+                        if line & ( 1 << 7 - x )
+                            ctx.fillRect x, y, 1, 1
+
+                charwrap = $( '<li>' )
+                charwrap.data 'char', c
+                charwrap.data 'pos', j
+                charwrap.append char
+                chars.append charwrap
+
+            set.append chars
+            $( '#sets' ).append set
+
+        $( '#next-set' ).click ( e ) =>
+            @set++
+            @set = 0 if @set > 14
+            @fadeSet()
+
+        $( '#prev-set' ).click ( e ) =>
+            @set--
+            @set = 14 if @set < 0
+            @fadeSet()
+
+        $( '#char-lock' ).click ( e ) =>
+            @locked = !@locked
+            $( e.target ).toggleClass 'on'
+
+        $( '#sets ul li' ).click ( e ) =>
+            @char = $( e.currentTarget ).data 'char'
+            @charpos = $( e.currentTarget ).data 'pos'
+            @draw()
+
+        @draw()
+
+    draw: ->
+        sets = $( '#sets > li' )
+        sets.hide()
+        set = sets.filter( ':nth-child(' + ( @set + 1 ) + ')' )
+        set.show()
+        set.find( 'li' ).removeClass( 'selected' )
+        set.find( 'li:nth-child(' + ( @charpos + 1 ) + ')' ).addClass( 'selected' )
+
+    fadeSet: ->
+        $('#sets > li:visible' ).fadeOut( 'fast', () =>
+            $('#sets > li:nth-child(' + ( @set + 1 ) + ')' ).fadeIn( 'fast' )
+            @char = @sets[ @set ][ @charpos ]
+            @draw()
+        )
 
 class Palette
 
@@ -327,10 +348,9 @@ class Palette
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)';
 
-$(document).ready ->
-    $('#close').click ->
-        $('#splash').hide()
+$( document ).ready ->
+    $( '#close' ).click ->
+        $( '#splash' ).hide()
         return false
 
     new Editor
-

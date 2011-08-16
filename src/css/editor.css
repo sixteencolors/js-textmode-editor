@@ -93,6 +93,7 @@ a:hover {
     display: block;
     text-align: center;
     margin: .75em 0 1em 0;
+    cursor: pointer;
 }
 
 #canvaswrapper {
@@ -131,7 +132,7 @@ a:hover {
     margin-bottom: 1px;
 }
 
-#palette div:hover, #colors li:hover {
+#fg, #bg, #colors li {
     cursor: pointer;
 }
 
@@ -152,56 +153,48 @@ a:hover {
 
 /* CHARSETS */
 
-#charsets .set .char {
-    display: block;
-    padding: 4px 0;
-    padding: 0 8px 0 40%;
-    border: 1px solid #000;
-    border-width: 1px 1px 1px 0;
-    margin: 4px 0;
-    width: 10px;
-}
-
-#charsets .set .char:hover {
-    cursor: pointer;
-}
-#charsets .set .char canvas {
-    height: 22px;
-    width: 10px;
-}
 #charsets {
     text-align: center;
-    margin: 16px 0;
-    height: 295px;
+    margin-top: 8px;
 }
 
-#charsets .set {
-    display: none;
+#sets ul {
+    border-top: 1px solid #000;
 }
 
-.char.selected {
+#sets ul li {
+    cursor: pointer;
+    height: 16px;
+    padding: 4px 0;
+    border-bottom: 1px solid #000;
+}
+
+#sets .selected {
     background: #ababab;
 }
 
-#charnavigator {
-}
-
-#charnavigator #next, #charnavigator #prev {
-    margin: 8px 0px 8px 1px;
-    height: 24px;
-    width: 24px;
-    background-color: #fff;
-    position: relative;
-    display: inline-block;
-}
-#charnavigator #next:hover, #charnavigator #prev:hover {
-    cursor: pointer;
-}
-
-#locker {
+#prev-set, #next-set {
+    margin: 8px 0;
     text-align: center;
+    width: 25px;
+    line-height: 25px;
+    cursor: pointer;
+    color: #fff;
 }
 
-#locker:hover, #menu li {
+#prev-set {
+    float: left;
+}
+
+#next-set {
+    margin-left: 26px;
+}
+
+#char-lock {
+    text-align: center;
     cursor: pointer;
+}
+
+#char-lock.on {
+    color: #fff;
 }
