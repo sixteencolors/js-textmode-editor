@@ -36,11 +36,9 @@ class @Editor
 
         # WORK IN PROGRESS
         @pal = new Palette
-        @pal.draw @
+        @pal.init @
         @sets = new CharacterSets @chars
         @sets.draw @
-        $('#toolbar').width @pal.width*2 + 'px'
-        $('#canvaswrapper').css 'margin-left', @pal.width * 2 + 'px'
         # WORK IN PROGRESS
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
@@ -122,7 +120,7 @@ class @Editor
                         else if e.altKey
                             @sets.swap(@charset, @charset = e.which - 112)
                         return false
-            @pal.setIndicatorColors()
+            @pal.draw()
             @cursor.draw()
 
         $("body").bind "keypress", (e) =>            
@@ -303,46 +301,29 @@ class Palette
         ]
         @fg = 7
         @bg = 0
-        @width = 26
-        @active = 0 # 0 = fg, 1 = bg
-        @element = $('#palette')
         this[k] = v for own k, v of options
 
-    draw: ( editor ) ->
-        @element.before $('<div id=fore class=selected>FG</div>')
-        fg = $('#fore')
-        fg.click ( e ) =>
-            if @active == 1
-                fg.addClass('selected')
-                bg.removeClass('selected')
-                @active = 0
-        @element.before $('<div id=back>BG</div>')
-        bg = $('#back')
-        bg.click ( e ) =>
-            if @active == 0
-                bg.addClass 'selected'
-                fg.removeClass 'selected'
-                @active = 1
-        @setIndicatorColors()
-        for i in [0..@colors.length-1]
-            block = $('<div id=color' + i + '>')
-            block.css 'background-color', @toRgbaString( @colors[ i ] )
-            block.css 'height', @width + 'px'
-            block.css 'width', @width + 'px'
+    init: ( editor ) ->
+        indicators = $( '#fg,#bg' )
+        indicators.click ( e ) ->
+            if !$( e.target ).hasClass( 'selected' )
+                indicators.toggleClass( 'selected' )
+        for i in [ 0 .. @colors.length - 1 ]
+            block = $( '<li>' )
+            block.data 'color', i
+            block.css 'background', @toRgbaString @colors[ i ]
             block.click ( e ) =>
-                pattern = ///
-                    color(\d+)
-                ///
-                color = e.currentTarget.id.match(pattern)[1]
-                @fg = color if @active == 0
-                @bg = color if @active == 1
-                @setIndicatorColors()
-            @element.append( block )
-    setIndicatorColors: ->
-        $('#fore').css 'background-color', @toRgbaString( @colors[@fg] )
-        $('#fore').css 'color', @toRgbaString if @fg > 8 then @colors[ 0 ] else @colors[ 15 ]
-        $('#back').css 'background-color', @toRgbaString( @colors[@bg] )
-        $('#back').css 'color', @toRgbaString if @bg > 8 then @colors[ 0 ] else @colors[ 15 ]
+                @[ indicators.filter( '.selected' ).attr 'id' ] = $( e.target ).data 'color'
+                @draw()
+            $( '#colors' ).append block
+        @draw()
+
+    draw: ->
+        $( '#fg' ).css 'background-color', @toRgbaString @colors[ @fg ]
+        $( '#fg' ).css 'color', @toRgbaString @colors[ if @fg > 8 then 0 else 15 ]
+        $( '#bg' ).css 'background-color', @toRgbaString @colors[ @bg ]
+        $( '#bg' ).css 'color', @toRgbaString @colors[ if @bg > 8 then 0 else 15 ]
+
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)';
 
