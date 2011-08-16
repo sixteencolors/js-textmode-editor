@@ -182,7 +182,7 @@ class @Editor
 
 class Cursor
 
-    constructor: (options) ->
+    constructor: ( options ) ->
         @x = 0
         @y = 0
         @mousedown = false
@@ -196,9 +196,9 @@ class Cursor
         $( '#cursor' ).css 'top', @y * 16
 
     moveRight: ->
-        if @x < @editor.width/8 - 1
+        if @x < @editor.width / 8 - 1
             @x++
-        else if @y < @editor.height/16 - 1
+        else if @y < @editor.height / 16 - 1
             @x =0
             @y++
         @draw()
@@ -208,12 +208,12 @@ class Cursor
             @x--
         else if @y > 0
             @y--
-            @x = @editor.width/8 - 1
+            @x = @editor.width / 8 - 1
         @draw()
         
 class CharacterSets
 
-    constructor: (options) ->
+    constructor: ( options ) ->
         @sets = [
             [ 218, 191, 192, 217, 196, 179, 195, 180, 193, 194, ]
             [ 201, 187, 200, 188, 205, 186, 204, 185, 202, 203, ]
@@ -304,7 +304,7 @@ class CharacterSets
 
 class Palette
 
-    constructor: (options) ->
+    constructor: ( options ) ->
         @colors = [
             [ 0, 0, 0 ],
             [ 170, 0, 0 ],
