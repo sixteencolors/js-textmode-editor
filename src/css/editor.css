@@ -188,6 +188,8 @@ a:hover {
 
 #charnavigator #next, #charnavigator #prev {
     margin: 8px 0px 8px 1px;
+    height: 24px;
+    width: 24px;
     background-color: #fff;
     position: relative;
     display: inline-block;

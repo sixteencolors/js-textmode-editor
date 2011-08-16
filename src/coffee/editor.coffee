@@ -263,7 +263,7 @@ class CharacterSets
                     $('#set' + (editor.charset = matches[1] )+ 'char' + (editor.char = matches[2])).addClass('selected')
 
         $('#set' + editor.charset).fadeIn()
-        @element.parent().append('<div id=charnavigator><span id=prev style="width: ' + (editor.pal.width - 2) + 'px;height: ' + (editor.pal.width - 2) + 'px;")></span><span id=next style="width: ' + (editor.pal.width - 2) + 'px;height: ' + (editor.pal.width - 2) + 'px;"></span></span></div>')
+        @element.parent().append('<div id=charnavigator><span id=prev></span><span id=next></span></span></div>')
         @element.parent().append('<div id=locker>Lock</div>')
         $('#next').click ( e ) =>
             @swap(editor.charset, editor.charset = if editor.charset < @chars.length - 1 then editor.charset = editor.charset + 1 else editor.charset = 0)
