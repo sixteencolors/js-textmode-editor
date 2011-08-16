@@ -11,10 +11,11 @@ class @Editor
         @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
-        @cursor = new Cursor 8, 16, @
         @grid = []
 
         # WORK IN PROGRESS
+        @cursor = new Cursor
+        @cursor.init @
         @pal = new Palette
         @pal.init @
         @sets = new CharacterSets
@@ -67,7 +68,7 @@ class @Editor
                         if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
                 when key.down
                     if (!mod)
-                        if @cursor.y < (@height - @cursor.height) / @cursor.height
+                        if @cursor.y < (@height - 16) / 16
                           @cursor.y++
                     else if (e.ctrlKey)
                         if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
@@ -87,7 +88,7 @@ class @Editor
                     oldrow = @grid[@cursor.y]
                     @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                 when key.end
-                    @cursor.x = @width / @cursor.width - 1
+                    @cursor.x = @width / 8 - 1
                 when key.home
                     @cursor.x = 0
                 when key.enter
@@ -115,15 +116,15 @@ class @Editor
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
-                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
-                @cursor.y = Math.floor( e.pageY / @cursor.height )
+                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
+                @cursor.y = Math.floor( e.pageY / 16 )
                 @putChar(@sets.char) if @sets.locked
                 return true
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.mousedown = true
-            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / @cursor.width )
-            @cursor.y = Math.floor( e.pageY / @cursor.height )
+            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
+            @cursor.y = Math.floor( e.pageY / 16 )
             @putChar(@sets.char) if @sets.locked
             @cursor.draw()
             return true
@@ -162,8 +163,8 @@ class @Editor
             continue if !@grid[y]?
             for x in [0..@grid[y].length - 1]
                 continue if !@grid[y][x]?
-                px = x * @cursor.width
-                py = y * @cursor.height
+                px = x * 8
+                py = y * 16
 
                 @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
                 @ctx.fillRect px, py, 8, 16
@@ -179,37 +180,39 @@ class @Editor
         @ctx.fill()
         return true
 
-    class Cursor
+class Cursor
 
-        constructor: (@width, @height, @editor) ->
-            @x = 0
-            @y = 0
-            @dom = $("#cursor")
-            @dom.width @width
-            @dom.height @height
-            @draw()
-            @mousedown = false
-        draw: ->
-            @dom.css( 'top', @y * @height )
-            @dom.css( 'left', @x * @width )
-        moveRight: ->
-            if @x < @editor.width/@width - 1
-                @x++
-            else if @y < @editor.height/@height - 1
-                @x =0;
-                @y++
-            @draw()
-            return true                
-        moveLeft: ->
-            if @x > 0
-                @x--
-            else if @y > 0
-                @y--
-                @x = @editor.width/@width - 1
-            @draw()
-            return true
+    constructor: (options) ->
+        @x = 0
+        @y = 0
+        @mousedown = false
+        this[k] = v for own k, v of options
+
+    init: ( @editor ) ->
+        @draw()
+
+    draw: ->
+        $( '#cursor' ).css 'left', @x * 8
+        $( '#cursor' ).css 'top', @y * 16
+
+    moveRight: ->
+        if @x < @editor.width/8 - 1
+            @x++
+        else if @y < @editor.height/16 - 1
+            @x =0
+            @y++
+        @draw()
+
+    moveLeft: ->
+        if @x > 0
+            @x--
+        else if @y > 0
+            @y--
+            @x = @editor.width/8 - 1
+        @draw()
         
-class CharacterSets 
+class CharacterSets
+
     constructor: (options) ->
         @sets = [
             [ 218, 191, 192, 217, 196, 179, 195, 180, 193, 194, ]
