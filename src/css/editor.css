@@ -145,15 +145,9 @@ a:hover {
 
 #sets ul li {
     cursor: pointer;
-    height: 24px;
+    height: 16px;
     padding: 4px 0;
     border-bottom: 1px solid #000;
-}
-
-#sets ul li canvas {
-    position: relative;
-    margin-top: -12px;
-    top: 50%;
 }
 
 #sets .selected {
