@@ -26,9 +26,10 @@ class @Editor
         setInterval( () =>
             @draw()
         , 1 )
+
         $('#clear').click =>
             @grid = []
-            return false
+
         $("body").bind "keydown", (e) =>
             key = 
               left: 37
@@ -178,7 +179,6 @@ class @Editor
                             @ctx.fillRect px + j, py + i, 1, 1
 
         @ctx.fill()
-        return true
 
 class Cursor
 
