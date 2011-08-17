@@ -130,7 +130,7 @@ class @Editor
             @cursor.draw()
             return true
 
-        $('#' + @id).mouseup ( e ) =>
+        $('body').mouseup ( e ) =>
             @cursor.mousedown = false
             @cursor.draw()
 
