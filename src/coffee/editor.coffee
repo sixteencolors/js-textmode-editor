@@ -131,6 +131,12 @@ class @Editor
             @cursor.mousedown = false
             @cursor.draw()
 
+        $(window).resize ( e ) =>
+            @width = @canvas.clientWidth
+            @height = @canvas.clientHeight
+            @canvas.setAttribute 'width', @width
+            @canvas.setAttribute 'height', @height        
+
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
