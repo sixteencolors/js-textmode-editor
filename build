@@ -38,7 +38,7 @@ if( !@args ) {
         $packer->minify( \$output, { 
             remove_comments => 1,
             remove_newlines => 1,
-            do_javascript   => 'best',
+            do_javascript   => 'clean',
             do_stylesheet   => 'minify',
             html5           => 1,
         } );
