@@ -45,8 +45,6 @@ class @Editor
               f8: 119
               f9: 120
               f10: 121
-              f11: 122
-              f12: 123
               backspace: 8
               delete: 46
               end: 35
@@ -95,7 +93,7 @@ class @Editor
                     @cursor.x = 0
                     @cursor.y++
                 else 
-                    if e.which >= 112 && e.which <= 123
+                    if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
                             @putChar(@sets.sets[ @sets.set ][e.which-112])
                         else if e.altKey
