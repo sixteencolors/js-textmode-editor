@@ -2,9 +2,10 @@ class @Editor
 
     constructor: ( options ) ->
         @tabstop  = 8
-        @linewrap = 80
         @id = 'canvas'
         this[k] = v for own k, v of options
+
+    init: ->
         @font = @loadFont()
         @canvas = document.getElementById(@id)
         @width = @canvas.clientWidth
@@ -13,14 +14,12 @@ class @Editor
         @canvas.setAttribute 'height', @height
         @grid = []
 
-        # WORK IN PROGRESS
         @cursor = new Cursor
         @cursor.init @
         @pal = new Palette
         @pal.init @
         @sets = new CharacterSets
         @sets.init @
-        # WORK IN PROGRESS
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         setInterval( () =>
@@ -356,4 +355,5 @@ $( document ).ready ->
         $( '#splash' ).hide()
         return false
 
-    new Editor
+    editor = new Editor
+    editor.init()
