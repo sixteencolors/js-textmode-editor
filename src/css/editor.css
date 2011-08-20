@@ -85,29 +85,19 @@ html.touch .toolbar {
     width: 90px;
 }
 
+
 #menu {
-    width: 100%;
+    list-style-type: none;
+    margin-top: 1em;        
 }
-
-#menu ul {
-    overflow: auto;
-    margin-left: 51px;
-}
-html.touch #menu ul {
-    margin-left: 90px;
-}
-
 
 #menu ul li {
+    width: 100%;
+    text-align: center;
+    margin: .75em 0 1em 0;
     color: #fff;
-    width: 44px;
     display: block;
-    text-align: left;
     cursor: pointer;
-    float: left;
-    height: 34px;
-    position: relative;
-    margin-top: 10px;
 }
 
 /* PALETTE */
@@ -245,7 +235,34 @@ html.touch #canvaswrapper {
     height: 100%;
 }
 
+@media screen and (max-height: 690px) {
+    #menu ul {
+        overflow: auto;
+        margin-left: 51px;
+        margin-top: 0;
+    }
+    html.touch #menu ul {
+        margin-left: 90px;
+    }
+
+    #menu {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    #menu ul li {
+        text-align: left;
+        width: 44px;
+        float: left;
+        height: 34px;
+        position: relative;
+        margin: 10px 0 0 0;
+    }
+
+}
+
 @media screen and (max-height: 640px) {
+
     #charsets { 
         position: absolute;
         top: 0;
