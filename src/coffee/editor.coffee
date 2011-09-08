@@ -8,7 +8,7 @@ class @Editor
     init: ->
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        @width = this.canvas.parentElement.offsetWidth
+        @width = @canvas.offsetWidth
         @height = @canvas.offsetHeight
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
@@ -132,7 +132,7 @@ class @Editor
             @cursor.draw()
 
         $(window).resize ( e ) =>
-            @width = @canvas.parentElement.offsetWidth
+            @width = @canvas.offsetWidth
             @height = @canvas.clientHeight
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height        
@@ -365,8 +365,8 @@ $( document ).ready ->
         $( '#splash' ).hide()
         return false
 
-    if isTouchScreen()
-        $('html').addClass('touch')
+#    if isTouchScreen()
+#        $('html').addClass('touch')
 
     editor = new Editor
     editor.init()

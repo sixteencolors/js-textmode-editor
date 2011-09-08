@@ -124,6 +124,7 @@ html.touch #colors li {
 
 #fg, #bg, #colors li {
     cursor: pointer;
+    list-style-type: none;
 }
 
 #fg, #bg {
@@ -261,7 +262,7 @@ html.touch #canvaswrapper {
 
 }
 
-@media screen and (max-height: 640px) {
+@media screen and (max-height: 640px) and (orientation: landscape) {
 
     #charsets { 
         position: absolute;
@@ -283,4 +284,94 @@ html.touch #canvaswrapper {
         margin-right: 90px;
     }
 
+}
+
+@media screen and (max-width: 820px) and (orientation: portrait) {
+    #palette, #menu, #charsets {
+        width: 100%;
+    }
+
+    #charsets {
+        position: absolute;
+        bottom: 0;
+        z-index: 1000;
+    }
+
+    #colors {
+        column-count: 1;
+        -webkit-column-count: 1;
+        -moz-column-count: 1;
+        -webkit-column-gap: 1px;
+    }
+
+    #colors li, #sets ul li, #charsets div, #sets {
+        float: left;
+    }
+
+    #sets ul li {
+        width: 50px;
+    }
+
+    #menu ul, #palette, #sets ul {
+        overflow: auto;
+        margin-top: 0;
+    }
+
+    #menu ul li {
+        text-align: left;
+        width: 44px;
+        float: left;
+        height: 34px;
+        position: relative;
+        margin: 10px 0 0 0;
+    }
+
+    #fg, #bg {
+        float: left;
+        margin: 26px 8px 0 0;
+    }
+
+    #canvaswrapper {
+        margin-left: 0;
+        float: left;
+        position: relative;
+        top: 0;
+    }
+
+    #palette div .selected {
+        margin: 0 8px 8px 0;
+        cursor: default;
+        text-align: right;
+    }
+
+}
+
+@media screen and (max-device-height: 960px) {
+    #colors li {
+        width: 88px;
+        height: 88px;
+    }
+
+    body {
+        font-size: 20px;
+    }
+
+    #menu li, #fg, #bg {
+        position: relative;
+        padding-top: 30px;
+        height: 58px;
+        width: 88px;
+    }
+
+    #menu {
+        width: 100%;
+    }
+
+    .toolbar {
+        width: 178px;
+    }
+
+    #canvaswrapper {
+        margin-left: 178px;
+    }
 }
