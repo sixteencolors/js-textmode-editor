@@ -8,8 +8,8 @@ class @Editor
     init: ->
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        @width = @canvas.offsetWidth
-        @height = @canvas.offsetHeight
+        @width = @canvas.clientWidth
+        @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @grid = []
@@ -115,14 +115,14 @@ class @Editor
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
                 @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
-                @cursor.y = Math.floor( ( e.pageY - $('#' + @id).offset().top ) / 16 )
+                @cursor.y = Math.floor( e.pageY / 16 )
                 @putChar(@sets.char) if @sets.locked
                 return true
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
-            @cursor.y = Math.floor( ( e.pageY - $('#' + @id).offset().top ) / 16 )
+            @cursor.y = Math.floor( e.pageY / 16 )
             @putChar(@sets.char) if @sets.locked
             @cursor.draw()
             return true
@@ -132,7 +132,7 @@ class @Editor
             @cursor.draw()
 
         $(window).resize ( e ) =>
-            @width = @canvas.offsetWidth
+            @width = @canvas.clientWidth
             @height = @canvas.clientHeight
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height        
@@ -353,20 +353,11 @@ class Palette
 
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)';
-@isTouchScreen = () ->
-    try
-        document.createEvent "TouchEvent"
-        return true
-    catch e
-        return false
 
 $( document ).ready ->
     $( '#close' ).click ->
         $( '#splash' ).hide()
         return false
-
-#    if isTouchScreen()
-#        $('html').addClass('touch')
 
     editor = new Editor
     editor.init()
