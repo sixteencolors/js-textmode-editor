@@ -199,6 +199,14 @@ a:hover {
 
 #canvas {
     background: #000;
-    width: 100%;
+    width: 66%;
     height: 100%;
+}
+
+/* VGA PREVIEW */
+#vga {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 1;
 }

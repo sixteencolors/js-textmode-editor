@@ -3,6 +3,8 @@ class @Editor
     constructor: ( options ) ->
         @tabstop  = 8
         @id = 'canvas'
+        @vga_id = 'vga'
+        @vga_scale = '.50'
         this[k] = v for own k, v of options
 
     init: ->
@@ -12,6 +14,9 @@ class @Editor
         @height = @canvas.clientHeight
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
+        @vga_canvas = document.getElementById(@vga_id)
+        @vga_canvas.setAttribute 'width', @width * @vga_scale
+        @vga_canvas.setAttribute 'height', @height
         @grid = []
 
         @cursor = new Cursor
@@ -22,6 +27,7 @@ class @Editor
         @sets.init @
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
+        @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
         setInterval( () =>
             @draw()
         , 1 )
@@ -182,6 +188,9 @@ class @Editor
                             @ctx.fillRect px + j, py + i, 1, 1
 
         @ctx.fill()
+
+        @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
+
 
 class Cursor
 
