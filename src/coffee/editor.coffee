@@ -115,7 +115,7 @@ class @Editor
             pattern = ///
                 [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-\s]
             ///
-            if char.match(pattern) && e.which <= 255 && !e.ctrlKey
+            if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
                 @putChar(char.charCodeAt( 0 ) & 255);                    
 
         $('#' + @id).mousemove ( e ) =>
