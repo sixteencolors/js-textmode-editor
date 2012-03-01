@@ -4,7 +4,7 @@ class @Editor
         @tabstop  = 8
         @id = 'canvas'
         @vga_id = 'vga'
-        @vga_scale = '.50'
+        @vga_scale = '.25'
         this[k] = v for own k, v of options
 
     init: ->
