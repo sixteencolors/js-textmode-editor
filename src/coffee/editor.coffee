@@ -33,7 +33,9 @@ class @Editor
         , 1 )
 
         $('#clear').click =>
-            @grid = []
+            answer = confirm('Clear canvas?');
+            if (answer)
+                @grid = [];
 
         $("body").bind "keydown", (e) =>
             key = 
@@ -364,8 +366,9 @@ class Palette
         return 'rgba(' + color.join( ',' ) + ',1)';
 
 $( document ).ready ->
+    $( '#splash' ).dialog({title: 'Sixteen Colors ANSI Editor', modal: true, show: 'slide'});
     $( '#close' ).click ->
-        $( '#splash' ).hide()
+        $( '#splash' ).dialog('close');
         return false
 
     editor = new Editor
