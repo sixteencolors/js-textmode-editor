@@ -135,6 +135,16 @@ class @Editor
             @cursor.draw()
             return true
 
+        $('#' + @id).bind 'touchstart', ( e ) =>            
+            e.preventDefault()
+            if (e.originalEvent.touches.length == 1)
+                return @putTouchChar(e.originalEvent.touches[0])
+
+        $('#' + @id).bind 'touchmove', ( e ) =>
+            if (e.originalEvent.touches.length == 1) # Only if one finger
+                touch = e.originalEvent.touches[0] # Get the information for finger #1        
+                return @putTouchChar( touch )
+
         $('body').mouseup ( e ) =>
             @cursor.mousedown = false
             @cursor.draw()
@@ -144,6 +154,15 @@ class @Editor
             @height = @canvas.clientHeight
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height        
+
+    putTouchChar: ( touch ) ->
+            node = touch.target
+            console.log "x: " + touch.pageX
+            @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
+            @cursor.y = Math.floor( touch.pageY / 16 )
+            @putChar(@sets.char) if @sets.locked
+            return true
+
 
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
