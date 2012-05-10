@@ -25,6 +25,7 @@ class @Editor
         @pal.init @
         @sets = new CharacterSets
         @sets.init @
+
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
@@ -36,6 +37,9 @@ class @Editor
             answer = confirm('Clear canvas?');
             if (answer)
                 @grid = [];
+
+        $('#save').click =>
+            window.open(@dataURL, 'ansiSave')
 
         $("body").bind "keydown", (e) =>
             key = 
@@ -59,7 +63,6 @@ class @Editor
               home: 36
               enter: 13
 
-            console.log "keydown: " + e.which
             mod = e.shiftKey || e.altKey || e.ctrlKey
             switch e.which
                 when key.left
@@ -113,7 +116,6 @@ class @Editor
 
         $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
-            console.log "keypress: " + e.which + "/" + char
             pattern = ///
                 [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~-\s]
             ///
@@ -157,7 +159,6 @@ class @Editor
 
     putTouchChar: ( touch ) ->
             node = touch.target
-            console.log "x: " + touch.pageX
             @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
             @cursor.y = Math.floor( touch.pageY / 16 )
             @putChar(@sets.char) if @sets.locked
@@ -211,6 +212,7 @@ class @Editor
         @ctx.fill()
 
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
+        @dataURL = @canvas.toDataURL("image/png")
 
 
 class Cursor
@@ -327,6 +329,7 @@ class CharacterSets
         set.show()
         set.find( 'li' ).removeClass( 'selected' )
         set.find( 'li:nth-child(' + ( @charpos + 1 ) + ')' ).addClass( 'selected' )
+        
 
     fadeSet: ->
         $('#sets > li:visible' ).fadeOut( 'fast', () =>
