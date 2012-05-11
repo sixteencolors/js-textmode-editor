@@ -30,7 +30,7 @@ class @Editor
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
         setInterval( () =>
             @draw()
-        , 1 )
+        , 50 )
 
         $('#clear').click =>
             answer = confirm('Clear canvas?');
