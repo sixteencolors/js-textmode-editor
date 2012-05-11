@@ -173,7 +173,7 @@
       $("body").bind("keypress", function(e) {
         var char, pattern;
         char = String.fromCharCode(e.which);
-        pattern = /[\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>\/\?`~-\s]/;
+        pattern = /[\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>\/\?`~\-\s]/;
         if (char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which !== 13) {
           return _this.putChar(char.charCodeAt(0) & 255);
         }
@@ -621,6 +621,7 @@ a:hover {
 /* PALETTE */
 
 #colors {
+    list-style-type: none;
     background: #000;
     padding-top: 1px;
     column-count: 2;
@@ -662,6 +663,7 @@ a:hover {
 }
 
 #sets ul {
+    list-style-type: none;
     border-top: 1px solid #000;
 }
 
