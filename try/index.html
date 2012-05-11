@@ -77,7 +77,8 @@
           "delete": 46,
           end: 35,
           home: 36,
-          enter: 13
+          enter: 13,
+          insert: 45
         };
         mod = e.shiftKey || e.altKey || e.ctrlKey;
         switch (e.which) {
@@ -130,9 +131,14 @@
             break;
           case key.backspace:
             _this.cursor.moveLeft();
-            _this.putChar(32);
-            _this.cursor.moveLeft();
-            return false;
+            if (_this.cursor.mode === 'ovr') {
+              _this.putChar(32);
+              _this.cursor.moveLeft();
+            } else {
+              oldrow = _this.grid[_this.cursor.y];
+              _this.grid[_this.cursor.y] = oldrow.slice(0, (_this.cursor.x - 1) + 1 || 9e9).concat(oldrow.slice(_this.cursor.x + 1, (oldrow.length - 1) + 1 || 9e9));
+            }
+            break;
           case key["delete"]:
             oldrow = _this.grid[_this.cursor.y];
             _this.grid[_this.cursor.y] = oldrow.slice(0, (_this.cursor.x - 1) + 1 || 9e9).concat(oldrow.slice(_this.cursor.x + 1, (oldrow.length - 1) + 1 || 9e9));
@@ -146,6 +152,9 @@
           case key.enter:
             _this.cursor.x = 0;
             _this.cursor.y++;
+            break;
+          case key.insert:
+            _this.cursor.change_mode();
             break;
           default:
             if (e.which >= 112 && e.which <= 121) {
@@ -220,7 +229,12 @@
     };
 
     Editor.prototype.putChar = function(charCode) {
+      var row, _ref;
       if (!this.grid[this.cursor.y]) this.grid[this.cursor.y] = [];
+      if (this.cursor.mode === 'ins') {
+        row = this.grid[this.cursor.y].slice(this.cursor.x);
+        [].splice.apply(this.grid[this.cursor.y], [(_ref = this.cursor.x + 1), 9e9].concat(row)), row;
+      }
       this.grid[this.cursor.y][this.cursor.x] = {
         char: charCode,
         attr: (this.pal.bg << 4) | this.pal.fg
@@ -289,6 +303,7 @@
       this.x = 0;
       this.y = 0;
       this.mousedown = false;
+      this.mode = 'ovr';
       for (k in options) {
         if (!__hasProp.call(options, k)) continue;
         v = options[k];
@@ -299,6 +314,15 @@
     Cursor.prototype.init = function(editor) {
       this.editor = editor;
       return this.draw();
+    };
+
+    Cursor.prototype.change_mode = function(mode) {
+      if (mode) {
+        $('#cursor').attr('class', mode);
+      } else {
+        $('#cursor').toggleClass('ins');
+      }
+      return this.mode = $('#cursor').attr('class') || 'ovr';
     };
 
     Cursor.prototype.draw = function() {
@@ -692,6 +716,10 @@ a:hover {
     height: 16px;
 }
 
+#cursor.ins {
+    background-image: url(img/cursor_ins.gif);
+}
+
 #canvas {
     background: #000;
     width: 78%;
@@ -705,7 +733,8 @@ a:hover {
     right: 0;
     opacity: 1;
     margin-right: 8px;
-}</style>
+}
+</style>
 </head>
 <body>
     <div id=splash>
