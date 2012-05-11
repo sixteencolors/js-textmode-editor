@@ -26,7 +26,7 @@
             font-size: 100%;
         }
         header {
-            background: url(images/banner.png) center top no-repeat;
+            background: url(images/banner.png) no-repeat center top;
             padding-top: 136px;
             height: 168px;
             width: 100%;
@@ -42,10 +42,21 @@
             text-align: center;
             position: absolute;
             top: 30%;
-            margin: 0 auto;
-            width: 100%;
+            width: 90%;
             margin-top: 168px;
-            padding-top: 32px;
+            margin-left: 32px;
+            margin-right: 32px;
+        }
+
+        #try div {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        #try p {
+            margin: 32px auto 40px auto;
+            text-align: justify;
+            max-width: 640px;
         }
 
         #links {
@@ -62,10 +73,11 @@
             text-indent: 0;
             padding: 0;
             white-space: nowrap;
+            line-height: 32px;
         }
 
         #links ul {
-            margin: 16px auto 0 auto;
+            margin: 8px auto 0 auto;
             padding: 0;
             text-align: center;
         }
@@ -88,6 +100,19 @@
             background: #ababab;
         }
 
+        p a {
+            text-transform: none;
+            padding: 0;
+        }
+
+        p a:hover {
+            background: none;
+        }
+
+        p a:active {
+            background: none;
+        }
+
     </style>
 </head>
 <body>
@@ -96,7 +121,10 @@
         <h2>ANSI Editor</h2>
     </header>
     <section id="try">
-        <a href="/try">Try it!</a>
+        <p>
+            We have begun work on an html5 based ANSI editor. If you would like to use the editor yourself, the code is available on <a href="https://github.com/sixteencolors/js-textmode-editor">GitHub</a>. It is not yet a "drop-in" implementation, but as the project progresses we will simplify the process. For now, you can <a href="/try">try it out</a> and give us <a href="mailto:feedback@sixteencolors.net">feedback</a> (or contact us on <a href="http://twitter.com/sixteencolors">twitter</a>). We welcome any contributors, suggestions, or criticisms. The goal is to facilitate the continuance of ANSI art and ASCII art as a medium by making it available to as many people as possible. 
+        </p>
+        <div><a href="/try">Try it!</a></div>
     </section>
     <section id="links">
         <ul>
