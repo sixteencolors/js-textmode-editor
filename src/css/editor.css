@@ -106,6 +106,7 @@ a:hover {
 /* PALETTE */
 
 #colors {
+    list-style-type: none;
     background: #000;
     padding-top: 1px;
     column-count: 2;
@@ -147,6 +148,7 @@ a:hover {
 }
 
 #sets ul {
+    list-style-type: none;
     border-top: 1px solid #000;
 }
 
