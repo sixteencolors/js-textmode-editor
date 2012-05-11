@@ -202,6 +202,10 @@ a:hover {
     height: 16px;
 }
 
+#cursor.ins {
+    background-image: url(img/cursor_ins.gif);
+}
+
 #canvas {
     background: #000;
     width: 78%;

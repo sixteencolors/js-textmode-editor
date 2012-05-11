@@ -61,6 +61,7 @@ class @Editor
               end: 35
               home: 36
               enter: 13
+              insert: 45
 
             mod = e.shiftKey || e.altKey || e.ctrlKey
             switch e.which
@@ -102,6 +103,8 @@ class @Editor
                 when key.enter
                     @cursor.x = 0
                     @cursor.y++
+                when key.insert
+                    @cursor.change_mode()
                 else 
                     if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
@@ -157,12 +160,11 @@ class @Editor
             @canvas.setAttribute 'height', @height        
 
     putTouchChar: ( touch ) ->
-            node = touch.target
-            @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
-            @cursor.y = Math.floor( touch.pageY / 16 )
-            @putChar(@sets.char) if @sets.locked
-            return true
-
+        node = touch.target
+        @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
+        @cursor.y = Math.floor( touch.pageY / 16 )
+        @putChar(@sets.char) if @sets.locked
+        return true
 
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
@@ -218,10 +220,19 @@ class Cursor
         @x = 0
         @y = 0
         @mousedown = false
+        @mode = 'ovr'
         this[k] = v for own k, v of options
 
     init: ( @editor ) ->
         @draw()
+
+    change_mode: ( mode ) ->
+        if mode
+            $( '#cursor' ).attr 'class', mode
+            @mode = mode
+        else 
+            $( '#cursor' ).toggleClass 'ins'
+            @mode = $( '#cursor' ).attr( 'class' ) || 'ovr'
 
     draw: ->
         $( '#cursor' ).css 'left', @x * 8
