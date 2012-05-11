@@ -27,8 +27,8 @@
         }
         header {
             background: url(images/banner.png) center top no-repeat;
-            height: 136px;
             padding-top: 136px;
+            height: 168px;
             width: 100%;
             top: 30%;
             position: relative;
@@ -40,9 +40,36 @@
 
         #try {
             text-align: center;
-            position: relative;
+            position: absolute;
             top: 30%;
+            margin: 0 auto;
+            width: 100%;
+            margin-top: 168px;
+            padding-top: 32px;
         }
+
+        #links {
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+
+        #links ul li {
+            display: inline;
+            list-style-type: none;
+            margin-left: 8px;
+            margin-right: 8px;
+            text-indent: 0;
+            padding: 0;
+            white-space: nowrap;
+        }
+
+        #links ul {
+            margin: 16px auto 0 auto;
+            padding: 0;
+            text-align: center;
+        }
+
 
         a {
             color: #0aa;
@@ -60,6 +87,7 @@
             color: #fff;
             background: #ababab;
         }
+
     </style>
 </head>
 <body>
@@ -69,6 +97,13 @@
     </header>
     <section id="try">
         <a href="/try">Try it!</a>
+    </section>
+    <section id="links">
+        <ul>
+            <li><a href="http://sixteencolors.net">Sixteen Colors ANSI and ASCII Art Archive</a></li>
+            <li><a href="https://github.com/sixteencolors/js-textmode-editor">Sixteen Colors Draw on GitHub</a></li>
+            <li class="twitter"><a href="http://twitter.com/sixteencolors">@sixteencolors</a>
+        </ul>
     </section>
 
 </body>
