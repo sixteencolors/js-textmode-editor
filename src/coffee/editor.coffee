@@ -168,6 +168,11 @@ class @Editor
 
     putChar: (charCode) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
+        if @cursor.mode == 'ins'
+            # NOTE: this will push chars off the right-side of the canvas
+            # but will still have an entry in the grid
+            for x in [@grid[ @cursor.y ].length..@cursor.x]
+                @grid[ @cursor.y ][ x ] = @grid[ @cursor.y ][ x - 1 ]
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @cursor.moveRight()
 
