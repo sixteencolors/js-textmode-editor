@@ -220,6 +220,8 @@ class @Editor
 
         @ctx.fill()
 
+        $( '#cursorpos' ).text '(' + @cursor.x + ', ' + @cursor.y + ')'
+
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
 
 class Cursor
