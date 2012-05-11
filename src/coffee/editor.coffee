@@ -229,10 +229,10 @@ class Cursor
     change_mode: ( mode ) ->
         if mode
             $( '#cursor' ).attr 'class', mode
-            @mode = mode
         else 
             $( '#cursor' ).toggleClass 'ins'
-            @mode = $( '#cursor' ).attr( 'class' ) || 'ovr'
+
+        @mode = $( '#cursor' ).attr( 'class' ) || 'ovr'
 
     draw: ->
         $( '#cursor' ).css 'left', @x * 8
