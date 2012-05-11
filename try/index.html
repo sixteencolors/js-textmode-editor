@@ -47,7 +47,7 @@
       }
       setInterval(function() {
         return _this.draw();
-      }, 1);
+      }, 50);
       $('#clear').click(function() {
         var answer;
         answer = confirm('Clear canvas?');
@@ -600,26 +600,22 @@ a:hover {
 
 #menu {
     list-style-type: none;
-    margin-top: 1em;
+}
+
+#cursorpos, #menu li {
+    color: #fff;
+    text-align: center;
+    line-height: 34px;
 }
 
 #menu li {
-    color: #fff;
     width: 100%;
     display: block;
-    text-align: center;
-    margin: .75em 0 1em 0;
     cursor: pointer;
 }
 
 #menu li:hover {
     background: #ababab;
-}
-
-#cursorpos {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 1em;
 }
 
 /* PALETTE */
