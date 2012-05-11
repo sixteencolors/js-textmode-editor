@@ -10,8 +10,8 @@ class @Editor
     init: ->
         @font = @loadFont()
         @canvas = document.getElementById(@id)
-        @width = @canvas.clientWidth
-        @height = @canvas.clientHeight
+        @width = @canvas.clientWidth - @canvas.clientWidth % 8
+        @height = @canvas.clientHeight - @canvas.clientHeight % 16
         @canvas.setAttribute 'width', @width
         @canvas.setAttribute 'height', @height
         @vga_canvas = document.getElementById(@vga_id)
