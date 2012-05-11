@@ -25,7 +25,6 @@ class @Editor
         @pal.init @
         @sets = new CharacterSets
         @sets.init @
-
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
@@ -39,7 +38,7 @@ class @Editor
                 @grid = [];
 
         $('#save').click =>
-            window.open(@dataURL, 'ansiSave')
+            window.open(@canvas.toDataURL("image/png"), 'ansiSave')
 
         $("body").bind "keydown", (e) =>
             key = 
@@ -212,8 +211,6 @@ class @Editor
         @ctx.fill()
 
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
-        @dataURL = @canvas.toDataURL("image/png")
-
 
 class Cursor
 
