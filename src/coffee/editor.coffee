@@ -90,9 +90,12 @@ class @Editor
                         if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
                 when key.backspace
                     @cursor.moveLeft()
-                    @putChar(32)
-                    @cursor.moveLeft()
-                    return false;
+                    if @cursor.mode == 'ovr'
+                        @putChar(32)
+                        @cursor.moveLeft()
+                    else
+                        oldrow = @grid[@cursor.y]
+                        @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                 when key.delete
                     oldrow = @grid[@cursor.y]
                     @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
@@ -171,8 +174,8 @@ class @Editor
         if @cursor.mode == 'ins'
             # NOTE: this will push chars off the right-side of the canvas
             # but will still have an entry in the grid
-            for x in [@grid[ @cursor.y ].length..@cursor.x]
-                @grid[ @cursor.y ][ x ] = @grid[ @cursor.y ][ x - 1 ]
+            row = @grid[@cursor.y][@cursor.x..]
+            @grid[@cursor.y][@cursor.x + 1..] = row
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @cursor.moveRight()
 
