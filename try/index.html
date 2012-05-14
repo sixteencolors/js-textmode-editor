@@ -2,8 +2,7 @@
 <html>
 <head>
     <title>Sixteen Colors ANSI Editor</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-    <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script>(function() {
   var CharacterSets, Cursor, Palette,
     __hasProp = Object.prototype.hasOwnProperty;
@@ -138,6 +137,7 @@
               oldrow = _this.grid[_this.cursor.y];
               _this.grid[_this.cursor.y] = oldrow.slice(0, (_this.cursor.x - 1) + 1 || 9e9).concat(oldrow.slice(_this.cursor.x + 1, (oldrow.length - 1) + 1 || 9e9));
             }
+            e.preventDefault();
             break;
           case key["delete"]:
             oldrow = _this.grid[_this.cursor.y];
@@ -246,7 +246,9 @@
       var content, req;
       req = new XMLHttpRequest;
       req.open('GET', url, false);
-      req.overrideMimeType('text/plain; charset=x-user-defined');
+      if (req.overrideMimeType) {
+        req.overrideMimeType('text/plain; charset=x-user-defined');
+      }
       req.send(null);
       content = req.status === 200 || req.status === 0 ? req.responseText : '';
       return content;
@@ -498,13 +500,9 @@
 
   $(document).ready(function() {
     var editor;
-    $('#splash').dialog({
-      title: 'Sixteen Colors ANSI Editor',
-      modal: true,
-      show: 'slide'
-    });
+    $('#splash').slideToggle('slow');
     $('#close').click(function() {
-      $('#splash').dialog('close');
+      $('#splash').slideToggle('slow');
       return false;
     });
     editor = new Editor;
@@ -529,6 +527,7 @@ html, body {
 /* SPLASH SCREEN */
 
 #splash {
+    display: none;
     z-index: 2;
     position: absolute;
     width: 400px;
@@ -626,8 +625,9 @@ a:hover {
     padding-top: 1px;
     column-count: 2;
     -webkit-column-count: 2;
-    -moz-column-count: 2;
     -webkit-column-gap: 1px;
+    -moz-column-count: 2;
+    -moz-column-gap: 1px;
 }
 
 #colors li {
@@ -708,6 +708,7 @@ a:hover {
 
 #canvaswrapper {
     position: relative;
+    height: 100%;
     margin-left: 51px;
 }
 
@@ -743,7 +744,7 @@ a:hover {
 </head>
 <body>
     <div id=splash>
-        <a id=close href=#>x</a>
+        <a id=close href=#>&times;</a>
         <h1>ANSI Editor</h1>
         <p>Welcome to the [name] <a href=http://en.wikipedia.org/wiki/ANSI_art>ANSI Art</a> editor, brought to you by the <a href=http://sixteencolors.net>Sixteen Colors ANSI Art and ASCII Art Archive</a>.</p>
         <h2>Colors</h2>
