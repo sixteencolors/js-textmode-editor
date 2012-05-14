@@ -406,9 +406,9 @@ class Palette
         return 'rgba(' + color.join( ',' ) + ',1)';
 
 $( document ).ready ->
-    $( '#splash' ).dialog({title: 'Sixteen Colors ANSI Editor', modal: true, show: 'slide'});
+    $( '#splash' ).slideToggle 'slow';
     $( '#close' ).click ->
-        $( '#splash' ).dialog('close');
+        $( '#splash' ).slideToggle 'slow';
         return false
 
     editor = new Editor
