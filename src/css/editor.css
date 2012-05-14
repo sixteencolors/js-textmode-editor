@@ -112,8 +112,9 @@ a:hover {
     padding-top: 1px;
     column-count: 2;
     -webkit-column-count: 2;
-    -moz-column-count: 2;
     -webkit-column-gap: 1px;
+    -moz-column-count: 2;
+    -moz-column-gap: 1px;
 }
 
 #colors li {
@@ -194,6 +195,7 @@ a:hover {
 
 #canvaswrapper {
     position: relative;
+    height: 100%;
     margin-left: 51px;
 }
 
