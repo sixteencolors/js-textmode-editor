@@ -96,6 +96,7 @@ class @Editor
                     else
                         oldrow = @grid[@cursor.y]
                         @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                    e.preventDefault()
                 when key.delete
                     oldrow = @grid[@cursor.y]
                     @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
@@ -182,7 +183,8 @@ class @Editor
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
         req.open 'GET', url, false
-        req.overrideMimeType 'text/plain; charset=x-user-defined'
+        if req.overrideMimeType
+            req.overrideMimeType 'text/plain; charset=x-user-defined'
         req.send null
         content = if req.status is 200 or req.status is 0 then req.responseText else ''
         return content
@@ -403,12 +405,12 @@ class Palette
         $( '#bg' ).css 'color', @toRgbaString @colors[ if @bg > 8 then 0 else 15 ]
 
     toRgbaString: ( color ) ->
-        return 'rgba(' + color.join( ',' ) + ',1)';
+        return 'rgba(' + color.join( ',' ) + ',1)'
 
 $( document ).ready ->
-    $( '#splash' ).slideToggle 'slow';
+    $( '#splash' ).slideToggle 'slow'
     $( '#close' ).click ->
-        $( '#splash' ).slideToggle 'slow';
+        $( '#splash' ).slideToggle 'slow'
         return false
 
     editor = new Editor
