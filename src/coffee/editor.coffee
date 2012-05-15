@@ -28,14 +28,14 @@ class @Editor
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
-        #setInterval( () =>
-        #    @draw()
-        #, 50 )
+
+        @draw()
 
         $('#clear').click =>
-            answer = confirm('Clear canvas?');
+            answer = confirm 'Clear canvas?'
             if (answer)
-                @grid = [];
+                @grid = []
+                @draw()
 
         $('#save').click =>
             window.open(@canvas.toDataURL("image/png"), 'ansiSave')
@@ -130,17 +130,18 @@ class @Editor
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
-                @cursor.x = Math.round( ( e.pageX - $('#' + @id).offset().left )  / 8 )
+                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / 8 )
                 @cursor.y = Math.floor( e.pageY / 16 )
                 @putChar(@sets.char) if @sets.locked
                 return true
 
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
+            return unless e.which == 1
             @cursor.mousedown = true
-            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
+            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / 8 ) 
             @cursor.y = Math.floor( e.pageY / 16 )
-            @putChar(@sets.char) if @sets.locked            
+            @putChar(@sets.char) if @sets.locked
             @cursor.draw()
             return true
 
@@ -224,9 +225,7 @@ class @Editor
                             @ctx.fillRect px + j, py + i, 1, 1
 
         @ctx.fill()
-
         $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
-
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
 
 class Cursor

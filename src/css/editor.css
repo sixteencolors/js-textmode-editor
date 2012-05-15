@@ -33,6 +33,7 @@ h1 {
 }
 
 h2 {
+    clear: left;
     font-size: 16px;
     font-weight: normal;
     color: #a50;
@@ -200,6 +201,7 @@ a:hover {
 }
 
 #cursor {
+    pointer-events: none;
     background-image: url(img/cursor_ovr.gif);
     background-position: bottom;
     position: absolute;
