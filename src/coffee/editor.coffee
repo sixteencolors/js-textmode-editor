@@ -163,7 +163,8 @@ class @Editor
             @width = @canvas.clientWidth
             @height = @canvas.clientHeight
             @canvas.setAttribute 'width', @width
-            @canvas.setAttribute 'height', @height        
+            @canvas.setAttribute 'height', @height
+            @draw()    
 
     putTouchChar: ( touch ) ->
         node = touch.target
