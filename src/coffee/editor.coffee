@@ -28,9 +28,9 @@ class @Editor
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
-        setInterval( () =>
-            @draw()
-        , 50 )
+        #setInterval( () =>
+        #    @draw()
+        #, 50 )
 
         $('#clear').click =>
             answer = confirm('Clear canvas?');
@@ -130,16 +130,20 @@ class @Editor
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
-                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
+                @cursor.x = Math.round( ( e.pageX - $('#' + @id).offset().left )  / 8 )
                 @cursor.y = Math.floor( e.pageY / 16 )
                 @putChar(@sets.char) if @sets.locked
+                console.log(e.pageX + ', ' + e.pageY)
+                console.log(Math.round((e.pageX - $('#' + @id).offset().left )  / 8 ))
+                console.log((e.pageX - $('#' + @id).offset().left )  / 8 )
+                console.log(@cursor.x + ', ' + @cursor.y)
                 return true
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left )  / 8 )
             @cursor.y = Math.floor( e.pageY / 16 )
-            @putChar(@sets.char) if @sets.locked
+            @putChar(@sets.char) if @sets.locked            
             @cursor.draw()
             return true
 
@@ -168,6 +172,7 @@ class @Editor
         @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
         @cursor.y = Math.floor( touch.pageY / 16 )
         @putChar(@sets.char) if @sets.locked
+        @draw()
         return true
 
     putChar: (charCode) ->
@@ -179,6 +184,7 @@ class @Editor
             @grid[@cursor.y][@cursor.x + 1..] = row
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @cursor.moveRight()
+        @draw()
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
