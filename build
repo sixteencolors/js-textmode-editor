@@ -21,8 +21,6 @@ if( !@args ) {
 
     my $src = $outdir->parent->subdir( 'src' );
 
-    _gen_font( $src, $outdir );
-
     require Template;
     my $tmpl = Template->new;
 
@@ -98,18 +96,4 @@ sub _gather_js {
     ( undef, $temp ) = File::Temp::tempfile();
     my $js = `coffee -p -j $temp $src/*.coffee`;
     return $js;
-}
-
-sub _gen_font {
-    my $srcdir = shift;
-    my $outdir = shift;
-    my $font   = do $srcdir->file( qw( font 8x16.pl ) )->stringify;
-
-    my $fh = $outdir->file( '8x16.dat' )->open( 'w' );
-
-    for my $x ( @$font ) {
-        print $fh chr $_ for @$x;
-    }
-
-    $fh->close;
 }

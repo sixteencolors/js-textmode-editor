@@ -205,10 +205,6 @@ a:hover {
     background-image: url(img/cursor_ovr.gif);
     background-position: bottom;
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 8px;
-    height: 16px;
 }
 
 #cursor.ins {
