@@ -133,11 +133,8 @@ class @Editor
                 @cursor.x = Math.round( ( e.pageX - $('#' + @id).offset().left )  / 8 )
                 @cursor.y = Math.floor( e.pageY / 16 )
                 @putChar(@sets.char) if @sets.locked
-                console.log(e.pageX + ', ' + e.pageY)
-                console.log(Math.round((e.pageX - $('#' + @id).offset().left )  / 8 ))
-                console.log((e.pageX - $('#' + @id).offset().left )  / 8 )
-                console.log(@cursor.x + ', ' + @cursor.y)
                 return true
+
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             @cursor.mousedown = true
