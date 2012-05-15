@@ -62,6 +62,7 @@ class @Editor
               home: 36
               enter: 13
               insert: 45
+              h: 72
 
             mod = e.shiftKey || e.altKey || e.ctrlKey
             switch e.which
@@ -110,7 +111,10 @@ class @Editor
                 when key.insert
                     @cursor.change_mode()
                 else 
-                    if e.which >= 112 && e.which <= 121
+                    if e.which == key.h && e.altKey
+                        $( '#splash' ).slideToggle 'slow'
+                        e.preventDefault()
+                    else if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
                             @putChar(@sets.sets[ @sets.set ][e.which-112])
                         else if e.altKey
