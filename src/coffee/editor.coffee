@@ -61,6 +61,7 @@ class @Editor
               end: 35
               home: 36
               enter: 13
+              escape: 27
               insert: 45
               h: 72
 
@@ -110,6 +111,9 @@ class @Editor
                     @cursor.y++
                 when key.insert
                     @cursor.change_mode()
+                when key.escape
+                    if $( '#splash' ).is( ':visible' )
+                         $( '#splash' ).slideToggle 'slow'
                 else 
                     if e.which == key.h && e.altKey
                         $( '#splash' ).slideToggle 'slow'
