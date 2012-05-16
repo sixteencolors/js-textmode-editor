@@ -103,7 +103,7 @@ class @Editor
                     oldrow = @grid[@cursor.y]
                     @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                 when key.end
-                    @cursor.x = @width / @font.width - 1
+                    @cursor.x = parseInt(@width / @font.width - 1)
                 when key.home
                     @cursor.x = 0
                 when key.enter
