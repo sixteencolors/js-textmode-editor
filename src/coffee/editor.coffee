@@ -184,7 +184,7 @@ class @Editor
         @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @font.width )
         @cursor.y = Math.floor( touch.pageY / @font.height )
         @putChar(@sets.char) if @sets.locked
-        @draw(@cursor.x, @cursor.y)
+        @drawChar(@cursor.x, @cursor.y)
         @updateCursorPosition()
         return true
 
