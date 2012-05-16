@@ -46,6 +46,10 @@ if( !@args ) {
     print $fh $output;
     $fh->close;
 
+    # favicon
+    require File::Copy;
+    File::Copy::copy($src->file( 'favicon.ico' )->stringify, $outdir);    
+
     # static folders, 1-to-1 copy
     require File::Copy::Recursive;
     for( qw( img ) ) {
