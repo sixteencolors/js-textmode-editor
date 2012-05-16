@@ -138,8 +138,8 @@ class @Editor
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
-                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / 8 )
-                @cursor.y = Math.floor( e.pageY / 16 )
+                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
+                @cursor.y = Math.floor( e.pageY / @font.height )
                 @putChar(@sets.char) if @sets.locked
                 return true
 
@@ -147,8 +147,8 @@ class @Editor
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
             return unless e.which == 1
             @cursor.mousedown = true
-            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / 8 ) 
-            @cursor.y = Math.floor( e.pageY / 16 )
+            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width ) 
+            @cursor.y = Math.floor( e.pageY / @font.height )
             @putChar(@sets.char) if @sets.locked
             @cursor.draw()
             return true
@@ -176,8 +176,8 @@ class @Editor
 
     putTouchChar: ( touch ) ->
         node = touch.target
-        @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / 8 )
-        @cursor.y = Math.floor( touch.pageY / 16 )
+        @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @font.width )
+        @cursor.y = Math.floor( touch.pageY / @font.height )
         @putChar(@sets.char) if @sets.locked
         @draw()
         return true
