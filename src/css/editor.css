@@ -111,6 +111,14 @@ a:hover {
     cursor: pointer;
 }
 
+#menu li#load {
+    cursor: default;
+    color: #ababab;
+}
+
+#menu li#load:hover {
+    background-color: transparent;
+}
 #menu li:hover {
     background: #ababab;
 }
