@@ -125,6 +125,7 @@ class @Editor
                             @sets.set = e.which - 112
                             @sets.fadeSet()
                         return false
+            @updateCursorPosition()
             @pal.draw()
             @cursor.draw()
 
@@ -172,7 +173,11 @@ class @Editor
             @height = @canvas.clientHeight - @canvas.clientHeight % @font.height
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
-            @draw()    
+            @draw() 
+            
+    updateCursorPosition: ->
+        $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
+   
 
     putTouchChar: ( touch ) ->
         node = touch.target
@@ -180,6 +185,7 @@ class @Editor
         @cursor.y = Math.floor( touch.pageY / @font.height )
         @putChar(@sets.char) if @sets.locked
         @draw(@cursor.x, @cursor.y)
+        @updateCursorPosition()
         return true
 
     putChar: (charCode) ->
@@ -192,6 +198,7 @@ class @Editor
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @drawChar(@cursor.x, @cursor.y)
         @cursor.moveRight()
+        @updateCursorPosition()
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
@@ -232,7 +239,6 @@ class @Editor
                 continue if !@grid[y][x]?
                 @drawChar(x, y, true)
 
-        $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
         @renderCanvas
 
     renderCanvas: ->
