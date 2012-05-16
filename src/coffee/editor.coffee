@@ -179,7 +179,7 @@ class @Editor
         @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @font.width )
         @cursor.y = Math.floor( touch.pageY / @font.height )
         @putChar(@sets.char) if @sets.locked
-        @draw()
+        @draw(@cursor.x, @cursor.y)
         return true
 
     putChar: (charCode) ->
@@ -190,8 +190,8 @@ class @Editor
             row = @grid[@cursor.y][@cursor.x..]
             @grid[@cursor.y][@cursor.x + 1..] = row
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
+        @drawChar(@cursor.x, @cursor.y)
         @cursor.moveRight()
-        @draw()
 
     loadUrl: ( url ) ->
         req = new XMLHttpRequest
@@ -205,6 +205,25 @@ class @Editor
     loadFont: ->
         return new Font8x16
 
+    drawChar: (x, y, full) ->
+        if @grid[y][x]
+            px = x * @font.width
+            py = y * @font.height
+
+            @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
+            @ctx.fillRect px, py, 8, 16
+
+            @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ @grid[y][x].attr & 15 ] ) #fg
+            chr = @font.chars[ @grid[y][x].char ]
+            for i in [ 0 .. @font.height - 1 ]
+                line = chr[ i ]
+                for j in [ 0 .. @font.width - 1 ]
+                    if line & ( 1 << 7 - j )
+                        @ctx.fillRect px + j, py + i, 1, 1
+            if !full #don't redraw on each character if it is a full canvas draw
+                @ctx.fill()
+                @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
+        
     draw: ->
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
@@ -212,19 +231,7 @@ class @Editor
             continue if !@grid[y]?
             for x in [0..@grid[y].length - 1]
                 continue if !@grid[y][x]?
-                px = x * @font.width
-                py = y * @font.height
-
-                @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
-                @ctx.fillRect px, py, 8, 16
-
-                @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ @grid[y][x].attr & 15 ] ) #fg
-                chr = @font.chars[ @grid[y][x].char ]
-                for i in [ 0 .. @font.height - 1 ]
-                    line = chr[ i ]
-                    for j in [ 0 .. @font.width - 1 ]
-                        if line & ( 1 << 7 - j )
-                            @ctx.fillRect px + j, py + i, 1, 1
+                @drawChar(x, y, true)
 
         @ctx.fill()
         $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
