@@ -221,8 +221,7 @@ class @Editor
                     if line & ( 1 << 7 - j )
                         @ctx.fillRect px + j, py + i, 1, 1
             if !full #don't redraw on each character if it is a full canvas draw
-                @ctx.fill()
-                @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
+                @renderCanvas
         
     draw: ->
         @ctx.fillStyle = "#000000"
@@ -233,9 +232,13 @@ class @Editor
                 continue if !@grid[y][x]?
                 @drawChar(x, y, true)
 
-        @ctx.fill()
         $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
-        @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas.height * @vga_scale);
+        @renderCanvas
+
+    renderCanvas: ->
+        @ctx.fill()
+        @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
+
 
 class Cursor
 
