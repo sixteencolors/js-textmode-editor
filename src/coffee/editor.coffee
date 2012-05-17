@@ -117,6 +117,7 @@ class @Editor
                 else 
                     if e.which == key.h && e.altKey
                         $( '#splash' ).slideToggle 'slow'
+                        e.preventDefault()
 
                     else if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
@@ -124,8 +125,8 @@ class @Editor
                         else if e.altKey
                             @sets.set = e.which - 112
                             @sets.fadeSet()
+                        e.preventDefault()
 
-                    e.preventDefault()
 
             @updateCursorPosition()
             @pal.draw()
