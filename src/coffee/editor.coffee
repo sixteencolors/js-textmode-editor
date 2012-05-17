@@ -231,7 +231,6 @@ class @Editor
                     if line & ( 1 << 7 - j )
                         @ctx.fillRect px + j, py + i, 1, 1
             if !full #don't redraw on each character if it is a full canvas draw
-                console.log("not full")
                 @renderCanvas()
         
     draw: ->
@@ -246,7 +245,6 @@ class @Editor
         @renderCanvas()
 
     renderCanvas: ->
-        console.log("render canvas")
         @ctx.fill()
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
 
