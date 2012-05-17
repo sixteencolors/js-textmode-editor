@@ -173,6 +173,7 @@
           default:
             if (e.which === key.h && e.altKey) {
               $('#splash').slideToggle('slow');
+              e.preventDefault();
             } else if (e.which >= 112 && e.which <= 121) {
               if (!e.altKey && !e.shiftKey && !e.ctrlKey) {
                 _this.putChar(_this.sets.sets[_this.sets.set][e.which - 112]);
@@ -180,8 +181,8 @@
                 _this.sets.set = e.which - 112;
                 _this.sets.fadeSet();
               }
+              e.preventDefault();
             }
-            e.preventDefault();
         }
         _this.updateCursorPosition();
         _this.pal.draw();
