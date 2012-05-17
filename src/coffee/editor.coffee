@@ -142,6 +142,7 @@ class @Editor
                 @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
                 @cursor.y = Math.floor( e.pageY / @font.height )
                 @putChar(@sets.char) if @sets.locked
+                @updateCursorPosition()
                 return true
 
 
@@ -152,12 +153,14 @@ class @Editor
             @cursor.y = Math.floor( e.pageY / @font.height )
             @putChar(@sets.char) if @sets.locked
             @cursor.draw()
+            @updateCursorPosition()
             return true
 
         $('#' + @id).bind 'touchstart', ( e ) =>            
             e.preventDefault()
             if (e.originalEvent.touches.length == 1)
                 return @putTouchChar(e.originalEvent.touches[0])
+            
 
         $('#' + @id).bind 'touchmove', ( e ) =>
             if (e.originalEvent.touches.length == 1) # Only if one finger
