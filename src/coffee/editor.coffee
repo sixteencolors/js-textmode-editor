@@ -117,17 +117,24 @@ class @Editor
                 else 
                     if e.which == key.h && e.altKey
                         $( '#splash' ).slideToggle 'slow'
-                        e.preventDefault()
+
                     else if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
                             @putChar(@sets.sets[ @sets.set ][e.which-112])
                         else if e.altKey
                             @sets.set = e.which - 112
                             @sets.fadeSet()
-                        return false
+
+                    e.preventDefault()
+
             @updateCursorPosition()
             @pal.draw()
             @cursor.draw()
+
+        # fix for ie loading help on F1 keypress
+        if document.all
+            window.onhelp = () -> return false
+            document.onhelp = () -> return false
 
         $("body").bind "keypress", (e) =>            
             char = String.fromCharCode(e.which)
