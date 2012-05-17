@@ -416,6 +416,10 @@ class Palette
         indicators.click ( e ) ->
             if !$( e.target ).hasClass( 'selected' )
                 indicators.toggleClass( 'selected' )
+
+        $( '#colors' ).children().empty()
+        $( '#colors' ).append '<ul class=first></ul>', '<ul></ul>'
+
         for i in [ 0 .. @colors.length - 1 ]
             block = $( '<li>' )
             block.data 'color', i
@@ -423,7 +427,7 @@ class Palette
             block.click ( e ) =>
                 @[ indicators.filter( '.selected' ).attr 'id' ] = $( e.target ).data 'color'
                 @draw()
-            $( '#colors' ).append block
+            $( '#colors ul:nth-child(' + ( 1 + Math.round( i / ( @colors.length - 1 ) ) ) + ')' ).append block
         @draw()
 
     draw: ->

@@ -125,15 +125,16 @@ a:hover {
 
 /* PALETTE */
 
-#colors {
-    list-style-type: none;
+#colors ul {
     background: #000;
+    float: left;
+    width: 25px;
+    list-style-type: none;
     padding-top: 1px;
-    column-count: 2;
-    -webkit-column-count: 2;
-    -webkit-column-gap: 1px;
-    -moz-column-count: 2;
-    -moz-column-gap: 1px;
+}
+
+#colors ul.first {
+    padding-right: 1px;
 }
 
 #colors li {
