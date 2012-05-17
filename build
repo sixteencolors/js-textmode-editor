@@ -48,7 +48,7 @@ if( !@args ) {
 
     # favicon
     require File::Copy;
-    File::Copy::copy($src->file( 'favicon.ico' )->stringify, $outdir);    
+    File::Copy::copy( $src->file( 'favicon.ico' )->stringify, $outdir );    
 
     # static folders, 1-to-1 copy
     require File::Copy::Recursive;
@@ -69,9 +69,9 @@ elsif( $args[ 0 ] eq 'zip' ) {
     require Cwd;
     my $cur = Cwd::cwd();
     chdir( 'output' );
-    $outdir->parent->file( '16c-editor.zip' )->remove;
+    $outdir->parent->file( '16c-draw.zip' )->remove;
 
-    `zip -9 -r ../16c-editor.zip .`;
+    `zip -9 -r ../16c-draw.zip .`;
 
     chdir( $cur );
 }
