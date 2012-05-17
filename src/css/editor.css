@@ -11,9 +11,13 @@ html, body {
     background: #333;
 }
 
+/* Drawings list */
+#drawings {
+    overflow: scroll;
+}
 /* SPLASH SCREEN */
 
-#splash {
+#splash, #drawings {
     display: none;
     z-index: 2;
     position: absolute;

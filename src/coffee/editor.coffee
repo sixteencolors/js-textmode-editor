@@ -19,6 +19,8 @@ class @Editor
         @vga_canvas.setAttribute 'height', @height
         @grid = []
 
+        @drawings = $.Storage.get("drawings")
+
         @cursor = new Cursor
         @cursor.init @
         @pal = new Palette
@@ -38,7 +40,17 @@ class @Editor
                 @draw()
 
         $('#save').click =>
-            window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+            # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+            @drawings =[] if !@drawings
+            @drawings[@getId()] = @grid
+            $.Storage.set("drawings", @drawings)       
+            
+        $('#load').click =>
+            $('#drawings ol').text = ''
+            @drawings =[] if !@drawings
+            @addDrawing drawing, i for drawing, i in @drawings
+            $( '#drawings' ).slideToggle 'slow'
+
 
         $("body").bind "keydown", (e) =>
             key = 
@@ -185,6 +197,17 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    addDrawing: ( drawing, id ) ->
+        $('#drawings ol').append( '<li>' + id + '</li>')
+
+    getId: ->
+        name = "id"
+        results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href)
+        return if results then results[1] else @generateId()
+
+    generateId: ->
+        return if @drawings then @drawings.length + 1 else 1
             
     updateCursorPosition: ->
         $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
