@@ -11,10 +11,12 @@ html, body {
     background: #333;
 }
 
-/* Drawings list */
+/* DRAWINGS (SAVE/LOAD) */
+
 #drawings {
-    overflow: scroll;
+    overflow: auto;
 }
+
 /* SPLASH SCREEN */
 
 #splash, #drawings {
