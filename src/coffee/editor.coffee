@@ -50,6 +50,11 @@ class @Editor
                 $('#drawings ol').children().empty()
                 @drawings =[] if !@drawings
                 @addDrawing drawing, i for drawing, i in @drawings
+
+                $('#drawings li').click (e) =>
+                    @grid = @drawings[ $( e.currentTarget ).text() ]
+                    @draw()
+
             $( '#drawings' ).slideToggle 'slow'
 
         $("body").bind "keydown", (e) =>
