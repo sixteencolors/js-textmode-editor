@@ -248,11 +248,27 @@ a:hover {
 
 }
 
-#drawings li {
+#drawings li span {
     cursor: pointer;
-    margin-left: 3em;
 }
 
-#drawings li:hover {
+#drawings li span.name:hover {
     color: #000;
+}
+
+#drawings li span.delete:hover {
+    color: #900;
+}
+
+#drawings li {
+    margin-left: 3em;   
+}
+
+#SaveDialog li {
+    margin: .5em 2em;
+    list-style-type: disc;
+}
+
+#SaveDialog ul {
+    margin-top: 1.5em;
 }

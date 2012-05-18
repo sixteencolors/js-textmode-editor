@@ -216,20 +216,26 @@ class @Editor
             @draw() 
 
     updateDrawingList: ->
-        unless $( '#drawings' ).is( ':visible' )
-            $('#drawings ol').empty()
-            @drawings =[] if !@drawings
-            @addDrawing drawing, i for drawing, i in @drawings
+        $('#drawings ol').empty()
+        @drawings =[] if !@drawings
+        @addDrawing drawing, i for drawing, i in @drawings
 
-            $('#drawings li').click (e) =>
-                @drawingId = $( e.currentTarget ).attr( "nid" )
-                @grid = @drawings[ @drawingId ].grid
-                @draw()
-                $( '#drawings' ).slideToggle 'slow'
+        $('#drawings li span.name').click (e) =>
+            @drawingId = $( e.currentTarget ).parent().attr( "nid" )
+            @grid = @drawings[ @drawingId ].grid
+            @draw()
+            $( '#drawings' ).slideToggle 'slow'
 
+        $('#drawings li span.delete').click (e) =>
+            answer = confirm 'Delete drawing?'
+            if (answer)
+                @drawings[$( e.currentTarget ).parent().attr("nid")] = null
+                $.Storage.set("drawings", JSON.stringify(@drawings))
+                @updateDrawingList()
 
     addDrawing: ( drawing, id ) ->
-        $('#drawings ol').append( '<li nid=' + id + '>' + if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
+        if drawing
+            $('#drawings ol').append( '<li nid=' + id + '><span class="name">' + if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</span> <span class="delete">X</span></li>')
 
     getId: ->
         
