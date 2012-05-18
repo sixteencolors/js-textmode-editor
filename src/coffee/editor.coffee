@@ -47,16 +47,7 @@ class @Editor
             $.Storage.set("drawings", JSON.stringify(@drawings))
             
         $('#load').click =>
-            unless $( '#drawings' ).is( ':visible' )
-                $('#drawings ol').empty()
-                @drawings =[] if !@drawings
-                @addDrawing drawing, i for drawing, i in @drawings
-
-                $('#drawings li').click (e) =>
-                    @drawingId = $( e.currentTarget ).attr( "nid" )
-                    @grid = @drawings[ @drawingId ].grid
-                    @draw()
-
+            @updateDrawingList()
             $( '#drawings' ).slideToggle 'slow'
 
         $("body").bind "keydown", (e) =>
@@ -83,6 +74,7 @@ class @Editor
               escape: 27
               insert: 45
               h: 72
+              l: 76
 
             mod = e.shiftKey || e.altKey || e.ctrlKey
             switch e.which
@@ -138,6 +130,11 @@ class @Editor
                 else 
                     if e.which == key.h && e.altKey
                         $( '#splash' ).slideToggle 'slow'
+                        e.preventDefault()
+
+                    if e.which == key.l && e.altKey
+                        @updateDrawingList()
+                        $( '#drawings' ).slideToggle 'slow'
                         e.preventDefault()
 
                     else if e.which >= 112 && e.which <= 121
@@ -206,6 +203,19 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    updateDrawingList: ->
+        unless $( '#drawings' ).is( ':visible' )
+            $('#drawings ol').empty()
+            @drawings =[] if !@drawings
+            @addDrawing drawing, i for drawing, i in @drawings
+
+            $('#drawings li').click (e) =>
+                @drawingId = $( e.currentTarget ).attr( "nid" )
+                @grid = @drawings[ @drawingId ].grid
+                @draw()
+                $( '#drawings' ).slideToggle 'slow'
+
 
     addDrawing: ( drawing, id ) ->
         $('#drawings ol').append( '<li nid=' + id + '>' + $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
@@ -285,6 +295,8 @@ class @Editor
 
     renderCanvas: ->
         @ctx.fill()
+        @vga_ctx.fillStyle = "#000000"
+        @vga_ctx.fillRect 0, 0,  @canvas.width * @vga_scale, @canvas. height * @vga_scale
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
 
 
