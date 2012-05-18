@@ -40,9 +40,10 @@ class @Editor
                 @drawingId = null
                 @grid = []
                 @draw()
+                $( '#name' ).val("")
 
         $('#save').click =>
-            $( '#SaveDialog' ).slideToggle 'slow'
+            @toggleSaveDialog()
             @drawings =[] if !@drawings
             if @drawings[@drawingId] then $( '#name' ).val(@drawings[@drawingId].name)
 
@@ -50,14 +51,13 @@ class @Editor
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             @drawings[@getId()] = {grid: @grid, date: new Date(), name: $('#name').val()}
             $.Storage.set("drawings", JSON.stringify(@drawings))
-            $( '#SaveDialog' ).slideToggle 'slow'
+            @toggleSaveDialog()
 
         $('#PNGSave').click =>
             window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             
         $('#load').click =>
-            @updateDrawingList()
-            $( '#drawings' ).slideToggle 'slow'
+            @toggleLoadDialog()
 
         $("body").bind "keydown", (e) =>
             key = 
@@ -84,6 +84,7 @@ class @Editor
               insert: 45
               h: 72
               l: 76
+              s: 83
 
             if (e.target.nodeName != "INPUT")
                 mod = e.shiftKey || e.altKey || e.ctrlKey
@@ -137,15 +138,21 @@ class @Editor
                              $( '#splash' ).slideToggle 'slow'
                         if $( '#drawings' ).is( ':visible' )
                             $( '#drawings' ).slideToggle 'slow'
+                        if $( '#SaveDialog' ).is( ':visible' )
+                            $( '#SaveDialog' ).slideToggle 'slow'
                     else 
                         if e.which == key.h && e.altKey
-                            $( '#splash' ).slideToggle 'slow'
+                            @toggleHelpDialog()
                             e.preventDefault()
 
                         if e.which == key.l && e.altKey
                             @updateDrawingList()
-                            $( '#drawings' ).slideToggle 'slow'
+                            @toggleLoadDialog()
                             e.preventDefault()
+
+                        if e.which == key.s && e.altKey
+                            @toggleSaveDialog()
+                            e.preventDefault()                       
 
                         else if e.which >= 112 && e.which <= 121
                             if !e.altKey && !e.shiftKey && !e.ctrlKey
@@ -215,6 +222,25 @@ class @Editor
             @canvas.setAttribute 'height', @height
             @draw() 
 
+    toggleSaveDialog: ->
+        unless $( '#SaveDialog' ).is( ':visible' )
+            $( '#drawings').slideUp 'slow'
+            $( '#splash' ).slideUp 'slow'
+        $( '#SaveDialog' ).slideToggle 'slow'
+
+    toggleLoadDialog: ->
+        unless $( '#drawings' ).is( ':visible' )
+            @updateDrawingList()
+            $( '#SaveDialog').slideUp 'slow'
+            $( '#splash' ).slideUp 'slow'
+        $( '#drawings' ).slideToggle 'slow'
+
+    toggleHelpDialog: ->
+        unless $( '#splash' ).is( ':visible' )
+            $( '#drawings').slideUp 'slow'
+            $( '#SaveDialog' ).slideUp 'slow'
+        $( '#splash' ).slideToggle 'slow'
+
     updateDrawingList: ->
         $('#drawings ol').empty()
         @drawings =[] if !@drawings
@@ -224,7 +250,7 @@ class @Editor
             @drawingId = $( e.currentTarget ).parent().attr( "nid" )
             @grid = @drawings[ @drawingId ].grid
             @draw()
-            $( '#drawings' ).slideToggle 'slow'
+            @toggleLoadDialog()
 
         $('#drawings li span.delete').click (e) =>
             answer = confirm 'Delete drawing?'
@@ -235,7 +261,7 @@ class @Editor
 
     addDrawing: ( drawing, id ) ->
         if drawing
-            $('#drawings ol').append( '<li nid=' + id + '><span class="name">' + if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</span> <span class="delete">X</span></li>')
+            $('#drawings ol').append( '<li nid=' + id + '><span class="name">' + (if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a")) + '</span> <span class="delete">X</span></li>')
 
     getId: ->
         
@@ -780,18 +806,19 @@ class @Font8x16 extends @Font
         this[k] = v for own k, v of options
 
 $( document ).ready ->
-    $( '#splash' ).slideToggle 'slow'
-    $( '#splash .close' ).click ->
-        $( '#splash' ).slideToggle 'slow'
-        return false
-
-    $( '#drawings .close' ).click ->
-        $( '#drawings' ).slideToggle 'slow'
-        return false
-
-    $( '#SaveDialog .close' ).click ->
-        $( '#SaveDialog' ).slideToggle 'slow'
-        return false
 
     editor = new Editor
     editor.init()
+
+    editor.toggleHelpDialog()
+    $( '#splash .close' ).click ->
+        editor.toggleHelpDialog()
+        return false
+
+    $( '#drawings .close' ).click ->
+        editor.toggleLoadDialog()
+        return false
+
+    $( '#SaveDialog .close' ).click ->
+        editor.toggleSaveDialog()
+        return false
