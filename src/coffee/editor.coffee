@@ -185,7 +185,7 @@ class @Editor
             if @cursor.mousedown
                 @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
                 @cursor.y = Math.floor( e.pageY / @font.height )
-                @putChar(@sets.char) if @sets.locked
+                @putChar(@sets.char, true) if @sets.locked
                 @updateCursorPosition()
                 return true
 
@@ -195,7 +195,7 @@ class @Editor
             @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width ) 
             @cursor.y = Math.floor( e.pageY / @font.height )
-            @putChar(@sets.char) if @sets.locked
+            @putChar(@sets.char, true) if @sets.locked
             @cursor.draw()
             @updateCursorPosition()
             return true
@@ -283,7 +283,7 @@ class @Editor
         @updateCursorPosition()
         return true
 
-    putChar: (charCode) ->
+    putChar: (charCode, holdCursor = false) ->
         @grid[@cursor.y] = [] if !@grid[@cursor.y]
         if @cursor.mode == 'ins'
             # NOTE: this will push chars off the right-side of the canvas
@@ -292,7 +292,7 @@ class @Editor
             @grid[@cursor.y][@cursor.x + 1..] = row
         @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
         @drawChar(@cursor.x, @cursor.y)
-        @cursor.moveRight()
+        unless holdCursor then @cursor.moveRight()
         @updateCursorPosition()
 
     loadUrl: ( url ) ->
