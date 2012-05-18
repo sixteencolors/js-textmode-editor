@@ -42,10 +42,18 @@ class @Editor
                 @draw()
 
         $('#save').click =>
-            # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+            $( '#SaveDialog' ).slideToggle 'slow'
             @drawings =[] if !@drawings
-            @drawings[@getId()] = {grid: @grid, date: new Date()}
+            if @drawings[@drawingId] then $( '#name' ).val(@drawings[@drawingId].name)
+
+        $('#html5Save').click =>
+            # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+            @drawings[@getId()] = {grid: @grid, date: new Date(), name: $('#name').val()}
             $.Storage.set("drawings", JSON.stringify(@drawings))
+            $( '#SaveDialog' ).slideToggle 'slow'
+
+        $('#PNGSave').click =>
+            window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             
         $('#load').click =>
             @updateDrawingList()
@@ -77,92 +85,94 @@ class @Editor
               h: 72
               l: 76
 
-            mod = e.shiftKey || e.altKey || e.ctrlKey
-            switch e.which
-                when key.left
-                    if (!mod)
+            if (e.target.nodeName != "INPUT")
+                mod = e.shiftKey || e.altKey || e.ctrlKey
+                switch e.which
+                    when key.left
+                        if (!mod)
+                            @cursor.moveLeft()
+                        else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
+                            if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
+                    when key.right
+                        if (!mod)
+                            @cursor.moveRight()
+                        else if e.ctrlKey || e.shiftKey
+                            if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
+                    when key.down
+                        if (!mod)
+                            if @cursor.y < (@height - 16) / 16
+                              @cursor.y++
+                        else if (e.ctrlKey)
+                            if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
+                    when key.up
+                        if (!mod)
+                            if @cursor.y > 0
+                              @cursor.y--
+                              @cursor.draw()
+                        else if e.ctrlKey
+                            if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
+                    when key.backspace
                         @cursor.moveLeft()
-                    else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
-                        if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
-                when key.right
-                    if (!mod)
-                        @cursor.moveRight()
-                    else if e.ctrlKey || e.shiftKey
-                        if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
-                when key.down
-                    if (!mod)
-                        if @cursor.y < (@height - 16) / 16
-                          @cursor.y++
-                    else if (e.ctrlKey)
-                        if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
-                when key.up
-                    if (!mod)
-                        if @cursor.y > 0
-                          @cursor.y--
-                          @cursor.draw()
-                    else if e.ctrlKey
-                        if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
-                when key.backspace
-                    @cursor.moveLeft()
-                    if @cursor.mode == 'ovr'
-                        @putChar(32)
-                        @cursor.moveLeft()
-                    else
+                        if @cursor.mode == 'ovr'
+                            @putChar(32)
+                            @cursor.moveLeft()
+                        else
+                            oldrow = @grid[@cursor.y]
+                            @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                        e.preventDefault()
+                    when key.delete
                         oldrow = @grid[@cursor.y]
                         @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
-                    e.preventDefault()
-                when key.delete
-                    oldrow = @grid[@cursor.y]
-                    @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
-                when key.end
-                    @cursor.x = parseInt(@width / @font.width - 1)
-                when key.home
-                    @cursor.x = 0
-                when key.enter
-                    @cursor.x = 0
-                    @cursor.y++
-                when key.insert
-                    @cursor.change_mode()
-                when key.escape
-                    if $( '#splash' ).is( ':visible' )
-                         $( '#splash' ).slideToggle 'slow'
-                    if $( '#drawings' ).is( ':visible' )
-                        $( '#drawings' ).slideToggle 'slow'
-                else 
-                    if e.which == key.h && e.altKey
-                        $( '#splash' ).slideToggle 'slow'
-                        e.preventDefault()
+                    when key.end
+                        @cursor.x = parseInt(@width / @font.width - 1)
+                    when key.home
+                        @cursor.x = 0
+                    when key.enter
+                        @cursor.x = 0
+                        @cursor.y++
+                    when key.insert
+                        @cursor.change_mode()
+                    when key.escape
+                        if $( '#splash' ).is( ':visible' )
+                             $( '#splash' ).slideToggle 'slow'
+                        if $( '#drawings' ).is( ':visible' )
+                            $( '#drawings' ).slideToggle 'slow'
+                    else 
+                        if e.which == key.h && e.altKey
+                            $( '#splash' ).slideToggle 'slow'
+                            e.preventDefault()
 
-                    if e.which == key.l && e.altKey
-                        @updateDrawingList()
-                        $( '#drawings' ).slideToggle 'slow'
-                        e.preventDefault()
+                        if e.which == key.l && e.altKey
+                            @updateDrawingList()
+                            $( '#drawings' ).slideToggle 'slow'
+                            e.preventDefault()
 
-                    else if e.which >= 112 && e.which <= 121
-                        if !e.altKey && !e.shiftKey && !e.ctrlKey
-                            @putChar(@sets.sets[ @sets.set ][e.which-112])
-                        else if e.altKey
-                            @sets.set = e.which - 112
-                            @sets.fadeSet()
-                        e.preventDefault()
+                        else if e.which >= 112 && e.which <= 121
+                            if !e.altKey && !e.shiftKey && !e.ctrlKey
+                                @putChar(@sets.sets[ @sets.set ][e.which-112])
+                            else if e.altKey
+                                @sets.set = e.which - 112
+                                @sets.fadeSet()
+                            e.preventDefault()
 
 
-            @updateCursorPosition()
-            @pal.draw()
-            @cursor.draw()
+                @updateCursorPosition()
+                @pal.draw()
+                @cursor.draw()
 
         # fix for ie loading help on F1 keypress
         if document.all
             window.onhelp = () -> return false
             document.onhelp = () -> return false
 
-        $("body").bind "keypress", (e) =>            
-            char = String.fromCharCode(e.which)
-            pattern = ///
-                [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
-            ///
-            if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
-                @putChar(char.charCodeAt( 0 ) & 255);                    
+        $("body").bind "keypress", (e) =>       
+            if (e.target.nodeName != "INPUT")     
+                char = String.fromCharCode(e.which)
+                pattern = ///
+                    [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
+                ///
+                if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
+                    @putChar(char.charCodeAt( 0 ) & 255);                    
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
@@ -219,7 +229,7 @@ class @Editor
 
 
     addDrawing: ( drawing, id ) ->
-        $('#drawings ol').append( '<li nid=' + id + '>' + $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
+        $('#drawings ol').append( '<li nid=' + id + '>' + if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
 
     getId: ->
         
@@ -771,6 +781,10 @@ $( document ).ready ->
 
     $( '#drawings .close' ).click ->
         $( '#drawings' ).slideToggle 'slow'
+        return false
+
+    $( '#SaveDialog .close' ).click ->
+        $( '#SaveDialog' ).slideToggle 'slow'
         return false
 
     editor = new Editor
