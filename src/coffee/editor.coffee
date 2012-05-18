@@ -37,6 +37,7 @@ class @Editor
         $('#clear').click =>
             answer = confirm 'Clear canvas?'
             if (answer)
+                @drawingId = null
                 @grid = []
                 @draw()
 
