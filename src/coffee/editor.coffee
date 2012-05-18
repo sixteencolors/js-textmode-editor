@@ -46,11 +46,11 @@ class @Editor
             $.Storage.set("drawings", JSON.stringify(@drawings))
             
         $('#load').click =>
-            $('#drawings ol').text = ''
-            @drawings =[] if !@drawings
-            @addDrawing drawing, i for drawing, i in @drawings
+            unless $( '#drawings' ).is( ':visible' )
+                $('#drawings ol').children().empty()
+                @drawings =[] if !@drawings
+                @addDrawing drawing, i for drawing, i in @drawings
             $( '#drawings' ).slideToggle 'slow'
-
 
         $("body").bind "keydown", (e) =>
             key = 
