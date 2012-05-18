@@ -18,6 +18,7 @@ class @Editor
         @vga_canvas.setAttribute 'width', @width * @vga_scale
         @vga_canvas.setAttribute 'height', @height
         @grid = []
+        @drawingId = null
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
@@ -52,7 +53,8 @@ class @Editor
                 @addDrawing drawing, i for drawing, i in @drawings
 
                 $('#drawings li').click (e) =>
-                    @grid = @drawings[ $( e.currentTarget ).attr("nid") ].grid
+                    @drawingId = $( e.currentTarget ).attr( "nid" )
+                    @grid = @drawings[ @drawingId ].grid
                     @draw()
 
             $( '#drawings' ).slideToggle 'slow'
@@ -209,9 +211,8 @@ class @Editor
         $('#drawings ol').append( '<li nid=' + id + '>' + $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
 
     getId: ->
-        name = "id"
-        results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href)
-        return if results then results[1] else @generateId()
+        
+        return if @drawingId then @drawingId else @generateId()
 
     generateId: ->
         return if @drawings then @drawings.length else 1
