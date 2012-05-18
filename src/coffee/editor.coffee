@@ -19,7 +19,7 @@ class @Editor
         @vga_canvas.setAttribute 'height', @height
         @grid = []
 
-        @drawings = $.Storage.get("drawings")
+        @drawings = $.parseJSON($.Storage.get("drawings"))
 
         @cursor = new Cursor
         @cursor.init @
@@ -43,7 +43,7 @@ class @Editor
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             @drawings =[] if !@drawings
             @drawings[@getId()] = @grid
-            $.Storage.set("drawings", @drawings)       
+            $.Storage.set("drawings", JSON.stringify(@drawings))
             
         $('#load').click =>
             $('#drawings ol').text = ''
@@ -126,6 +126,8 @@ class @Editor
                 when key.escape
                     if $( '#splash' ).is( ':visible' )
                          $( '#splash' ).slideToggle 'slow'
+                    if $( '#drawings' ).is( ':visible' )
+                        $( '#drawings' ).slideToggle 'slow'
                 else 
                     if e.which == key.h && e.altKey
                         $( '#splash' ).slideToggle 'slow'
@@ -207,7 +209,7 @@ class @Editor
         return if results then results[1] else @generateId()
 
     generateId: ->
-        return if @drawings then @drawings.length + 1 else 1
+        return if @drawings then @drawings.length else 1
             
     updateCursorPosition: ->
         $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
