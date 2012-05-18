@@ -61,7 +61,7 @@ dd {
     margin-left: 150px;
 }
 
-li {
+ul li {
     list-style-type: none;
 }
 
@@ -71,13 +71,13 @@ li {
     margin-right: auto;
 }
 
-a {
+a, #drawings li {
     color: #666;
     font-weight: bold;
     text-decoration: none;
 }
 
-a#close {
+a.close {
     position: absolute;
     display: block;
     color: #999;
@@ -249,4 +249,18 @@ a:hover {
     right: 0;
     opacity: 1;
     margin-right: 8px;
+}
+
+.alert {
+    color: #900;
+
+}
+
+#drawings li {
+    cursor: pointer;
+    margin-left: 3em;
+}
+
+#drawings li:hover {
+    color: #000;
 }

@@ -42,17 +42,17 @@ class @Editor
         $('#save').click =>
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             @drawings =[] if !@drawings
-            @drawings[@getId()] = @grid
+            @drawings[@getId()] = {grid: @grid, date: new Date()}
             $.Storage.set("drawings", JSON.stringify(@drawings))
             
         $('#load').click =>
             unless $( '#drawings' ).is( ':visible' )
-                $('#drawings ol').children().empty()
+                $('#drawings ol').empty()
                 @drawings =[] if !@drawings
                 @addDrawing drawing, i for drawing, i in @drawings
 
                 $('#drawings li').click (e) =>
-                    @grid = @drawings[ $( e.currentTarget ).text() ]
+                    @grid = @drawings[ $( e.currentTarget ).attr("nid") ].grid
                     @draw()
 
             $( '#drawings' ).slideToggle 'slow'
@@ -206,7 +206,7 @@ class @Editor
             @draw() 
 
     addDrawing: ( drawing, id ) ->
-        $('#drawings ol').append( '<li>' + id + '</li>')
+        $('#drawings ol').append( '<li nid=' + id + '>' + $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a") + '</li>')
 
     getId: ->
         name = "id"
@@ -751,8 +751,12 @@ class @Font8x16 extends @Font
 
 $( document ).ready ->
     $( '#splash' ).slideToggle 'slow'
-    $( '#close' ).click ->
+    $( '#splash .close' ).click ->
         $( '#splash' ).slideToggle 'slow'
+        return false
+
+    $( '#drawings .close' ).click ->
+        $( '#drawings' ).slideToggle 'slow'
         return false
 
     editor = new Editor
