@@ -21,6 +21,8 @@ if( !@args ) {
 
     my $src = $outdir->parent->subdir( 'src' );
 
+    _gen_font( $src, $outdir );
+
     require Template;
     my $tmpl = Template->new;
 
@@ -46,13 +48,9 @@ if( !@args ) {
     print $fh $output;
     $fh->close;
 
-    # favicon
-    require File::Copy;
-    File::Copy::copy( $src->file( 'favicon.ico' )->stringify, $outdir );    
-
     # static folders, 1-to-1 copy
     require File::Copy::Recursive;
-    for( qw( img ) ) {
+    for( qw( img js ) ) {
         my $d = $outdir->subdir( $_ );
         $d->mkpath;
         File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );
@@ -69,9 +67,9 @@ elsif( $args[ 0 ] eq 'zip' ) {
     require Cwd;
     my $cur = Cwd::cwd();
     chdir( 'output' );
-    $outdir->parent->file( '16c-draw.zip' )->remove;
+    $outdir->parent->file( '16c-editor.zip' )->remove;
 
-    `zip -9 -r ../16c-draw.zip .`;
+    `zip -9 -r ../16c-editor.zip .`;
 
     chdir( $cur );
 }
@@ -100,4 +98,18 @@ sub _gather_js {
     ( undef, $temp ) = File::Temp::tempfile();
     my $js = `coffee -p -j $temp $src/*.coffee`;
     return $js;
+}
+
+sub _gen_font {
+    my $srcdir = shift;
+    my $outdir = shift;
+    my $font   = do $srcdir->file( qw( font 8x16.pl ) )->stringify;
+
+    my $fh = $outdir->file( '8x16.dat' )->open( 'w' );
+
+    for my $x ( @$font ) {
+        print $fh chr $_ for @$x;
+    }
+
+    $fh->close;
 }
