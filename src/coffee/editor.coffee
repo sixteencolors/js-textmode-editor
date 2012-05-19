@@ -290,7 +290,7 @@ class @Editor
             # but will still have an entry in the grid
             row = @grid[@cursor.y][@cursor.x..]
             @grid[@cursor.y][@cursor.x + 1..] = row
-        @grid[@cursor.y][@cursor.x] = { char: charCode, attr: ( @pal.bg << 4 ) | @pal.fg }
+        @grid[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
         @drawChar(@cursor.x, @cursor.y)
         unless holdCursor then @cursor.moveRight()
         @updateCursorPosition()
@@ -316,7 +316,7 @@ class @Editor
             @ctx.fillRect px, py, 8, 16
 
             @ctx.fillStyle = @pal.toRgbaString( @pal.colors[ @grid[y][x].attr & 15 ] ) #fg
-            chr = @font.chars[ @grid[y][x].char ]
+            chr = @font.chars[ @grid[y][x].ch.charCodeAt( 0 ) & 0xff  ]
             for i in [ 0 .. @font.height - 1 ]
                 line = chr[ i ]
                 for j in [ 0 .. @font.width - 1 ]
@@ -805,9 +805,35 @@ class @Font8x16 extends @Font
         @height = 16
         this[k] = v for own k, v of options
 
+FileSelectHandler = ( e ) ->
+    # fetch FileList object
+    files = e.target.files || e.dataTransfer.files
+    # process all File objects
+    ParseFile file for file in files
+
+ParseFile = ( file ) ->
+    reader = new FileReader()
+    $( reader ).load ( e ) ->
+        console.log( e.target.result )
+        content = e.target.result
+        image = new ImageTextModeANSI()
+        image.parse( content )
+        editor.grid = image.screen
+        editor.draw()
+        editor.toggleLoadDialog()
+        return true
+
+    $( reader ).error ( e ) ->
+        console.log ( "error loading file" )
+
+    $( reader ).bind  "loadstart", (e) -> 
+        console.log ("load started" )
+
+    reader.readAsBinaryString(file)
+    return false
+
 $( document ).ready ->
 
-    editor = new Editor
     editor.init()
 
     editor.toggleHelpDialog()
@@ -822,3 +848,14 @@ $( document ).ready ->
     $( '#SaveDialog .close' ).click ->
         editor.toggleSaveDialog()
         return false
+
+    if (window.File && window.FileList && window.FileReader) 
+        fileselect = $("#fileselect")
+        # file select
+        fileselect.change ( e ) -> 
+            FileSelectHandler ( e )
+
+        # is XHR2 available?
+        return false
+
+editor = new Editor

@@ -6,6 +6,8 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script src="js/jquery.Storage.js" type="text/javascript"></script>
     <script src="js/jquery.DateFormat-1.0.js" type="text/javascript"></script>
+    <script type=text/javascript src="js/jquery.url.js"></script>
+    <script type=text/javascript src=js/textmode.min.js></script>
     <script>[% javascript %]</script>
     <style type=text/css>[% css %]</style>
     <script type="text/javascript">
@@ -56,6 +58,14 @@
         <h2>Your Drawings</h2>
         <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list</p>
         <ol></ol>
+        <h2>Upload Drawing</h2>
+        <form id="upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+            <div>
+                <label for="fileselect">Drawing to upload: </label>
+                <input type="file" id="fileselect" name="fileselect" />
+            </div>
+        </form>
     </div>
     <div id=SaveDialog>
         <a class=close href=#>&times;</a>
