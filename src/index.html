@@ -54,18 +54,22 @@
         </div>
     </div>
     <div id=drawings>
-        <a class=close href=#>&times;</a>
-        <h2>Your Drawings</h2>
-        <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list</p>
-        <ol></ol>
-        <h2>Upload Drawing</h2>
-        <form id="upload" method="post" enctype="multipart/form-data">
-            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-            <div>
-                <label for="fileselect">Drawing to upload: </label>
-                <input type="file" id="fileselect" name="fileselect" />
-            </div>
-        </form>
+        <div>
+            <a class=close href=#>&times;</a>
+            <h2>Your Drawings</h2>
+            <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list</p>
+            <ol></ol>
+        </div>
+        <div>
+            <h2>Upload Drawing</h2>
+            <form id="upload" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+                <div>
+                    <label for="fileselect">Drawing to upload: </label>
+                    <input type="file" id="fileselect" name="fileselect" />
+                </div>
+            </form>
+        </div>
     </div>
     <div id=SaveDialog>
         <a class=close href=#>&times;</a>

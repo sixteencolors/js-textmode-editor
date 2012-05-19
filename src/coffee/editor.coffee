@@ -40,12 +40,12 @@ class @Editor
                 @drawingId = null
                 @grid = []
                 @draw()
-                $( '#name' ).val("")
+                @setName("")
 
         $('#save').click =>
             @toggleSaveDialog()
             @drawings =[] if !@drawings
-            if @drawings[@drawingId] then $( '#name' ).val(@drawings[@drawingId].name)
+            if @drawings[@drawingId] then @setName(@drawings[@drawingId].name)
 
         $('#html5Save').click =>
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
@@ -221,6 +221,9 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+            
+    setName: (name) ->
+        $('#name').val( name )
 
     toggleSaveDialog: ->
         unless $( '#SaveDialog' ).is( ':visible' )
@@ -829,6 +832,7 @@ ParseFile = ( file ) ->
     $( reader ).bind  "loadstart", (e) -> 
         console.log ("load started" )
 
+    editor.setName( file.name )
     reader.readAsBinaryString(file)
     return false
 
