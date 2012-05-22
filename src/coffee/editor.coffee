@@ -218,6 +218,10 @@ class @Editor
                 @cursor.y = Math.floor( e.pageY / @font.height )
                 @putChar(@sets.char, true) if @sets.locked
                 @updateCursorPosition()
+                if !@block.mode && !sets.locked
+                    $(this).trigger("startblock", [@cursor.x, @cursor.y])
+                else if !@sets.locked
+                    $(this).trigger("moveblock")
                 return true
 
 
@@ -229,6 +233,8 @@ class @Editor
             @putChar(@sets.char, true) if @sets.locked
             @cursor.draw()
             @updateCursorPosition()
+            $(this).trigger("endblock")
+
             return true
 
         $('#' + @id).bind 'touchstart', ( e ) =>            
