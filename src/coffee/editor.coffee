@@ -221,19 +221,22 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
-            
+
+        $( '#dialogs .close' ).click ( e ) =>
+            @toggleDialog $( e.currentTarget ).parent().attr 'class'
+
     setName: (name) ->
         $('#name').val( name )
 
-    toggleDialog: (name) ->
+    toggleDialog: ( name ) ->
         dialog = $( '#dialogs .' + name )
 
         if dialog.is( ':visible' )
-            dialog.slideToggle 'slow', () ->
-                dialog.parent().toggle()
+            dialog.parent().slideToggle 'slow', () ->
+                dialog.toggle()
         else
-            dialog.parent().toggle 0, () ->
-                dialog.slideToggle 'slow'
+            dialog.toggle 0, () ->
+                dialog.parent().slideToggle 'slow'
 
     toggleSaveDialog: ->
         unless $( '#SaveDialog' ).is( ':visible' )
