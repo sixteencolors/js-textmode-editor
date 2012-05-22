@@ -225,7 +225,19 @@ a:hover {
 }
 
 #cursor.ins {
-    background-image: url(img/cursor_ins.gif);
+    background-image: url(img/cursor_ins.gif);    
+}
+
+#highlight {
+    background-color: #999;
+    display: none;
+    position: absolute;
+    zoom: 1;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+
 }
 
 #canvas {

@@ -19,6 +19,7 @@ class @Editor
         @vga_canvas.setAttribute 'height', @height
         @grid = []
         @drawingId = null
+        @block = {x: 0, y: 0, mode: false}
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
@@ -59,6 +60,10 @@ class @Editor
         $('#load').click =>
             @toggleLoadDialog()
 
+        $("body").bind "keyup", (e) =>
+            if @block.mode && !e.shiftKey && e.which != 16 # is in block mode, shift has been released and a key other then shift is pressed
+                $(this).trigger "endblock"
+
         $("body").bind "keydown", (e) =>
             key = 
               left: 37
@@ -87,7 +92,8 @@ class @Editor
               s: 83
 
             if (e.target.nodeName != "INPUT")
-                mod = e.shiftKey || e.altKey || e.ctrlKey
+                mod = e.altKey || e.ctrlKey
+
                 switch e.which
                     when key.left
                         if (!mod)
@@ -164,6 +170,13 @@ class @Editor
 
 
                 @updateCursorPosition()
+
+                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
+                    if !@block.mode
+                        $(this).trigger("startblock", [@cursor.x, @cursor.y])
+                    else
+                        $(this).trigger("moveblock")
+
                 @pal.draw()
                 @cursor.draw()
 
@@ -171,6 +184,24 @@ class @Editor
         if document.all
             window.onhelp = () -> return false
             document.onhelp = () -> return false
+
+        $(this).bind "startblock", (e, x, y) =>
+            @block = {x: x, y: y, mode: true}
+            $("#highlight").css('display', 'block')
+            $("#highlight").css('left', (x - 1) * @font.width)
+            $("#highlight").css('top', y * @font.height)
+            console.log("start block mode (" + x + ", " + y + ")")
+            $(this).trigger "moveblock"
+
+        $(this).bind "endblock", (e) =>
+            @block.mode = false
+            $("#highlight").css('display', 'none')
+            console.log("end block mode")
+
+        $(this).bind "moveblock", (e) =>
+            $("#highlight").width (@cursor.x - @block.x + 1) * @font.width
+            $("#highlight").height (@cursor.y - @block.y + 1) * @font.height
+            console.log 'move: bx: ' + @block.x + ' by: ' + @block.y + 'x: ' + @cursor.x + ' y: ' + @cursor.y
 
         $("body").bind "keypress", (e) =>       
             if (e.target.nodeName != "INPUT")     
