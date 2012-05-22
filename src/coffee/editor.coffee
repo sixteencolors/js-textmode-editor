@@ -93,6 +93,9 @@ class @Editor
 
             if (e.target.nodeName != "INPUT")
                 mod = e.altKey || e.ctrlKey
+                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
+                    if !@block.mode
+                        $(this).trigger("startblock", [@cursor.x, @cursor.y])
 
                 switch e.which
                     when key.left
@@ -170,12 +173,8 @@ class @Editor
 
 
                 @updateCursorPosition()
-
-                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
-                    if !@block.mode
-                        $(this).trigger("startblock", [@cursor.x, @cursor.y])
-                    else
-                        $(this).trigger("moveblock")
+                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home )) && @block.mode
+                    $(this).trigger("moveblock")
 
                 @pal.draw()
                 @cursor.draw()
@@ -197,11 +196,13 @@ class @Editor
             console.log("end block mode")
 
         $(this).bind "moveblock", (e) =>
-            $("#highlight").css('left', (if @cursor.x > @block.x then @block.x - 1 else @cursor.x - 1) * @font.width)
-            $("#highlight").css('top', (if @cursor.y > @block.y then @block.y else @cursor.y) * @font.height)
-            $("#highlight").width Math.abs(@cursor.x - @block.x + 1) * @font.width
+            $("#highlight").css('left', (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width)
+            $("#highlight").css('top', (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height)
+            $("#highlight").width (Math.abs(@cursor.x - @block.x) + 1) * @font.width
             $("#highlight").height Math.abs(@cursor.y - @block.y + 1) * @font.height
             console.log 'move: bx: ' + @block.x + ' by: ' + @block.y + 'x: ' + @cursor.x + ' y: ' + @cursor.y
+            console.log 'left: ' + $("#highlight").css('left')
+            console.log 'width: ' + $("#highlight").css('width')
 
         $("body").bind "keypress", (e) =>       
             if (e.target.nodeName != "INPUT")     
