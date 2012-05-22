@@ -225,6 +225,16 @@ class @Editor
     setName: (name) ->
         $('#name').val( name )
 
+    toggleDialog: (name) ->
+        dialog = $( '#dialogs .' + name )
+
+        if dialog.is( ':visible' )
+            dialog.slideToggle 'slow', () ->
+                dialog.parent().toggle()
+        else
+            dialog.parent().toggle 0, () ->
+                dialog.slideToggle 'slow'
+
     toggleSaveDialog: ->
         unless $( '#SaveDialog' ).is( ':visible' )
             $( '#drawings').slideUp 'slow'
@@ -839,19 +849,20 @@ ParseFile = ( file ) ->
 $( document ).ready ->
 
     editor.init()
+    editor.toggleDialog 'splash'
 
-    editor.toggleHelpDialog()
-    $( '#splash .close' ).click ->
-        editor.toggleHelpDialog()
-        return false
+#    editor.toggleHelpDialog()
+#    $( '#splash .close' ).click ->
+#        editor.toggleHelpDialog()
+#        return false
 
-    $( '#drawings .close' ).click ->
-        editor.toggleLoadDialog()
-        return false
+#    $( '#drawings .close' ).click ->
+#        editor.toggleLoadDialog()
+#        return false
 
-    $( '#SaveDialog .close' ).click ->
-        editor.toggleSaveDialog()
-        return false
+#    $( '#SaveDialog .close' ).click ->
+#        editor.toggleSaveDialog()
+#        return false
 
     if (window.File && window.FileList && window.FileReader) 
         fileselect = $("#fileselect")

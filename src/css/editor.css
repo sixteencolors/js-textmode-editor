@@ -11,6 +11,33 @@ html, body {
     background: #333;
 }
 
+/* DIALOGS */
+
+#dialogs {
+    display: none;
+    position: absolute;
+    background: rgba( 55, 55, 55, 0.5 );
+    left: 0px;
+    top: 0px;
+    width:100%;
+    height:100%;
+    text-align: center;
+    z-index: 1000;
+}
+
+#dialogs > div {
+    display: none;
+    width: 450px;
+    height: 340px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -225px;
+    margin-top: -170px;
+    background: #fff;
+    border: 4px solid #aaa;
+}
+
 /* DRAWINGS (SAVE/LOAD) */
 
 #drawings {
