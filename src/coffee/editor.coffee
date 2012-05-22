@@ -188,8 +188,6 @@ class @Editor
         $(this).bind "startblock", (e, x, y) =>
             @block = {x: x, y: y, mode: true}
             $("#highlight").css('display', 'block')
-            $("#highlight").css('left', (x - 1) * @font.width)
-            $("#highlight").css('top', y * @font.height)
             console.log("start block mode (" + x + ", " + y + ")")
             $(this).trigger "moveblock"
 
@@ -199,8 +197,10 @@ class @Editor
             console.log("end block mode")
 
         $(this).bind "moveblock", (e) =>
-            $("#highlight").width (@cursor.x - @block.x + 1) * @font.width
-            $("#highlight").height (@cursor.y - @block.y + 1) * @font.height
+            $("#highlight").css('left', (if @cursor.x > @block.x then @block.x - 1 else @cursor.x - 1) * @font.width)
+            $("#highlight").css('top', (if @cursor.y > @block.y then @block.y else @cursor.y) * @font.height)
+            $("#highlight").width Math.abs(@cursor.x - @block.x + 1) * @font.width
+            $("#highlight").height Math.abs(@cursor.y - @block.y + 1) * @font.height
             console.log 'move: bx: ' + @block.x + ' by: ' + @block.y + 'x: ' + @cursor.x + ' y: ' + @cursor.y
 
         $("body").bind "keypress", (e) =>       
