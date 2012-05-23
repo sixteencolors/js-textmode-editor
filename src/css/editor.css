@@ -229,6 +229,7 @@ a:hover {
 }
 
 #highlight {
+    pointer-events: none;
     background-color: #999;
     display: none;
     position: absolute;
