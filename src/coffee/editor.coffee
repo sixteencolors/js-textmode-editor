@@ -167,6 +167,12 @@ class @Editor
                 @pal.draw()
                 @cursor.draw()
 
+        # file select
+        if (window.File && window.FileList && window.FileReader) 
+            fileselect = $("#fileselect")
+            fileselect.change ( e ) -> 
+                FileSelectHandler ( e )
+
         # fix for ie loading help on F1 keypress
         if document.all
             window.onhelp = () -> return false
@@ -236,26 +242,8 @@ class @Editor
                 dialog.toggle()
         else
             dialog.toggle 0, () ->
+                # @updateDrawingList()
                 dialog.parent().slideToggle 'slow'
-
-    toggleSaveDialog: ->
-        unless $( '#SaveDialog' ).is( ':visible' )
-            $( '#drawings').slideUp 'slow'
-            $( '#splash' ).slideUp 'slow'
-        $( '#SaveDialog' ).slideToggle 'slow'
-
-    toggleLoadDialog: ->
-        unless $( '#drawings' ).is( ':visible' )
-            @updateDrawingList()
-            $( '#SaveDialog').slideUp 'slow'
-            $( '#splash' ).slideUp 'slow'
-        $( '#drawings' ).slideToggle 'slow'
-
-    toggleHelpDialog: ->
-        unless $( '#splash' ).is( ':visible' )
-            $( '#drawings').slideUp 'slow'
-            $( '#SaveDialog' ).slideUp 'slow'
-        $( '#splash' ).slideToggle 'slow'
 
     updateDrawingList: ->
         $('#drawings ol').empty()
@@ -850,30 +838,6 @@ ParseFile = ( file ) ->
     return false
 
 $( document ).ready ->
-
+    editor = new Editor
     editor.init()
     editor.toggleDialog 'splash'
-
-#    editor.toggleHelpDialog()
-#    $( '#splash .close' ).click ->
-#        editor.toggleHelpDialog()
-#        return false
-
-#    $( '#drawings .close' ).click ->
-#        editor.toggleLoadDialog()
-#        return false
-
-#    $( '#SaveDialog .close' ).click ->
-#        editor.toggleSaveDialog()
-#        return false
-
-    if (window.File && window.FileList && window.FileReader) 
-        fileselect = $("#fileselect")
-        # file select
-        fileselect.change ( e ) -> 
-            FileSelectHandler ( e )
-
-        # is XHR2 available?
-        return false
-
-editor = new Editor
