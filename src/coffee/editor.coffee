@@ -187,31 +187,32 @@ class @Editor
         $(this).bind "startblock", (e, x, y) =>
             @block = {x: x, y: y, mode: true}
             $("#highlight").css('display', 'block')
-            console.log("start block mode (" + x + ", " + y + ")")
             $(this).trigger "moveblock"
 
         $(this).bind "endblock", (e) =>
             @block.mode = false
             $("#highlight").css('display', 'none')
-            console.log("end block mode")
 
         $(this).bind "moveblock", (e) =>
             $("#highlight").css('left', (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width)
             $("#highlight").css('top', (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height)
             $("#highlight").width (Math.abs(@cursor.x - @block.x) + 1) * @font.width
             $("#highlight").height Math.abs(@cursor.y - @block.y + 1) * @font.height
-            console.log 'move: bx: ' + @block.x + ' by: ' + @block.y + 'x: ' + @cursor.x + ' y: ' + @cursor.y
-            console.log 'left: ' + $("#highlight").css('left')
-            console.log 'width: ' + $("#highlight").css('width')
 
         $("body").bind "keypress", (e) =>       
-            if (e.target.nodeName != "INPUT")     
+            if @block.mode && e.which == 102 # f for fill foreground
+                @fillBlock(@pal.fg, null)
+                @draw()
+            if @block.mode && e.which == 98 # b for fill background
+                @fillBlock(null, @pal.bg)
+                @draw()
+            else if e.target.nodeName != "INPUT"
                 char = String.fromCharCode(e.which)
                 pattern = ///
                     [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
                 ///
                 if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
-                    @putChar(char.charCodeAt( 0 ) & 255);                    
+                    @putChar(char.charCodeAt( 0 ) & 255);  
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
@@ -260,6 +261,14 @@ class @Editor
             @canvas.setAttribute 'height', @height
             @draw() 
             
+    fillBlock: (fg, bg) ->
+        for y in [@block.y..@cursor.y]
+            continue if !@grid[y]?
+            for x in [(@cursor.x)..@block.x]
+                continue if !@grid[y][x]?
+                @grid[y][x].attr = ( (if bg then bg  else ( @grid[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @grid[y][x].attr & 15
+
+
     setName: (name) ->
         $('#name').val( name )
 
@@ -855,7 +864,6 @@ FileSelectHandler = ( e ) ->
 ParseFile = ( file ) ->
     reader = new FileReader()
     $( reader ).load ( e ) ->
-        console.log( e.target.result )
         content = e.target.result
         image = new ImageTextModeANSI()
         image.parse( content )
