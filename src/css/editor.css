@@ -21,7 +21,6 @@ html, body {
     top: 0px;
     width:100%;
     height:100%;
-    text-align: center;
     z-index: 1000;
 }
 
@@ -36,30 +35,11 @@ html, body {
     margin-top: -170px;
     background: #fff;
     border: 4px solid #aaa;
-}
-
-/* DRAWINGS (SAVE/LOAD) */
-
-#drawings {
+    padding: 8px;
     overflow: auto;
 }
 
 /* SPLASH SCREEN */
-
-#splash, #drawings, #SaveDialog {
-    display: none;
-    z-index: 2;
-    position: absolute;
-    width: 400px;
-    height: 330px;
-    top: 50%;
-    left: 50%;
-    margin-left: -200px;
-    margin-top: -150px;
-    background: #fff;
-    border: 4px solid #aaa;
-    padding: 8px;
-}
 
 h1 {
     font-size: 18px;
