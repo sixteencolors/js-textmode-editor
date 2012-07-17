@@ -203,9 +203,29 @@ class @Editor
             if @block.mode && e.which == 102 # f for fill foreground
                 @fillBlock(@pal.fg, null)
                 @draw()
-            if @block.mode && e.which == 98 # b for fill background
+            else if @block.mode && e.which == 98 # b for fill background
                 @fillBlock(null, @pal.bg)
-                @draw()
+                @draw()            
+            else if @block.mode && e.which == 99 # c for copy
+                # make copy of portion of canvas
+                @copyCanvas = document.createElement('canvas')
+                @copyCanvas.id = 'copy'
+                @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
+                @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+                @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
+
+                sourceX = (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width
+                sourceY = (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height
+                sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+                sourceHeight = Math.abs(@cursor.y - @block.y + 1) * @font.height
+                destWidth = sourceWidth
+                destHeight = sourceHeight
+                destX = 0
+                destY = 0
+
+                @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+                $(@copyCanvas).insertBefore('#vga')
+
             else if e.target.nodeName != "INPUT"
                 char = String.fromCharCode(e.which)
                 pattern = ///

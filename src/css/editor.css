@@ -247,6 +247,13 @@ a:hover {
     height: 100%;
 }
 
+/* block copy/move */
+
+#copy {
+    position: absolute;
+    z-index: 1000;
+}
+
 /* VGA PREVIEW */
 #vga {
     position: absolute;
