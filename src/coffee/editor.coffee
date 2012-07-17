@@ -19,7 +19,7 @@ class @Editor
         @vga_canvas.setAttribute 'height', @height
         @grid = []
         @drawingId = null
-        @block = {x: 0, y: 0, mode: false}
+        @block = {x: 0, y: 0, mode: 'off'}
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
@@ -61,7 +61,7 @@ class @Editor
             @toggleLoadDialog()
 
         $("body").bind "keyup", (e) =>
-            if @block.mode && !e.shiftKey && e.which != 16 # is in block mode, shift has been released and a key other then shift is pressed
+            if @block.mode == 'on' && !e.shiftKey && e.which != 16 # is in block mode, shift has been released and a key other then shift is pressed
                 $(this).trigger "endblock"
 
         $("body").bind "keydown", (e) =>
@@ -94,7 +94,7 @@ class @Editor
             if (e.target.nodeName != "INPUT")
                 mod = e.altKey || e.ctrlKey
                 if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
-                    if !@block.mode
+                    if @block.mode == 'off'
                         $(this).trigger("startblock", [@cursor.x, @cursor.y])
 
                 switch e.which
@@ -173,7 +173,7 @@ class @Editor
 
 
                 @updateCursorPosition()
-                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home )) && @block.mode
+                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home )) && @block.mode == 'on'
                     $(this).trigger("moveblock")
 
                 @pal.draw()
@@ -190,7 +190,7 @@ class @Editor
             $(this).trigger "moveblock"
 
         $(this).bind "endblock", (e) =>
-            @block.mode = false
+            @block.mode = 'off'
             $("#highlight").css('display', 'none')
 
         $(this).bind "moveblock", (e) =>
@@ -200,13 +200,14 @@ class @Editor
             $("#highlight").height Math.abs(@cursor.y - @block.y + 1) * @font.height
 
         $("body").bind "keypress", (e) =>       
-            if @block.mode && e.which == 102 # f for fill foreground
+            if @block.mode == 'on' && e.which == 102 # f for fill foreground
                 @fillBlock(@pal.fg, null)
                 @draw()
-            else if @block.mode && e.which == 98 # b for fill background
+            else if @block.mode == 'on' && e.which == 98 # b for fill background
                 @fillBlock(null, @pal.bg)
                 @draw()            
-            else if @block.mode && e.which == 99 # c for copy
+            else if @block.mode == 'on' && e.which == 99 # c for copy
+                @block.mode = 'copy'
                 # make copy of portion of canvas
                 @copyCanvas = document.createElement('canvas')
                 @copyCanvas.id = 'copy'
@@ -224,6 +225,8 @@ class @Editor
                 destY = 0
 
                 @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+                $(@copyCanvas).css('left', sourceX + 8)
+                $(@copyCanvas).css('top', sourceY + 8)
                 $(@copyCanvas).insertBefore('#vga')
 
             else if e.target.nodeName != "INPUT"
@@ -240,7 +243,7 @@ class @Editor
                 @cursor.y = Math.floor( e.pageY / @font.height )
                 @putChar(@sets.char, true) if @sets.locked
                 @updateCursorPosition()
-                if !@block.mode && !sets.locked
+                if @block.mode == 'off' && !sets.locked
                     $(this).trigger("startblock", [@cursor.x, @cursor.y])
                 else if !@sets.locked
                     $(this).trigger("moveblock")
@@ -448,6 +451,10 @@ class Cursor
         else if @y < @editor.height / @editor.font.height - 1
             @x =0
             @y++
+
+        if @editor.block.mode == 'copy'
+            $(@canvasCopy).css('left', @cursor.x)
+            $(@canvasCopy).css('top', @cursor.y)
         @draw()
 
     moveLeft: ->
