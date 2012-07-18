@@ -110,15 +110,12 @@ class @Editor
                             if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
                     when key.down
                         if (!mod)
-                            if @cursor.y < (@height - 16) / 16
-                              @cursor.y++
+                            @cursor.moveDown()
                         else if (e.ctrlKey)
                             if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
                     when key.up
                         if (!mod)
-                            if @cursor.y > 0
-                              @cursor.y--
-                              @cursor.draw()
+                            @cursor.moveUp()
                         else if e.ctrlKey
                             if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
                     when key.backspace
@@ -208,6 +205,16 @@ class @Editor
                 @draw()            
             else if @block.mode == 'on' && e.which == 99 # c for copy
                 @block.mode = 'copy'
+                # make copy of drawing data
+                @copyGrid = []
+                for y in [ @cursor.y .. @block.y ]
+                    for x in [ @cursor.x .. @block.x ]
+                        adjustedY = y - Math.abs(@cursor.y - @block.y)
+                        adjustedX = x - Math.abs(@cursor.x - @block.x)
+                        if !@copyGrid[adjustedY]?
+                            @copyGrid[adjustedY] = []
+                        @copyGrid[adjustedY][adjustedX] = @grid[y][@cursor.x]
+
                 # make copy of portion of canvas
                 @copyCanvas = document.createElement('canvas')
                 @copyCanvas.id = 'copy'
@@ -215,19 +222,23 @@ class @Editor
                 @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
                 @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
 
-                sourceX = (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width
-                sourceY = (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height
                 sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
                 sourceHeight = Math.abs(@cursor.y - @block.y + 1) * @font.height
+                @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
+                @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
+                sourceX = @cursor.x * @font.width
+                sourceY = @cursor.y * @font.height
                 destWidth = sourceWidth
                 destHeight = sourceHeight
                 destX = 0
                 destY = 0
 
                 @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-                $(@copyCanvas).css('left', sourceX + 8)
-                $(@copyCanvas).css('top', sourceY + 8)
+
                 $(@copyCanvas).insertBefore('#vga')
+                @positionCopy()
+
+
 
             else if e.target.nodeName != "INPUT"
                 char = String.fromCharCode(e.which)
@@ -283,6 +294,10 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    positionCopy: ->
+        $(@copyCanvas).css('left', @cursor.x  * @font.width)
+        $(@copyCanvas).css('top', (@cursor.y) * @font.height)
             
     fillBlock: (fg, bg) ->
         for y in [@block.y..@cursor.y]
@@ -452,11 +467,8 @@ class Cursor
             @x =0
             @y++
 
-        if @editor.block.mode == 'copy'
-            copy = $(@editor.copyCanvas)
-            copy.css('left', @x  * @editor.font.width - @editor.copyCanvas.clientWidth)
-            copy.css('top', @y * @editor.font.height - @editor.copyCanvas.clientHeight)
-        @draw()
+        @move()
+
 
     moveLeft: ->
         if @x > 0
@@ -464,7 +476,28 @@ class Cursor
         else if @y > 0
             @y--
             @x = @editor.width / @editor.font.width - 1
+        
+        @move()
+
+
+    moveUp: ->
+        if @y > 0                            
+          @y--
+
+        @move()
+
+    moveDown: ->
+        if @y < (@editor.height - 16) / 16
+          @y++
+
+        @move()
+
+
+    move: ->
+        if @editor.block.mode == 'copy'
+            @editor.positionCopy()
         @draw()
+
         
 class CharacterSets
 
