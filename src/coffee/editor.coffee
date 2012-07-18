@@ -185,7 +185,7 @@ class @Editor
             document.onhelp = () -> return false
 
         $(this).bind "startblock", (e, x, y) =>
-            @block = {x: x, y: y, mode: true}
+            @block = {x: x, y: y, mode: 'on'}
             $("#highlight").css('display', 'block')
             $(this).trigger "moveblock"
 
@@ -453,8 +453,9 @@ class Cursor
             @y++
 
         if @editor.block.mode == 'copy'
-            $(@canvasCopy).css('left', @cursor.x)
-            $(@canvasCopy).css('top', @cursor.y)
+            copy = $(@editor.copyCanvas)
+            copy.css('left', @x  * @editor.font.width - @editor.copyCanvas.clientWidth)
+            copy.css('top', @y * @editor.font.height - @editor.copyCanvas.clientHeight)
         @draw()
 
     moveLeft: ->

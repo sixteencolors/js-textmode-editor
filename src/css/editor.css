@@ -252,6 +252,7 @@ a:hover {
 #copy {
     position: absolute;
     z-index: 1000;
+    top: 0;
 }
 
 /* VGA PREVIEW */
