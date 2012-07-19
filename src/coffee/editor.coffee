@@ -135,8 +135,11 @@ class @Editor
                     when key.home
                         @cursor.x = 0
                     when key.enter
-                        @cursor.x = 0
-                        @cursor.y++
+                        if @block.mode == 'copy'
+                            @paste()
+                        else
+                            @cursor.x = 0
+                            @cursor.y++
                     when key.insert
                         @cursor.change_mode()
                     when key.escape
@@ -146,6 +149,9 @@ class @Editor
                             $( '#drawings' ).slideToggle 'slow'
                         if $( '#SaveDialog' ).is( ':visible' )
                             $( '#SaveDialog' ).slideToggle 'slow'
+                        if @block.mode == 'copy'
+                            @block.mode = 'off'
+                            $( '#copy' ).remove()
                     else 
                         if e.which == key.h && e.altKey
                             @toggleHelpDialog()
@@ -205,15 +211,34 @@ class @Editor
                 @draw()            
             else if @block.mode == 'on' && e.which == 99 # c for copy
                 @block.mode = 'copy'
+                $("#highlight").css('display', 'none')
                 # make copy of drawing data
                 @copyGrid = []
-                for y in [ @cursor.y .. @block.y ]
-                    for x in [ @cursor.x .. @block.x ]
-                        adjustedY = y - Math.abs(@cursor.y - @block.y)
-                        adjustedX = x - Math.abs(@cursor.x - @block.x)
-                        if !@copyGrid[adjustedY]?
-                            @copyGrid[adjustedY] = []
-                        @copyGrid[adjustedY][adjustedX] = @grid[y][@cursor.x]
+                if @cursor.y > @block.y 
+                    starty = @block.y
+                    endy = @cursor.y
+                else 
+                    starty = @cursor.y
+                    endy = @block.y
+
+                if @cursor.x > @block.x
+                    startx = @block.x
+                    endx = @cursor.x
+                else
+                    startx = @cursor.x
+                    endx = @block.x
+
+                yy = 0;
+                for y in [ starty .. endy ]
+                    xx = 0;
+                    for x in [ startx .. endx ]
+                        # adjustedY = y - Math.abs(@cursor.y - @block.y)
+                        # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                        if !@copyGrid[yy]?
+                            @copyGrid[yy] = []
+                        @copyGrid[yy][xx] = @grid[y][x]
+                        xx++
+                    yy++
 
                 # make copy of portion of canvas
                 @copyCanvas = document.createElement('canvas')
@@ -250,8 +275,7 @@ class @Editor
 
         $('#' + @id).mousemove ( e ) =>
             if @cursor.mousedown
-                @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
-                @cursor.y = Math.floor( e.pageY / @font.height )
+                @setMouseCoordinates(e)
                 @putChar(@sets.char, true) if @sets.locked
                 @updateCursorPosition()
                 if @block.mode == 'off' && !sets.locked
@@ -259,6 +283,9 @@ class @Editor
                 else if !@sets.locked
                     $(this).trigger("moveblock")
                 return true
+            if @block.mode == 'copy'
+                @setMouseCoordinates(e)
+                @positionCopy()
 
 
         $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
@@ -285,6 +312,9 @@ class @Editor
                 return @putTouchChar( touch )
 
         $('body').mouseup ( e ) =>
+            if @block.mode == 'copy'
+                @paste()
+
             @cursor.mousedown = false
             @cursor.draw()
 
@@ -294,6 +324,27 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    paste: ->
+        # place copy
+        stationaryY = @cursor.y
+        stationaryX = @cursor.x
+
+        for y in [ 0 .. @copyGrid.length - 1]
+            continue if !@copyGrid[y]?
+            for x in [0 .. @copyGrid[y].length - 1]
+                continue if !@copyGrid[y][x]?
+                if !@grid[stationaryY + y]?
+                    @grid[stationaryY + y] = []
+                @grid[stationaryY + y][stationaryX + x] = @copyGrid[y][x]
+        @draw()
+
+        @block.mode = 'off'
+        $('#copy').remove()
+
+    setMouseCoordinates: (e) ->
+        @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
+        @cursor.y = Math.floor( e.pageY / @font.height )
 
     positionCopy: ->
         $(@copyCanvas).css('left', @cursor.x  * @font.width)
