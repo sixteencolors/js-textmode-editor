@@ -209,61 +209,11 @@ class @Editor
             else if @block.mode == 'on' && e.which == 98 # b for fill background
                 @fillBlock(null, @pal.bg)
                 @draw()            
+            else if @block.mode == 'on' && e.which == 120 # x for cut
+                @cut()
+
             else if @block.mode == 'on' && e.which == 99 # c for copy
-                @block.mode = 'copy'
-                $("#highlight").css('display', 'none')
-                # make copy of drawing data
-                @copyGrid = []
-                if @cursor.y > @block.y 
-                    starty = @block.y
-                    endy = @cursor.y
-                else 
-                    starty = @cursor.y
-                    endy = @block.y
-
-                if @cursor.x > @block.x
-                    startx = @block.x
-                    endx = @cursor.x
-                else
-                    startx = @cursor.x
-                    endx = @block.x
-
-                yy = 0;
-                for y in [ starty .. endy ]
-                    xx = 0;
-                    for x in [ startx .. endx ]
-                        # adjustedY = y - Math.abs(@cursor.y - @block.y)
-                        # adjustedX = x - Math.abs(@cursor.x - @block.x)
-                        if !@copyGrid[yy]?
-                            @copyGrid[yy] = []
-                        @copyGrid[yy][xx] = @grid[y][x]
-                        xx++
-                    yy++
-
-                # make copy of portion of canvas
-                @copyCanvas = document.createElement('canvas')
-                @copyCanvas.id = 'copy'
-                @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
-                @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-                @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
-
-                sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-                sourceHeight = Math.abs(@cursor.y - @block.y + 1) * @font.height
-                @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
-                @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
-                sourceX = @cursor.x * @font.width
-                sourceY = @cursor.y * @font.height
-                destWidth = sourceWidth
-                destHeight = sourceHeight
-                destX = 0
-                destY = 0
-
-                @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-
-                $(@copyCanvas).insertBefore('#vga')
-                @positionCopy()
-
-
+                @copy()
 
             else if e.target.nodeName != "INPUT"
                 char = String.fromCharCode(e.which)
@@ -324,6 +274,69 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    copy: ->
+        @copyOrCut()
+
+    cut: ->
+        @copyOrCut(true)
+
+
+    copyOrCut: (cut=false)->
+        @block.mode = 'copy'
+        $("#highlight").css('display', 'none')
+        # make copy of drawing data
+        @copyGrid = []
+        if @cursor.y > @block.y 
+            starty = @block.y
+            endy = @cursor.y
+        else 
+            starty = @cursor.y
+            endy = @block.y
+
+        if @cursor.x > @block.x
+            startx = @block.x
+            endx = @cursor.x
+        else
+            startx = @cursor.x
+            endx = @block.x
+
+        yy = 0;
+        for y in [ starty .. endy ]
+            xx = 0;
+            for x in [ startx .. endx ]
+                # adjustedY = y - Math.abs(@cursor.y - @block.y)
+                # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                if !@copyGrid[yy]?
+                    @copyGrid[yy] = []
+                @copyGrid[yy][xx] = @grid[y][x]
+                @grid[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @grid[y][x]?)  # clear block if cutting
+                xx++
+            yy++
+
+        @draw() if cut
+        # make copy of portion of canvas
+        @copyCanvas = document.createElement('canvas')
+        @copyCanvas.id = 'copy'
+        @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
+        @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+        @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
+
+        sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+        sourceHeight = Math.abs(@cursor.y - @block.y + 1) * @font.height
+        @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
+        @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
+        sourceX = @cursor.x * @font.width
+        sourceY = @cursor.y * @font.height
+        destWidth = sourceWidth
+        destHeight = sourceHeight
+        destX = 0
+        destY = 0
+
+        @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+
+        $(@copyCanvas).insertBefore('#vga')
+        @positionCopy()
 
     paste: ->
         # place copy

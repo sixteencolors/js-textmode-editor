@@ -253,6 +253,7 @@ a:hover {
     position: absolute;
     z-index: 1000;
     top: 0;
+    pointer-events: none;
 }
 
 /* VGA PREVIEW */
