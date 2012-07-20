@@ -135,7 +135,7 @@ class @Editor
                     when key.home
                         @cursor.x = 0
                     when key.enter
-                        if @block.mode == 'copy'
+                        if @block.mode in ['copy', 'cut']
                             @paste()
                         else
                             @cursor.x = 0
@@ -149,9 +149,11 @@ class @Editor
                             $( '#drawings' ).slideToggle 'slow'
                         if $( '#SaveDialog' ).is( ':visible' )
                             $( '#SaveDialog' ).slideToggle 'slow'
-                        if @block.mode == 'copy'
-                            @block.mode = 'off'
+                        if @block.mode in ['copy', 'cut']
+                            if @block.mode is 'cut'
+                                @cancelCut()
                             $( '#copy' ).remove()
+                            $(this).trigger("endblock")
                     else 
                         if e.which == key.h && e.altKey
                             @toggleHelpDialog()
@@ -195,12 +197,13 @@ class @Editor
         $(this).bind "endblock", (e) =>
             @block.mode = 'off'
             $("#highlight").css('display', 'none')
+            @copyGrid = []
 
         $(this).bind "moveblock", (e) =>
             $("#highlight").css('left', (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width)
             $("#highlight").css('top', (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height)
             $("#highlight").width (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-            $("#highlight").height Math.abs(@cursor.y - @block.y + 1) * @font.height
+            $("#highlight").height (Math.abs(@cursor.y - @block.y) + 1) * @font.height
 
         $("body").bind "keypress", (e) =>       
             if @block.mode == 'on' && e.which == 102 # f for fill foreground
@@ -210,9 +213,11 @@ class @Editor
                 @fillBlock(null, @pal.bg)
                 @draw()            
             else if @block.mode == 'on' && e.which == 120 # x for cut
+                @setBlockEnd()
                 @cut()
 
             else if @block.mode == 'on' && e.which == 99 # c for copy
+                @setBlockEnd()
                 @copy()
 
             else if e.target.nodeName != "INPUT"
@@ -233,7 +238,7 @@ class @Editor
                 else if !@sets.locked
                     $(this).trigger("moveblock")
                 return true
-            if @block.mode == 'copy'
+            if @block.mode in ['copy', 'cut']
                 @setMouseCoordinates(e)
                 @positionCopy()
 
@@ -262,7 +267,7 @@ class @Editor
                 return @putTouchChar( touch )
 
         $('body').mouseup ( e ) =>
-            if @block.mode == 'copy'
+            if @block.mode in ['copy', 'cut']
                 @paste()
 
             @cursor.mousedown = false
@@ -275,17 +280,47 @@ class @Editor
             @canvas.setAttribute 'height', @height
             @draw() 
 
+    setBlockEnd: ->
+        @block.endy = @cursor.y
+        @block.endx = @cursor.x
+
+
     copy: ->
+        @block.mode = 'copy'
         @copyOrCut()
 
     cut: ->
+        @block.mode = 'cut'
         @copyOrCut(true)
 
 
+    cancelCut: ->
+        if @block.endy > @block.y 
+            starty = @block.y
+            endy = @block.endy
+        else 
+            starty = @block.endy
+            endy = @block.y
+
+        if @block.endx > @block.x
+            startx = @block.x
+            endx = @block.endx
+        else
+            startx = @block.endx
+            endx = @block.x
+
+        yy = 0;
+        for y in [ starty .. endy ]
+            xx = 0;
+            for x in [ startx .. endx ]
+                # adjustedY = y - Math.abs(@cursor.y - @block.y)
+                # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                @grid[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
+                xx++
+            yy++
+        @draw()
+
     copyOrCut: (cut=false)->
-        @block.mode = 'copy'
-        $("#highlight").css('display', 'none')
-        # make copy of drawing data
         @copyGrid = []
         if @cursor.y > @block.y 
             starty = @block.y
@@ -301,20 +336,6 @@ class @Editor
             startx = @cursor.x
             endx = @block.x
 
-        yy = 0;
-        for y in [ starty .. endy ]
-            xx = 0;
-            for x in [ startx .. endx ]
-                # adjustedY = y - Math.abs(@cursor.y - @block.y)
-                # adjustedX = x - Math.abs(@cursor.x - @block.x)
-                if !@copyGrid[yy]?
-                    @copyGrid[yy] = []
-                @copyGrid[yy][xx] = @grid[y][x]
-                @grid[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @grid[y][x]?)  # clear block if cutting
-                xx++
-            yy++
-
-        @draw() if cut
         # make copy of portion of canvas
         @copyCanvas = document.createElement('canvas')
         @copyCanvas.id = 'copy'
@@ -323,7 +344,7 @@ class @Editor
         @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
 
         sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-        sourceHeight = Math.abs(@cursor.y - @block.y + 1) * @font.height
+        sourceHeight = (Math.abs(@cursor.y - @block.y) + 1) * @font.height
         @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
         @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
         sourceX = @cursor.x * @font.width
@@ -334,6 +355,24 @@ class @Editor
         destY = 0
 
         @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+
+        # make copy of drawing data
+
+        yy = 0;
+        for y in [ starty .. endy ]
+            xx = 0;
+            for x in [ startx .. endx ]
+                # adjustedY = y - Math.abs(@cursor.y - @block.y)
+                # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                if !@copyGrid[yy]?
+                    @copyGrid[yy] = []
+                @copyGrid[yy][xx] = { ch: @grid[y][x].ch, attr: @grid[y][x].attr } if @grid[y][x]?
+                @grid[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @grid[y][x]?)  # clear block if cutting
+                xx++
+            yy++
+
+        @draw() if cut
+
 
         $(@copyCanvas).insertBefore('#vga')
         @positionCopy()
@@ -352,7 +391,7 @@ class @Editor
                 @grid[stationaryY + y][stationaryX + x] = @copyGrid[y][x]
         @draw()
 
-        @block.mode = 'off'
+        $(this).trigger("endblock")
         $('#copy').remove()
 
     setMouseCoordinates: (e) ->
@@ -558,7 +597,7 @@ class Cursor
 
 
     move: ->
-        if @editor.block.mode == 'copy'
+        if @editor.block.mode in ['copy', 'cut']
             @editor.positionCopy()
         @draw()
 
