@@ -64,7 +64,9 @@ class @Editor
             # is in block mode, shift has been released and a key other then shift is pressed
             # 16 = shift
             # 17 = ctrl
-            if @block.mode == 'on' && !e.shiftKey && e.which != 16 && e.which != 17 
+            # 46 = del
+            # 8 = backspace
+            if @block.mode == 'on' && !e.shiftKey && e.which not in [16, 17, 46, 8] 
                 $(this).trigger "endblock"
 
         $("body").bind "keydown", (e) =>
@@ -94,7 +96,9 @@ class @Editor
               l: 76
               s: 83
 
-            if (e.target.nodeName != "INPUT")
+            if @block.mode and e.which in [key["delete"], key.backspace]
+                @delete()
+            else if (e.target.nodeName != "INPUT")
                 mod = e.altKey || e.ctrlKey
                 if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
                     if @block.mode == 'off'
@@ -296,7 +300,11 @@ class @Editor
 
     cut: ->
         @block.mode = 'cut'
-        @copyOrCut(true)
+        @copyOrCut(true, true)
+
+    delete: ->
+        @copyOrCut(false, true)
+        $(this).trigger("endblock")
 
 
     cancelCut: ->
@@ -327,7 +335,7 @@ class @Editor
         $('#copy').remove()
         @draw()
 
-    copyOrCut: (cut=false)->
+    copyOrCut: (copy = true, cut=false)->
         @copyGrid = []
         if @cursor.y > @block.y 
             starty = @block.y
@@ -343,26 +351,27 @@ class @Editor
             startx = @cursor.x
             endx = @block.x
 
-        # make copy of portion of canvas
-        @copyCanvas = document.createElement('canvas')
-        @copyCanvas.id = 'copy'
-        @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
-        @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-        @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.y) + 1) * @font.height
+        if copy
+            # make copy of portion of canvas
+            @copyCanvas = document.createElement('canvas')
+            @copyCanvas.id = 'copy'
+            @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
+            @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+            @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.y) + 1) * @font.height
 
-        sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-        sourceHeight = (Math.abs(@cursor.y - @block.y) + 1) * @font.height
-        @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
-        @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
-        sourceX = @cursor.x * @font.width
-        sourceY = @cursor.y * @font.height
-        destWidth = sourceWidth
-        destHeight = sourceHeight
-        destX = 0
-        destY = 0
+            sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
+            sourceHeight = (Math.abs(@cursor.y - @block.y) + 1) * @font.height
+            @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
+            @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
+            sourceX = @cursor.x * @font.width
+            sourceY = @cursor.y * @font.height
+            destWidth = sourceWidth
+            destHeight = sourceHeight
+            destX = 0
+            destY = 0
 
-        @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-        $(@copyCanvas).insertBefore('#vga')
+            @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+            $(@copyCanvas).insertBefore('#vga')
 
         # make copy of drawing data
 
@@ -372,9 +381,10 @@ class @Editor
             for x in [ startx .. endx ]
                 # adjustedY = y - Math.abs(@cursor.y - @block.y)
                 # adjustedX = x - Math.abs(@cursor.x - @block.x)
+
                 if !@copyGrid[yy]?
                     @copyGrid[yy] = []
-                @copyGrid[yy][xx] = { ch: @grid[y][x].ch, attr: @grid[y][x].attr } if @grid[y][x]?
+                @copyGrid[yy][xx] = { ch: @grid[y][x].ch, attr: @grid[y][x].attr } if @grid[y][x]? and copy
                 @grid[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @grid[y][x]?)  # clear block if cutting
                 xx++
             yy++
