@@ -1,4 +1,33 @@
 class @Editor
+    key = 
+      left: 37
+      up: 38
+      right: 39
+      down: 40
+      f1: 112
+      f2: 113
+      f3: 114
+      f4: 115
+      f5: 116
+      f6: 117
+      f7: 118
+      f8: 119
+      f9: 120
+      f10: 121
+      backspace: 8
+      delete: 46
+      end: 35
+      home: 36
+      enter: 13
+      escape: 27
+      insert: 45
+      h: 72
+      l: 76
+      s: 83,
+      ctrlF: 6,
+      ctrlB: 2,
+      ctrlX: 24,
+      ctrlC: 3
 
     constructor: ( options ) ->
         @tabstop  = 8
@@ -19,7 +48,7 @@ class @Editor
         @vga_canvas.setAttribute 'height', @height
         @grid = []
         @drawingId = null
-        @block = {x: 0, y: 0, mode: 'off'}
+        @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
@@ -62,39 +91,11 @@ class @Editor
 
         $("body").bind "keyup", (e) =>
             # is in block mode, shift has been released and a key other then shift is pressed
-            # 16 = shift
-            # 17 = ctrl
-            # 46 = del
-            # 8 = backspace
-            if @block.mode == 'on' && !e.shiftKey && e.which not in [16, 17, 46, 8] 
+            if @block.mode == 'on' && !e.shiftKey && e.which not in [key.shift, key.ctrl, key["delete"], key.backspace] 
                 $(this).trigger "endblock"
 
         $("body").bind "keydown", (e) =>
-            key = 
-              left: 37
-              up: 38
-              right: 39
-              down: 40
-              f1: 112
-              f2: 113
-              f3: 114
-              f4: 115
-              f5: 116
-              f6: 117
-              f7: 118
-              f8: 119
-              f9: 120
-              f10: 121
-              backspace: 8
-              delete: 46
-              end: 35
-              home: 36
-              enter: 13
-              escape: 27
-              insert: 45
-              h: 72
-              l: 76
-              s: 83
+
 
             if @block.mode and e.which in [key["delete"], key.backspace]
                 @delete()
@@ -197,7 +198,7 @@ class @Editor
             document.onhelp = () -> return false
 
         $(this).bind "startblock", (e, x, y) =>
-            @block = {x: x, y: y, mode: 'on'}
+            @block = {start: {x: x, y: y}, end: {x: x, y: y}, mode: 'on'}
             $("#highlight").css('display', 'block')
             $(this).trigger "moveblock"
 
@@ -207,25 +208,25 @@ class @Editor
             @copyGrid = []
 
         $(this).bind "moveblock", (e) =>
-            $("#highlight").css('left', (if @cursor.x >= @block.x then @block.x else @cursor.x) * @font.width)
-            $("#highlight").css('top', (if @cursor.y >= @block.y then @block.y else @cursor.y) * @font.height)
-            $("#highlight").width (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-            $("#highlight").height (Math.abs(@cursor.y - @block.y) + 1) * @font.height
+            $("#highlight").css('left', (if @cursor.x >= @block.start.x then @block.start.x else @cursor.x) * @font.width)
+            $("#highlight").css('top', (if @cursor.y >= @block.start.y then @block.start.y else @cursor.y) * @font.height)
+            $("#highlight").width (Math.abs(@cursor.x - @block.start.x) + 1) * @font.width
+            $("#highlight").height (Math.abs(@cursor.y - @block.start.y) + 1) * @font.height
 
         $("body").bind "keypress", (e) =>       
             if @block.mode is 'on' and e.ctrlKey
                 switch e.which
-                    when 6 # 102 # f for fill foreground
+                    when key.ctrlF # fill foreground
                         @fillBlock(@pal.fg, null)
                         @draw()
-                    when 2 # 98 # b for fill background
+                    when key.ctrlB # fill background
                         @fillBlock(null, @pal.bg)
                         @draw()            
-                    when 24 # 120 # x for cut
+                    when key.ctrlX # cut
                         @setBlockEnd()
                         @cut()
 
-                    when 3 # 99 # c for copy
+                    when key.ctrlC # copy
                         @setBlockEnd()
                         @copy()
 
@@ -290,8 +291,8 @@ class @Editor
             @draw() 
 
     setBlockEnd: ->
-        @block.endy = @cursor.y
-        @block.endx = @cursor.x
+        @block.end.y = @cursor.y
+        @block.end.x = @cursor.x
 
 
     copy: ->
@@ -308,26 +309,26 @@ class @Editor
 
 
     cancelCut: ->
-        if @block.endy > @block.y 
-            starty = @block.y
-            endy = @block.endy
+        if @block.end.y > @block.start.y 
+            starty = @block.start.y
+            endy = @block.end.y
         else 
-            starty = @block.endy
-            endy = @block.y
+            starty = @block.end.y
+            endy = @block.start.y
 
-        if @block.endx > @block.x
-            startx = @block.x
-            endx = @block.endx
+        if @block.end.x > @block.start.x
+            startx = @block.start.x
+            endx = @block.end.x
         else
-            startx = @block.endx
-            endx = @block.x
+            startx = @block.end.x
+            endx = @block.start.x
 
         yy = 0;
         for y in [ starty .. endy ]
             xx = 0;
             for x in [ startx .. endx ]
-                # adjustedY = y - Math.abs(@cursor.y - @block.y)
-                # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
+                # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
                 @grid[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
                 xx++
             yy++
@@ -337,32 +338,32 @@ class @Editor
 
     copyOrCut: (copy = true, cut=false)->
         @copyGrid = []
-        if @cursor.y > @block.y 
-            starty = @block.y
+        if @cursor.y > @block.start.y 
+            starty = @block.start.y
             endy = @cursor.y
         else 
             starty = @cursor.y
-            endy = @block.y
+            endy = @block.start.y
 
-        if @cursor.x > @block.x
-            startx = @block.x
+        if @cursor.x > @block.start.x
+            startx = @block.start.x
             endx = @cursor.x
         else
             startx = @cursor.x
-            endx = @block.x
+            endx = @block.start.x
 
         if copy
             # make copy of portion of canvas
             @copyCanvas = document.createElement('canvas')
             @copyCanvas.id = 'copy'
             @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
-            @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-            @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.y) + 1) * @font.height
+            @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.start.x) + 1) * @font.width
+            @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.start.y) + 1) * @font.height
 
-            sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-            sourceHeight = (Math.abs(@cursor.y - @block.y) + 1) * @font.height
-            @cursor.x = if @cursor.x >= @block.x then @block.x else @cursor.x
-            @cursor.y = if @cursor.y >= @block.y then @block.y else @cursor.y
+            sourceWidth = (Math.abs(@cursor.x - @block.start.x) + 1) * @font.width
+            sourceHeight = (Math.abs(@cursor.y - @block.start.y) + 1) * @font.height
+            @cursor.x = if @cursor.x >= @block.start.x then @block.start.x else @cursor.x
+            @cursor.y = if @cursor.y >= @block.start.y then @block.start.y else @cursor.y
             sourceX = @cursor.x * @font.width
             sourceY = @cursor.y * @font.height
             destWidth = sourceWidth
@@ -379,8 +380,8 @@ class @Editor
         for y in [ starty .. endy ]
             xx = 0;
             for x in [ startx .. endx ]
-                # adjustedY = y - Math.abs(@cursor.y - @block.y)
-                # adjustedX = x - Math.abs(@cursor.x - @block.x)
+                # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
+                # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
 
                 if !@copyGrid[yy]?
                     @copyGrid[yy] = []
@@ -420,9 +421,9 @@ class @Editor
         $(@copyCanvas).css('top', (@cursor.y) * @font.height)
             
     fillBlock: (fg, bg) ->
-        for y in [@block.y..@cursor.y]
+        for y in [@block.start.y..@cursor.y]
             continue if !@grid[y]?
-            for x in [(@cursor.x)..@block.x]
+            for x in [(@cursor.x)..@block.start.x]
                 continue if !@grid[y][x]?
                 @grid[y][x].attr = ( (if bg then bg  else ( @grid[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @grid[y][x].attr & 15
 
