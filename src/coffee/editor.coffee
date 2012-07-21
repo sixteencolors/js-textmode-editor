@@ -341,7 +341,7 @@ class @Editor
         @copyCanvas.id = 'copy'
         @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
         @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.x) + 1) * @font.width
-        @copyCanvas.setAttribute 'height', Math.abs(@cursor.y - @block.y + 1) * @font.height
+        @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.y) + 1) * @font.height
 
         sourceWidth = (Math.abs(@cursor.x - @block.x) + 1) * @font.width
         sourceHeight = (Math.abs(@cursor.y - @block.y) + 1) * @font.height
@@ -355,6 +355,7 @@ class @Editor
         destY = 0
 
         @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+        $(@copyCanvas).insertBefore('#vga')
 
         # make copy of drawing data
 
@@ -374,7 +375,6 @@ class @Editor
         @draw() if cut
 
 
-        $(@copyCanvas).insertBefore('#vga')
         @positionCopy()
 
     paste: ->
