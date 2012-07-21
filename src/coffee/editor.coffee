@@ -61,7 +61,10 @@ class @Editor
             @toggleLoadDialog()
 
         $("body").bind "keyup", (e) =>
-            if @block.mode == 'on' && !e.shiftKey && e.which != 16 # is in block mode, shift has been released and a key other then shift is pressed
+            # is in block mode, shift has been released and a key other then shift is pressed
+            # 16 = shift
+            # 17 = ctrl
+            if @block.mode == 'on' && !e.shiftKey && e.which != 16 && e.which != 17 
                 $(this).trigger "endblock"
 
         $("body").bind "keydown", (e) =>
@@ -206,19 +209,21 @@ class @Editor
             $("#highlight").height (Math.abs(@cursor.y - @block.y) + 1) * @font.height
 
         $("body").bind "keypress", (e) =>       
-            if @block.mode == 'on' && e.which == 102 # f for fill foreground
-                @fillBlock(@pal.fg, null)
-                @draw()
-            else if @block.mode == 'on' && e.which == 98 # b for fill background
-                @fillBlock(null, @pal.bg)
-                @draw()            
-            else if @block.mode == 'on' && e.which == 120 # x for cut
-                @setBlockEnd()
-                @cut()
+            if @block.mode is 'on' and e.ctrlKey
+                switch e.which
+                    when 6 # 102 # f for fill foreground
+                        @fillBlock(@pal.fg, null)
+                        @draw()
+                    when 2 # 98 # b for fill background
+                        @fillBlock(null, @pal.bg)
+                        @draw()            
+                    when 24 # 120 # x for cut
+                        @setBlockEnd()
+                        @cut()
 
-            else if @block.mode == 'on' && e.which == 99 # c for copy
-                @setBlockEnd()
-                @copy()
+                    when 3 # 99 # c for copy
+                        @setBlockEnd()
+                        @copy()
 
             else if e.target.nodeName != "INPUT"
                 char = String.fromCharCode(e.which)
