@@ -256,7 +256,7 @@ class @Editor
             @putChar(@sets.char, true) if @sets.locked
             @cursor.draw()
             @updateCursorPosition()
-            $(this).trigger("endblock")
+            $(this).trigger("endblock") if @block.mode not in ['copy', 'cut']
 
             return true
 
@@ -323,6 +323,8 @@ class @Editor
                 @grid[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
                 xx++
             yy++
+
+        $('#copy').remove()
         @draw()
 
     copyOrCut: (cut=false)->
@@ -393,11 +395,11 @@ class @Editor
                 continue if !@copyGrid[y][x]?
                 if !@grid[stationaryY + y]?
                     @grid[stationaryY + y] = []
-                @grid[stationaryY + y][stationaryX + x] = @copyGrid[y][x]
+                @grid[stationaryY + y][stationaryX + x] = { ch: @copyGrid[y][x].ch, attr: @copyGrid[y][x].attr } if @copyGrid[y][x]?
         @draw()
 
-        $(this).trigger("endblock")
         $('#copy').remove()
+        $(this).trigger("endblock")
 
     setMouseCoordinates: (e) ->
         @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @font.width )
