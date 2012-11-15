@@ -8,6 +8,7 @@ BUILDING THE PROJECT
    * File::Copy::Recursive
    * Template
  * CoffeeScript
+ * Handlebars ( $ npm install handlebars -g )
 
 ### Optional Dependencies
 

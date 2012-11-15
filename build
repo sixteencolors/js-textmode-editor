@@ -26,14 +26,21 @@ if( !@args ) {
 
     my %vars;
     $vars{ css } = _gather_css( $src );
-    $vars{ javascript } = _gather_js( $src );
+    $vars{ js } = _gather_js( $src );
 
     my $output;
-    $tmpl->process( $src->file( 'index.html' )->stringify, \%vars, \$output );
+    $tmpl->process( $src->file( 'index.html' )->stringify, '', \$output );
 
     if( !$opts{ '--no-minify' } && eval "require HTML::Packer;" ) {
         my $packer = HTML::Packer->init();
-        $packer->minify( \$output, { 
+        $packer->minify( \$vars{ css }, { 
+            remove_comments => 1,
+            remove_newlines => 1,
+            do_javascript   => 'clean',
+            do_stylesheet   => 'minify',
+            html5           => 1,
+        } );
+        $packer->minify( \$vars{ js }, { 
             remove_comments => 1,
             remove_newlines => 1,
             do_javascript   => 'clean',
@@ -42,9 +49,22 @@ if( !@args ) {
         } );
     }
 
-    my $fh = $outdir->file( 'index.html' )->open( 'w' );
+    my $dir = $outdir->subdir( 'js' );
+    $dir->mkpath;
+    my $fh = $dir->file( 'js-textmode-editor.js' )->open( 'w' );
+    print $fh $vars{ js };
+    $fh->close;
+
+    $dir = $outdir->subdir( 'css' );
+    $dir->mkpath;
+    $fh = $dir->file( 'js-textmode-editor.css' )->open( 'w' );    
+    print $fh $vars{ css };
+    $fh->close;
+
+    $fh = $outdir->file( 'index.html' )->open( 'w' );
     print $fh $output;
     $fh->close;
+
 
     # favicon
     require File::Copy;
@@ -99,5 +119,7 @@ sub _gather_js {
     my $temp;
     ( undef, $temp ) = File::Temp::tempfile();
     my $js = `coffee -p -j $temp $src/*.coffee`;
+    $js .= `handlebars $src/../handlebars/*.handlebars`;
     return $js;
 }
+
