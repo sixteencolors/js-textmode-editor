@@ -724,7 +724,7 @@ class Palette
         indicators = $( '#fg,#bg' )
         indicators.click ( e ) ->
             if !$( e.target ).hasClass( 'selected' )
-                indicators.toggleClass( 'selected' )
+                indicators.toggleClass( 'selected', 200 )
 
         $( '#colors' ).children().empty()
         $( '#colors' ).append '<ul class=first></ul>', '<ul></ul>'
@@ -736,6 +736,12 @@ class Palette
             block.click ( e ) =>
                 @[ indicators.filter( '.selected' ).attr 'id' ] = $( e.target ).data 'color'
                 @draw()
+
+            block.bind "contextmenu", (e) =>
+                @[ indicators.filter( '#bg' ).attr 'id' ] = $( e.target ).data 'color'
+                @draw()
+                return false
+
             $( '#colors ul:nth-child(' + ( 1 + Math.round( i / ( editor.image.palette.colors.length - 1 ) ) ) + ')' ).append block
         @draw()
 
@@ -744,6 +750,7 @@ class Palette
         $( '#fg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @fg > 8 then 0 else 15 ]
         $( '#bg' ).css 'background-color', @toRgbaString editor.image.palette.colors[ @bg ]
         $( '#bg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @bg > 8 then 0 else 15 ]
+        return true
 
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)'

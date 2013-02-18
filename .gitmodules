@@ -1,0 +1,3 @@
+[submodule "externals/js-image-textmode"]
+	path = externals/js-image-textmode
+	url = git://github.com/sixteencolors/js-image-textmode.git
