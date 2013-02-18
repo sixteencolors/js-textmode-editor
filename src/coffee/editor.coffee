@@ -51,7 +51,6 @@ class @Editor
         @grid = []
         @drawingId = null
         @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
-        @setHeight()
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
@@ -65,6 +64,7 @@ class @Editor
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
+        @setHeight()
 
         @draw()
 
@@ -98,6 +98,7 @@ class @Editor
                 @height = @height + @image.font.height
                 @setHeight()
             @cursor.offset = e.target.scrollTop
+            @cursor.draw()
             console.log "Scrolled"
 
         $("body").bind "keyup", (e) =>
@@ -268,7 +269,7 @@ class @Editor
             return unless e.which == 1
             @cursor.mousedown = true
             @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @image.font.width ) 
-            @cursor.y = Math.floor( e.pageY / @image.font.height )
+            @cursor.y = Math.floor( (e.pageY - $('#' + @id).offset().top ) / @image.font.height )
             @putChar(@sets.char, true) if @sets.locked
             @cursor.draw()
             @updateCursorPosition()
@@ -305,6 +306,7 @@ class @Editor
         @canvas.setAttribute 'height', @height
         @vga_canvas.setAttribute 'height', @height
         console.log("Height updated to " + @height + "px")
+        @draw()
 
 
     setBlockEnd: ->
@@ -503,7 +505,7 @@ class @Editor
     putTouchChar: ( touch ) ->
         node = touch.target
         @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @image.font.width )
-        @cursor.y = Math.floor( touch.pageY / @image.font.height )
+        @cursor.y = Math.floor( (touch.pageY - $('#' + @id).offset().top )/ @image.font.height )
         @putChar(@sets.char) if @sets.locked
         @drawChar(@cursor.x, @cursor.y)
         @updateCursorPosition()
@@ -577,6 +579,7 @@ class Cursor
         @mousedown = false
         @mode = 'ovr'
         @selector = $( '#cursor' )
+        @offset = 0
         this[k] = v for own k, v of options
 
     init: ( @editor ) ->
@@ -596,7 +599,7 @@ class Cursor
         @selector.css 'width', width
         @selector.css 'height', height
         @selector.css 'left', @x * width
-        @selector.css 'top', @y * height
+        @selector.css 'top', @y * height - @offset
 
     moveRight: ->
         if @x < @editor.width / @editor.image.font.width - 1
