@@ -34,24 +34,27 @@ class @Editor
         @id = 'canvas'
         @vga_id = 'vga'
         @vga_scale = '.25'
+        @columns = 80
         this[k] = v for own k, v of options
 
     init: ->
+        @image = new ImageTextModeANSI
+
         @canvas = document.getElementById @id
-        @width = @canvas.clientWidth 
-        @height = @canvas.clientHeight
+        @width = @image.font.width * @columns
+        $('#canvaswrapper').height($(window).height())
+        $('#canvasscroller').height($(window).height())
+        @height = $(window).height() + @image.font.height
         @canvas.setAttribute 'width', @width
-        @canvas.setAttribute 'height', @height
         @vga_canvas = document.getElementById @vga_id
         @vga_canvas.setAttribute 'width', @width * @vga_scale
-        @vga_canvas.setAttribute 'height', @height
         @grid = []
         @drawingId = null
         @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
+        @setHeight()
 
         @drawings = $.parseJSON($.Storage.get("drawings"))
 
-        @image = new ImageTextModeANSI
 
         @cursor = new Cursor
         @cursor.init @
@@ -89,6 +92,13 @@ class @Editor
             
         $('#load').click =>
             @toggleLoadDialog()
+
+        $("#canvasscroller").scroll (e) => # Increase canvas side if user scrolls past edge of screen
+            if (e.target.clientHeight + e.target.scrollTop >= @height)
+                @height = @height + @image.font.height
+                @setHeight()
+            @cursor.offset = e.target.scrollTop
+            console.log "Scrolled"
 
         $("body").bind "keyup", (e) =>
             # is in block mode, shift has been released and a key other then shift is pressed
@@ -290,6 +300,12 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    setHeight: ->
+        @canvas.setAttribute 'height', @height
+        @vga_canvas.setAttribute 'height', @height
+        console.log("Height updated to " + @height + "px")
+
 
     setBlockEnd: ->
         @block.end.y = @cursor.y

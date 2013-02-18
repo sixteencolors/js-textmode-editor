@@ -213,19 +213,22 @@ a:hover {
 
 #canvaswrapper {
     position: relative;
-    height: 100%;
     margin-left: 51px;
+}
+
+#canvasscroller {
+    overflow: scroll;
 }
 
 #cursor {
     pointer-events: none;
-    background-image: url(img/cursor_ovr.gif);
+    background-image: url(../img/cursor_ovr.gif);
     background-position: bottom;
     position: absolute;
 }
 
 #cursor.ins {
-    background-image: url(img/cursor_ins.gif);    
+    background-image: url(../img/cursor_ins.gif);    
 }
 
 #highlight {
@@ -243,8 +246,6 @@ a:hover {
 
 #canvas {
     background: #000;
-    width: 78%;
-    height: 100%;
 }
 
 /* block copy/move */
