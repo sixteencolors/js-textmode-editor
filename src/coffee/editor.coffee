@@ -308,6 +308,9 @@ class @Editor
         $('#canvaswrapper').height($(window).height())
         $('#canvasscroller').height($(window).height())
 
+        if (height < $(window).height() + @image.font.height)
+            height = $(window).height() + @image.font.height
+
         if (height > @height or !@height?)
             @height = height
             if (copy)
@@ -324,6 +327,7 @@ class @Editor
             @vga_canvas.setAttribute 'height', @height
             console.log("Height updated to " + @height + "px")
             # @draw()
+
 
 
     setBlockEnd: ->
@@ -494,6 +498,8 @@ class @Editor
         $('#drawings li span.name').click (e) =>
             @drawingId = $( e.currentTarget ).parent().attr( "nid" )
             @grid = @drawings[ @drawingId ].grid
+            @height = 0
+            @setHeight(@grid.length * @image.font.height, false)
             @draw()
             @toggleLoadDialog()
 
