@@ -42,9 +42,6 @@ class @Editor
 
         @canvas = document.getElementById @id
         @width = @image.font.width * @columns
-        $('#canvaswrapper').height($(window).height())
-        $('#canvasscroller').height($(window).height())
-        @height = $(window).height() + @image.font.height
         @canvas.setAttribute 'width', @width
         @vga_canvas = document.getElementById @vga_id
         @vga_canvas.setAttribute 'width', @width * @vga_scale
@@ -64,7 +61,7 @@ class @Editor
         
         @ctx = @canvas.getContext '2d' if @canvas.getContext
         @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
-        @setHeight()
+        @setHeight($(window).height() + @image.font.height)
 
         @draw()
 
@@ -95,8 +92,7 @@ class @Editor
 
         $("#canvasscroller").scroll (e) => # Increase canvas side if user scrolls past edge of screen
             if (e.target.clientHeight + e.target.scrollTop >= @height)
-                @height = @height + @image.font.height
-                @setHeight()
+                @setHeight(@height + @image.font.height)
             @cursor.offset = e.target.scrollTop
             @cursor.draw()
             console.log "Scrolled"
@@ -107,7 +103,7 @@ class @Editor
                 $(this).trigger "endblock"
 
         $("body").bind "keydown", (e) =>
-
+            prevention = false
 
             if @block.mode and e.which in [key["delete"], key.backspace]
                 @delete()
@@ -129,11 +125,13 @@ class @Editor
                         else if e.ctrlKey || e.shiftKey
                             if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
                     when key.down
+                        prevention = true
                         if (!mod)
                             @cursor.moveDown()
                         else if (e.ctrlKey)
                             if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
                     when key.up
+                        prevention = true
                         if (!mod)
                             @cursor.moveUp()
                         else if e.ctrlKey
@@ -203,6 +201,10 @@ class @Editor
 
                 @pal.draw()
                 @cursor.draw()
+
+                if (prevention)
+                    e.preventDefault
+                    return false
 
         # fix for ie loading help on F1 keypress
         if document.all
@@ -302,11 +304,26 @@ class @Editor
             @canvas.setAttribute 'height', @height
             @draw() 
 
-    setHeight: ->
-        @canvas.setAttribute 'height', @height
-        @vga_canvas.setAttribute 'height', @height
-        console.log("Height updated to " + @height + "px")
-        @draw()
+    setHeight: (height, copy = true) ->
+        $('#canvaswrapper').height($(window).height())
+        $('#canvasscroller').height($(window).height())
+
+        if (height > @height or !@height?)
+            @height = height
+            if (copy)
+                tempCanvas = @canvas.toDataURL("image/png")
+                tempImg = new Image()
+                tempImg.src = tempCanvas
+                $(tempImg).load =>
+                    @canvas.setAttribute 'height', @height
+                    @ctx.drawImage(tempImg, 0, 0)
+                    @renderCanvas()
+            else
+                @canvas.setAttribute 'height', @height
+
+            @vga_canvas.setAttribute 'height', @height
+            console.log("Height updated to " + @height + "px")
+            # @draw()
 
 
     setBlockEnd: ->
@@ -625,14 +642,18 @@ class Cursor
         if @y > 0                            
           @y--
 
+        if @y * @editor.image.font.height < $("#canvasscroller").scrollTop()
+            $("#canvasscroller").scrollTop($("#canvasscroller").scrollTop() - @editor.image.font.height)
+
         @move()
 
     moveDown: ->
-        if @y < (@editor.height - 16) / 16
-          @y++
+        if (@y >= parseInt(($(window).height() - @editor.image.font.height * 2) / @editor.image.font.height))
+            $("#canvasscroller").scrollTop($("#canvasscroller").scrollTop() + @editor.image.font.height)
+
+        @y++
 
         @move()
-
 
     move: ->
         if @editor.block.mode in ['copy', 'cut']
@@ -784,9 +805,11 @@ FileSelectHandler = ( e ) ->
 ParseFile = ( file ) ->
     reader = new FileReader()
     $( reader ).load ( e ) ->
+        editor.height = 0
         content = e.target.result
-        @image.parse( content )
-        editor.grid = image.screen
+        editor.image.parse( content )
+        editor.grid = editor.image.screen
+        editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
         editor.draw()
         editor.toggleLoadDialog()
         return true
