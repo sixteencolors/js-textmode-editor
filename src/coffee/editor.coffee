@@ -45,7 +45,6 @@ class @Editor
         @canvas.setAttribute 'width', @width
         @vga_canvas = document.getElementById @vga_id
         @vga_canvas.setAttribute 'width', @width * @vga_scale
-        @grid = []
         @drawingId = null
         @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
 
@@ -69,7 +68,7 @@ class @Editor
             answer = confirm 'Clear canvas?'
             if (answer)
                 @drawingId = null
-                @grid = []
+                @image.screen = []
                 @draw()
                 @setName("")
 
@@ -80,7 +79,7 @@ class @Editor
 
         $('#html5Save').click =>
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
-            @drawings[@getId()] = {grid: @grid, date: new Date(), name: $('#name').val()}
+            @drawings[@getId()] = {grid: @image.screen, date: new Date(), name: $('#name').val()}
             $.Storage.set("drawings", JSON.stringify(@drawings))
             @toggleSaveDialog()
 
@@ -142,12 +141,12 @@ class @Editor
                             @putChar(32)
                             @cursor.moveLeft()
                         else
-                            oldrow = @grid[@cursor.y]
-                            @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                            oldrow = @image.screen[@cursor.y]
+                            @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                         e.preventDefault()
                     when key.delete
-                        oldrow = @grid[@cursor.y]
-                        @grid[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                        oldrow = @image.screen[@cursor.y]
+                        @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                     when key.end
                         @cursor.x = parseInt(@width / @image.font.width - 1)
                     when key.home
@@ -376,7 +375,7 @@ class @Editor
             for x in [ startx .. endx ]
                 # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
                 # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
-                @grid[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
+                @image.screen[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
                 xx++
             yy++
 
@@ -436,8 +435,8 @@ class @Editor
 
                 if !@copyGrid[yy]?
                     @copyGrid[yy] = []
-                @copyGrid[yy][xx] = { ch: @grid[y][x].ch, attr: @grid[y][x].attr } if @grid[y][x]? and copy
-                @grid[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @grid[y][x]?)  # clear block if cutting
+                @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y][x]? and copy
+                @image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y][x]?)  # clear block if cutting
                 xx++
             yy++
 
@@ -455,9 +454,9 @@ class @Editor
             continue if !@copyGrid[y]?
             for x in [0 .. @copyGrid[y].length - 1]
                 continue if !@copyGrid[y][x]?
-                if !@grid[stationaryY + y]?
-                    @grid[stationaryY + y] = []
-                @grid[stationaryY + y][stationaryX + x] = { ch: @copyGrid[y][x].ch, attr: @copyGrid[y][x].attr } if @copyGrid[y][x]?
+                if !@image.screen[stationaryY + y]?
+                    @image.screen[stationaryY + y] = []
+                @image.screen[stationaryY + y][stationaryX + x] = { ch: @copyGrid[y][x].ch, attr: @copyGrid[y][x].attr } if @copyGrid[y][x]?
         @draw()
 
         $('#copy').remove()
@@ -473,10 +472,10 @@ class @Editor
             
     fillBlock: (fg, bg) ->
         for y in [@block.start.y..@cursor.y]
-            continue if !@grid[y]?
+            continue if !@image.screen[y]?
             for x in [(@cursor.x)..@block.start.x]
-                continue if !@grid[y][x]?
-                @grid[y][x].attr = ( (if bg then bg  else ( @grid[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @grid[y][x].attr & 15
+                continue if !@image.screen[y][x]?
+                @image.screen[y][x].attr = ( (if bg then bg  else ( @image.screen[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @image.screen[y][x].attr & 15
 
 
     setName: (name) ->
@@ -508,9 +507,9 @@ class @Editor
 
         $('#drawings li span.name').click (e) =>
             @drawingId = $( e.currentTarget ).parent().attr( "nid" )
-            @grid = @drawings[ @drawingId ].grid
+            @image.screen = @drawings[ @drawingId ].grid
             @height = 0
-            @setHeight(@grid.length * @image.font.height, false)
+            @setHeight(@image.screen.length * @image.font.height, false)
             @draw()
             @toggleLoadDialog()
 
@@ -546,13 +545,13 @@ class @Editor
         return true
 
     putChar: (charCode, holdCursor = false) ->
-        @grid[@cursor.y] = [] if !@grid[@cursor.y]
+        @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
         if @cursor.mode == 'ins'
             # NOTE: this will push chars off the right-side of the canvas
             # but will still have an entry in the grid
-            row = @grid[@cursor.y][@cursor.x..]
-            @grid[@cursor.y][@cursor.x + 1..] = row
-        @grid[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
+            row = @image.screen[@cursor.y][@cursor.x..]
+            @image.screen[@cursor.y][@cursor.x + 1..] = row
+        @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
         @drawChar(@cursor.x, @cursor.y)
         unless holdCursor then @cursor.moveRight()
         @updateCursorPosition()
@@ -570,15 +569,15 @@ class @Editor
         return new ImageTextModeFont8x16
 
     drawChar: (x, y, full = false) ->
-        if @grid[y][x]
+        if @image.screen[y][x]
             px = x * @image.font.width
             py = y * @image.font.height
 
-            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ ( @grid[y][x].attr & 240 ) >> 4 ] ) #bg
+            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ ( @image.screen[y][x].attr & 240 ) >> 4 ] ) #bg
             @ctx.fillRect px, py, 8, 16
 
-            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ @grid[y][x].attr & 15 ] ) #fg
-            chr = @image.font.chars[ @grid[y][x].ch.charCodeAt( 0 ) & 0xff  ]
+            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ @image.screen[y][x].attr & 15 ] ) #fg
+            chr = @image.font.chars[ @image.screen[y][x].ch.charCodeAt( 0 ) & 0xff  ]
             for i in [ 0 .. @image.font.height - 1 ]
                 line = chr[ i ]
                 for j in [ 0 .. @image.font.width - 1 ]
@@ -590,10 +589,10 @@ class @Editor
     draw: ->
         @ctx.fillStyle = "#000000"
         @ctx.fillRect 0, 0, @canvas.width, @canvas.height
-        for y in [0..@grid.length - 1]
-            continue if !@grid[y]?
-            for x in [0..@grid[y].length - 1]
-                continue if !@grid[y][x]?
+        for y in [0..@image.screen.length - 1]
+            continue if !@image.screen[y]?
+            for x in [0..@image.screen[y].length - 1]
+                continue if !@image.screen[y][x]?
                 @drawChar(x, y, true)
 
         @renderCanvas()
@@ -843,7 +842,6 @@ ParseFile = ( file ) ->
         editor.image.parse( content )
         clearInterval(progressIntervalID)
         console.log 'End parsing'
-        editor.grid = editor.image.screen
         editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
         editor.draw()
         editor.toggleLoadDialog()
