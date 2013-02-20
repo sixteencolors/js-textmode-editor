@@ -605,8 +605,8 @@ class @Editor
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
         highlight = $("#vgahighlight")
         highlight.width(@vga_canvas.getAttribute 'width')
-        $('#vgahighlight').height($("#canvaswrapper").height() * @vga_scale)
-
+        highlight.height($("#canvaswrapper").height() * @vga_scale)
+        $("#vgawrapper").css('left', $("#toolbar").width() + $("#canvas").width())
 
 class Cursor
 
