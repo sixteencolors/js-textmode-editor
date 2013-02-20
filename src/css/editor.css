@@ -233,15 +233,22 @@ a:hover {
 
 #highlight {
     pointer-events: none;
-    background-color: #999;
     display: none;
     position: absolute;
+
+}
+
+.highlight {
+    background-color: #999;
     zoom: 1;
     -moz-opacity: 0.5;
     opacity: 0.5;
     -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
     filter: alpha(opacity=50);
+}
 
+#vgahighlight {
+    position: absolute;
 }
 
 #canvas {
@@ -258,12 +265,16 @@ a:hover {
 }
 
 /* VGA PREVIEW */
-#vga {
+#vgawrapper {
     position: absolute;
     top: 0;
-    right: 0;
-    opacity: 1;
+    right: 20px;
     margin-right: 8px;
+    
+}
+
+#vga {
+    opacity: 1;
 }
 
 .alert {

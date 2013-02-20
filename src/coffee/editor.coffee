@@ -95,6 +95,7 @@ class @Editor
             @cursor.draw()
             if @cursor.mousedown
                 $(this).trigger "moveblock"
+            $("#vgahighlight").css('top', @getScrollOffset() * @vga_scale)
 
         $("body").bind "keyup", (e) =>
             # is in block mode, shift has been released and a key other then shift is pressed
@@ -602,6 +603,9 @@ class @Editor
         @vga_ctx.fillStyle = "#000000"
         @vga_ctx.fillRect 0, 0,  @canvas.width * @vga_scale, @canvas. height * @vga_scale
         @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
+        highlight = $("#vgahighlight")
+        highlight.width(@vga_canvas.getAttribute 'width')
+        $('#vgahighlight').height($("#canvaswrapper").height() * @vga_scale)
 
 
 class Cursor
