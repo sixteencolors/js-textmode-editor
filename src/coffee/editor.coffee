@@ -91,11 +91,11 @@ class @Editor
             @toggleLoadDialog()
 
         $("#canvasscroller").scroll (e) => # Increase canvas side if user scrolls past edge of screen
-            if (e.target.clientHeight + e.target.scrollTop >= @height)
+            if (e.target.clientHeight + @getScrollOffset() >= @height)
                 @setHeight(@height + @image.font.height)
-            @cursor.offset = e.target.scrollTop
             @cursor.draw()
-            console.log "Scrolled"
+            if @cursor.mousedown
+                $(this).trigger "moveblock"
 
         $("body").bind "keyup", (e) =>
             # is in block mode, shift has been released and a key other then shift is pressed
@@ -111,7 +111,7 @@ class @Editor
                 mod = e.altKey || e.ctrlKey
                 if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
                     if @block.mode == 'off'
-                        $(this).trigger("startblock", [@cursor.x, @cursor.y])
+                        $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
 
                 switch e.which
                     when key.left
@@ -211,8 +211,8 @@ class @Editor
             window.onhelp = () -> return false
             document.onhelp = () -> return false
 
-        $(this).bind "startblock", (e, x, y) =>
-            @block = {start: {x: x, y: y}, end: {x: x, y: y}, mode: 'on'}
+        $(this).bind "startblock", (e, x, y, offset) =>
+            @block = {start: {x: x, y: y, offset: offset}, end: {x: x, y: y, offset: offset}, mode: 'on'}
             $("#highlight").css('display', 'block')
             $(this).trigger "moveblock"
 
@@ -222,10 +222,11 @@ class @Editor
             @copyGrid = []
 
         $(this).bind "moveblock", (e) =>
+            adjustedStartY = @block.start.y + @block.start.offset - @getLinesOffset()
             $("#highlight").css('left', (if @cursor.x >= @block.start.x then @block.start.x else @cursor.x) * @image.font.width)
-            $("#highlight").css('top', (if @cursor.y >= @block.start.y then @block.start.y else @cursor.y) * @image.font.height)
+            $("#highlight").css('top', ((if @cursor.y >= adjustedStartY then adjustedStartY else @cursor.y)  ) * @image.font.height)
             $("#highlight").width (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
-            $("#highlight").height (Math.abs(@cursor.y - @block.start.y) + 1) * @image.font.height
+            $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
         $("body").bind "keypress", (e) =>       
             if @block.mode is 'on' and e.ctrlKey
@@ -258,7 +259,7 @@ class @Editor
                 @putChar(@sets.char, true) if @sets.locked
                 @updateCursorPosition()
                 if @block.mode == 'off' && !sets.locked
-                    $(this).trigger("startblock", [@cursor.x, @cursor.y])
+                    $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
                 else if !@sets.locked
                     $(this).trigger("moveblock")
                 return true
@@ -303,6 +304,12 @@ class @Editor
             @canvas.setAttribute 'width', @width
             @canvas.setAttribute 'height', @height
             @draw() 
+
+    getScrollOffset: ->
+        $("#canvasscroller").scrollTop()
+
+    getLinesOffset: ->
+        Math.floor(@getScrollOffset() / @image.font.height)
 
     setHeight: (height, copy = true) ->
         $('#canvaswrapper').height($(window).height())
@@ -393,19 +400,23 @@ class @Editor
             endx = @block.start.x
 
         if copy
+            adjustedStartY = @block.start.y + @block.start.offset 
+            adjustedY = @cursor.y + @getLinesOffset()
+            sourceWidth = (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
+            sourceHeight = (Math.abs(adjustedY - adjustedStartY) + 1) * @image.font.height
+
             # make copy of portion of canvas
             @copyCanvas = document.createElement('canvas')
             @copyCanvas.id = 'copy'
             @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
-            @copyCanvas.setAttribute 'width', (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
-            @copyCanvas.setAttribute 'height', (Math.abs(@cursor.y - @block.start.y) + 1) * @image.font.height
+            @copyCanvas.setAttribute 'width', sourceWidth 
+            @copyCanvas.setAttribute 'height', sourceHeight
 
-            sourceWidth = (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
-            sourceHeight = (Math.abs(@cursor.y - @block.start.y) + 1) * @image.font.height
             @cursor.x = if @cursor.x >= @block.start.x then @block.start.x else @cursor.x
-            @cursor.y = if @cursor.y >= @block.start.y then @block.start.y else @cursor.y
-            sourceX = @cursor.x * @image.font.width
-            sourceY = @cursor.y * @image.font.height
+            @cursor.y = if adjustedY >= adjustedStartY then adjustedStartY else adjustedY
+            sourceX = @cursor.x * @image.font.width 
+            sourceY = @cursor.y * @image.font.height 
+            @cursor.y -= @getLinesOffset()
             destWidth = sourceWidth
             destHeight = sourceHeight
             destX = 0
@@ -622,7 +633,7 @@ class Cursor
         @selector.css 'width', width
         @selector.css 'height', height
         @selector.css 'left', @x * width
-        @selector.css 'top', @y * height - @offset
+        @selector.css 'top', @y * height - @editor.getScrollOffset()
 
     moveRight: ->
         if @x < @editor.width / @editor.image.font.width - 1
@@ -648,14 +659,14 @@ class Cursor
         if @y > 0                            
           @y--
 
-        if @y * @editor.image.font.height < $("#canvasscroller").scrollTop()
-            $("#canvasscroller").scrollTop($("#canvasscroller").scrollTop() - @editor.image.font.height)
+        if @y * @editor.image.font.height < @getScrollOffset()
+            $("#canvasscroller").scrollTop(@getScrollOffset() - @editor.image.font.height)
 
         @move()
 
     moveDown: ->
         if (@y >= parseInt(($(window).height() - @editor.image.font.height * 2) / @editor.image.font.height))
-            $("#canvasscroller").scrollTop($("#canvasscroller").scrollTop() + @editor.image.font.height)
+            $("#canvasscroller").scrollTop(@getScrollOffset() + @editor.image.font.height)
 
         @y++
 
@@ -665,6 +676,7 @@ class Cursor
         if @editor.block.mode in ['copy', 'cut']
             @editor.positionCopy()
         @draw()
+
 
         
 class CharacterSets
@@ -808,26 +820,64 @@ FileSelectHandler = ( e ) ->
     # process all File objects
     ParseFile file for file in files
 
+AbortParse = ->
+    @reader.abort()
+
 ParseFile = ( file ) ->
-    reader = new FileReader()
-    $( reader ).load ( e ) ->
+    @reader = new FileReader()
+    $( @reader ).load ( e ) ->
+        progress = $(".percent")
+        progress.width('100%')
+        progress.text('100%')
+        setTimeout("document.getElementById('progress_bar').className='';", 2000);
+
         editor.height = 0
         content = e.target.result
+        start = new Date().getTime();
+        console.log 'Begin parsing'
+        progressIntervalID = setInterval ->
+            end = new Date().getTime()
+            console.log((end - start) + 's')
+        , 1000
+
         editor.image.parse( content )
+        clearInterval(progressIntervalID)
+        console.log 'End parsing'
         editor.grid = editor.image.screen
         editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
         editor.draw()
         editor.toggleLoadDialog()
         return true
 
-    $( reader ).error ( e ) ->
-        console.log ( "error loading file" )
+    $( @reader ).error ( e ) ->
+        switch e.target.error.code
+            when e.target.error.NOT_FOUND_ERR
+              alert "File Not Found!"
+            when evt.target.error.NOT_READABLE_ERR
+              alert "File is not readable"
+            when evt.target.error.ABORT_ERR
+            # noop
+            else
+              alert "An error occurred reading this file."
 
-    $( reader ).bind  "loadstart", (e) -> 
+    $( @reader ).bind "progress", (e) ->
+      if e.lengthComputable
+        percentLoaded = Math.round((e.loaded / e.total) * 100)
+        
+        # Increase the progress bar length.
+        if percentLoaded < 100
+          progress.style.width = percentLoaded + "%"
+          progress.textContent = percentLoaded + "%"        
+
+    $( @reader ).bind "abort", (e) ->
+        alert('File read cancelled')
+
+    $( @reader ).bind  "loadstart", (e) -> 
+        $("#progress_bar").addClass "loading"
         console.log ("load started" )
 
     editor.setName( file.name )
-    reader.readAsBinaryString(file)
+    @reader.readAsBinaryString(file)
     return false
 
 $( document ).ready ->
