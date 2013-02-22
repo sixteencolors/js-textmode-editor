@@ -1,0 +1,60 @@
+* {margin: 0;padding: 0;}
+html, body {height: 100%;overflow: hidden;font-family: Arial, sans-serif;font-size: 13px;background: #333;}
+/* DRAWINGS (SAVE/LOAD) */#drawings {overflow: auto;}
+/* SPLASH SCREEN */#splash, #drawings, #SaveDialog {display: none;z-index: 2;position: absolute;width: 400px;height: 330px;top: 50%;left: 50%;margin-left: -200px;margin-top: -150px;background: #fff;border: 4px solid #aaa;padding: 8px;}
+h1 {font-size: 18px;}
+h2 {clear: left;font-size: 16px;font-weight: normal;color: #a50;}
+h1, h2, dl, p {margin-bottom: 8px;}
+dt {color: #a00;font-weight: bold;width: 150px;clear: left;float: left;}
+dd {margin-left: 150px;}
+ul li {list-style-type: none;}
+.addthis_toolbox {margin-top: 1.5em;margin-left: auto;margin-right: auto;}
+a, #drawings li {color: #666;font-weight: bold;text-decoration: none;}
+a.close {position: absolute;display: block;color: #999;font-weight: bold;font-size: large;text-decoration: none;top: 4px;right: 8px;}
+a:hover {color: #000 !important;}
+/* TOOLBAR */#toolbar {float: left;width: 51px;height: 100%;background: #555;}
+#menu {list-style-type: none;}
+#cursorpos, #menu li {color: #fff;text-align: center;line-height: 34px;}
+#menu li {width: 100%;display: block;cursor: pointer;}
+#menu li:hover {background: #ababab;}
+/* PALETTE */#colors ul {background: #000;float: left;width: 25px;list-style-type: none;padding-top: 1px;}
+#colors ul.first {padding-right: 1px;}
+#colors li {width: 25px;height: 25px;margin-bottom: 1px;}
+#fg, #bg, #colors li {cursor: pointer;}
+#fg, #bg {margin: 0 15px 3px 0;line-height: 25px;padding: 0 10px;color: #fff;text-align: center;font-weight: bold;}
+#palette .selected {margin-right: 0;cursor: default;text-align: right;}
+/* CHARSETS */#charsets {text-align: center;margin-top: 8px;}
+#sets ul {list-style-type: none;border-top: 1px solid #000;}
+#sets ul li {cursor: pointer;height: 16px;padding: 4px 0;border-bottom: 1px solid #000;}
+#sets .selected {background: #ababab;}
+#prev-set, #next-set {margin: 8px 0;text-align: center;width: 25px;line-height: 25px;cursor: pointer;color: #fff;}
+#prev-set {float: left;}
+#next-set {margin-left: 26px;}
+#char-lock {text-align: center;cursor: pointer;}
+#char-lock.on {color: #fff;}
+/* CANVAS + CURSOR */#canvaswrapper {position: relative;margin-left: 51px;}
+#canvasscroller {overflow: scroll;}
+#cursor {pointer-events: none;background-image: url(../img/cursor_ovr.gif);background-position: bottom;position: absolute;}
+#cursor.ins {background-image: url(../img/cursor_ins.gif);}
+#highlight {pointer-events: none;display: none;position: absolute;}
+.highlight {background-color: #999;zoom: 1;-moz-opacity: 0.5;opacity: 0.5;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";filter: alpha(opacity=50);}
+#vgahighlight {position: absolute;}
+#canvas {background: #000;}
+/* block copy/move */#copy {position: absolute;z-index: 1000;top: 0;pointer-events: none;}
+/* VGA PREVIEW */#vgawrapper {position: absolute;top: 0;right: 20px;margin-right: 8px;}
+#vga {opacity: 1;}
+.alert {color: #900;}
+#drawings li span {cursor: pointer;}
+#drawings li span.name:hover {color: #000;}
+#drawings li span.delete:hover {color: #900;}
+#drawings li {margin-left: 3em;}
+#SaveDialog li {margin: .5em 2em;list-style-type: disc;}
+#SaveDialog ul {margin-top: 1.5em;}
+/* UPLOAD */#filedrag{
+display: none;font-weight: bold;text-align: center;padding: 1em 0;margin: 1em 0;color: #555;border: 2px dashed #555;border-radius: 7px;cursor: default;}
+#filedrag.hover{
+color: #f00;border-color: #f00;border-style: solid;box-shadow: inset 0 3px 4px #888;}
+#drawings div {margin-bottom: 1em;}
+#progress_bar {margin: 10px 0;padding: 3px;border: 1px solid #000;font-size: 14px;clear: both;opacity: 0;-moz-transition: opacity 1s linear;-o-transition: opacity 1s linear;-webkit-transition: opacity 1s linear;}
+#progress_bar.loading {opacity: 1.0;}
+#progress_bar .percent {background-color: #99ccff;height: auto;width: 0;}
