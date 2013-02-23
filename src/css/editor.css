@@ -19,7 +19,7 @@ html, body {
 
 /* SPLASH SCREEN */
 
-#splash, #drawings, #SaveDialog {
+#splash, #drawings, #SaveDialog, .dialog {
     display: none;
     z-index: 2;
     position: absolute;

@@ -37,8 +37,46 @@ class @Editor
         @columns = 80
         this[k] = v for own k, v of options
 
+    dbAuthenticate: ->
+
+        @dbClient.authenticate interactive: false, (error, client) ->
+          return @showError(error) if error
+          if client.isAuthenticated()
+            $("#DropboxSaveContainer").show()
+            $("#DropboxLogin").hide()
+            $('#user-name').text userInfo.name
+          else
+            $("#DropboxSaveContainer").hide()
+            $("#DropboxLogin").show()
+            $("#DropboxLogin").click =>
+                client.authenticate (error, client) ->
+                    #return handleError(error)  if error
+                    
+                    client.getUserInfo (error, userInfo) =>
+                        #return showError(error) if error
+                        console.log error if error and window.console
+                        $("#DropboxSaveContainer").show()
+                        $("#DropboxLogin").hide()
+                        $('#user-name').text userInfo.name
+                        console.log("authenticated to dropbox as #{userInfo.name}") if window.console
+          #@tasks = new Tasks @, @dbClient
+          #@tasks.load =>
+            #@wire()
+            #@render()
+            #@$root.removeClass 'hidden'        
+
+    # Updates the UI to show that an error has occurred.
+    showError: (error) ->
+        $('#ErrorDialog').slideToggle 'slow'
+        $("#ErrorDialog .message").text(error)
+        console.log error if window.console
+
     init: ->
         @image = new ImageTextModeANSI
+        @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
+        @dbClient.authDriver(new Dropbox.Drivers.Popup({receiverFile: "oauth_receiver.html"}));
+        @dbAuthenticate()
+        # @dbClient.authDriver new Dropbox.Drivers.Redirect(rememberUser: true)
 
         @canvas = document.getElementById @id
         @width = @image.font.width * @columns
@@ -77,6 +115,9 @@ class @Editor
             @drawings =[] if !@drawings
             if @drawings[@drawingId] then @setName(@drawings[@drawingId].name)
 
+            @dbAuthenticate()
+
+
         $('#html5Save').click =>
             # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             @drawings[@getId()] = {grid: @image.screen, date: new Date(), name: $('#name').val()}
@@ -86,6 +127,12 @@ class @Editor
         $('#PNGSave').click =>
             window.open(@canvas.toDataURL("image/png"), 'ansiSave')
             
+        $('#DropboxSave').click =>
+            @dbClient.writeFile 'ansi/' + $('#name').val(), @image.write(), (error, stat) =>
+                return @showError(error) if error
+                @toggleSaveDialog()
+
+
         $('#load').click =>
             @toggleLoadDialog()
 
@@ -167,6 +214,8 @@ class @Editor
                             $( '#drawings' ).slideToggle 'slow'
                         if $( '#SaveDialog' ).is( ':visible' )
                             $( '#SaveDialog' ).slideToggle 'slow'
+                        if $( '#ErrorDialog').is(':visible')
+                            $('#ErrorDialog').slideToggle 'slow'
                         if @block.mode in ['copy', 'cut']
                             if @block.mode is 'cut'
                                 @cancelCut()

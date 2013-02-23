@@ -77,6 +77,7 @@ if( !@args ) {
         $d->mkpath;
         File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );
     }
+
 }
 elsif( $args[ 0 ] eq 'server' ) {
     require Plack::Loader;
