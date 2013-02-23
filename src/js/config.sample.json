@@ -1,0 +1,5 @@
+var config = {
+	dropbox: {
+		key: '<yourkey>'
+	}
+}
