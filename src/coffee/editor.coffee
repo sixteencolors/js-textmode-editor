@@ -1,682 +1,682 @@
 class @Editor
-    key = 
-      left: 37
-      up: 38
-      right: 39
-      down: 40
-      f1: 112
-      f2: 113
-      f3: 114
-      f4: 115
-      f5: 116
-      f6: 117
-      f7: 118
-      f8: 119
-      f9: 120
-      f10: 121
-      backspace: 8
-      delete: 46
-      end: 35
-      home: 36
-      enter: 13
-      escape: 27
-      insert: 45
-      h: 72
-      l: 76
-      s: 83,
-      ctrlF: 6,
-      ctrlB: 2,
-      ctrlX: 24,
-      ctrlC: 3
+  key =
+    left: 37
+    up: 38
+    right: 39
+    down: 40
+    f1: 112
+    f2: 113
+    f3: 114
+    f4: 115
+    f5: 116
+    f6: 117
+    f7: 118
+    f8: 119
+    f9: 120
+    f10: 121
+    backspace: 8
+    delete: 46
+    end: 35
+    home: 36
+    enter: 13
+    escape: 27
+    insert: 45
+    h: 72
+    l: 76
+    s: 83,
+    ctrlF: 6,
+    ctrlB: 2,
+    ctrlX: 24,
+    ctrlC: 3
 
-    constructor: ( options ) ->
-        @tabstop  = 8
-        @id = 'canvas'
-        @vga_id = 'vga'
-        @vga_scale = '.25'
-        @columns = 80
-        this[k] = v for own k, v of options
+  constructor: ( options ) ->
+    @tabstop  = 8
+    @id = 'canvas'
+    @vga_id = 'vga'
+    @vga_scale = '.25'
+    @columns = 80
+    this[k] = v for own k, v of options
 
-    dbAuthenticate: ->
+  dbAuthenticate: ->
 
-        @dbClient.authenticate interactive: false, (error, client) =>
-          return @showError(error) if error
-          if client.isAuthenticated()
-            $("#DropboxSaveContainer").show()
-            $("#DropboxFiles").show()
-            $(".dropbox-login").hide()
-            $('#user-name').text userInfo.name
-          else
-            $("#DropboxSaveContainer").hide()
-            $("#DropboxFiles").hide()
-            $(".dropbox-login").show()
-            $(".dropbox-login").click =>
-                client.authenticate (error, client) =>
-                    return @showError(error)  if error
-                    
-                    client.getUserInfo (error, userInfo) =>
-                        #return showError(error) if error
-                        console.log error if error and window.console
-                        $("#DropboxFiles").show()
-                        $("#DropboxSaveContainer").show()
-                        $(".dropbox-login").hide()
-                        $('#user-name').text userInfo.name
-                        @updateDrawingList()
-                        console.log("authenticated to dropbox as #{userInfo.name}") if window.console
-
-    # Updates the UI to show that an error has occurred.
-    showError: (error) ->
-        $('#ErrorDialog').slideToggle 'slow'
-        $("#ErrorDialog .message").text(error)
-        console.log error if window.console
-
-    init: ->
-        @image = new ImageTextModeANSI
-        @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
-        @dbClient.authDriver(new Dropbox.Drivers.Popup({receiverFile: "oauth_receiver.html"}));
-        @dbAuthenticate()
-        # @dbClient.authDriver new Dropbox.Drivers.Redirect(rememberUser: true)
-
-        @canvas = document.getElementById @id
-        @width = @image.font.width * @columns
-        @canvas.setAttribute 'width', @width
-        @vga_canvas = document.getElementById @vga_id
-        @vga_canvas.setAttribute 'width', @width * @vga_scale
-        @drawingId = null
-        @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
-
-        @drawings = $.parseJSON($.Storage.get("drawings"))
-
-
-        @cursor = new Cursor
-        @cursor.init @
-        @pal = new Palette
-        @pal.init @
-        @sets = new CharacterSets
-        @sets.init @
-        
-        @ctx = @canvas.getContext '2d' if @canvas.getContext
-        @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
-        @setHeight($(window).height() + @image.font.height)
-
-        @draw()
-
-        $('#clear').click =>
-            answer = confirm 'Clear canvas?'
-            if (answer)
-                @drawingId = null
-                @image.screen = []
-                @draw()
-                @setName("")
-
-        $('#save').click =>
-            @toggleSaveDialog()
-            @drawings =[] if !@drawings
-            if @drawings[@drawingId] then @setName(@drawings[@drawingId].name)
-
-            @dbAuthenticate()
-
-
-        $('#html5Save').click =>
-            # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
-            @drawings[@getId()] = {grid: @image.screen, date: new Date(), name: $('#name').val()}
-            $.Storage.set("drawings", JSON.stringify(@drawings))
-            @toggleSaveDialog()
-
-        $('#PNGSave').click =>
-            window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+    @dbClient.authenticate interactive: false, (error, client) =>
+      return @showError(error) if error
+      if client.isAuthenticated()
+        $("#DropboxSaveContainer").show()
+        $("#DropboxFiles").show()
+        $(".dropbox-login").hide()
+        $('#user-name').text userInfo.name
+      else
+        $("#DropboxSaveContainer").hide()
+        $("#DropboxFiles").hide()
+        $(".dropbox-login").show()
+        $(".dropbox-login").click =>
+          client.authenticate (error, client) =>
+            return @showError(error)  if error
             
-        $('#DropboxSave').click =>
-            @dbClient.writeFile 'ansi/' + $('#name').val(), @image.write(), (error, stat) =>
-                return @showError(error) if error
-                @toggleSaveDialog()
+            client.getUserInfo (error, userInfo) =>
+              #return showError(error) if error
+              console.log error if error and window.console
+              $("#DropboxFiles").show()
+              $("#DropboxSaveContainer").show()
+              $(".dropbox-login").hide()
+              $('#user-name').text userInfo.name
+              @updateDrawingList()
+              console.log "authenticated to dropbox as #{userInfo.name}" if window.console
+
+  # Updates the UI to show that an error has occurred.
+  showError: (error) ->
+    $('#ErrorDialog').slideToggle 'slow'
+    $("#ErrorDialog .message").text(error)
+    console.log error if window.console
+
+  init: ->
+    @image = new ImageTextModeANSI
+    @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
+    @dbClient.authDriver(new Dropbox.Drivers.Popup({, rememberUser: true, receiverFile: "oauth_receiver.html"}));
+    @dbAuthenticate()
+    # @dbClient.authDriver new Dropbox.Drivers.Redirect(rememberUser: true)
+
+    @canvas = document.getElementById @id
+    @width = @image.font.width * @columns
+    @canvas.setAttribute 'width', @width
+    @vga_canvas = document.getElementById @vga_id
+    @vga_canvas.setAttribute 'width', @width * @vga_scale
+    @drawingId = null
+    @block = {start: {x: 0, y: 0}, end: {x: 0, y: 0}, mode: 'off'}
+
+    @drawings = $.parseJSON($.Storage.get("drawings"))
 
 
-        $('#load').click =>
-            @toggleLoadDialog()
+    @cursor = new Cursor
+    @cursor.init @
+    @pal = new Palette
+    @pal.init @
+    @sets = new CharacterSets
+    @sets.init @
+    
+    @ctx = @canvas.getContext '2d' if @canvas.getContext
+    @vga_ctx = @vga_canvas.getContext '2d' if @vga_canvas.getContext
+    @setHeight($(window).height() + @image.font.height)
 
-        $("#canvasscroller").scroll (e) => # Increase canvas side if user scrolls past edge of screen
-            if (e.target.clientHeight + @getScrollOffset() >= @height)
-                @setHeight(@height + @image.font.height)
-            @cursor.draw()
-            if @cursor.mousedown
-                $(this).trigger "moveblock"
-            $("#vgahighlight").css('top', @getScrollOffset() * @vga_scale)
+    @draw()
 
-        $("body").bind "keyup", (e) =>
-            # is in block mode, shift has been released and a key other then shift is pressed
-            if @block.mode == 'on' && !e.shiftKey && e.which not in [key.shift, key.ctrl, key["delete"], key.backspace] 
-                $(this).trigger "endblock"
+    $('#clear').click =>
+        answer = confirm 'Clear canvas?'
+        if (answer)
+            @drawingId = null
+            @image.screen = []
+            @draw()
+            @setName("")
 
-        $("body").bind "keydown", (e) =>
-            prevention = false
+    $('#save').click =>
+        @toggleSaveDialog()
+        @drawings =[] if !@drawings
+        if @drawings[@drawingId] then @setName(@drawings[@drawingId].name)
 
-            if @block.mode and e.which in [key["delete"], key.backspace]
-                @delete()
-            else if (e.target.nodeName != "INPUT")
-                mod = e.altKey || e.ctrlKey
-                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
-                    if @block.mode == 'off'
-                        $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
+        @dbAuthenticate()
 
-                switch e.which
-                    when key.left
-                        if (!mod)
-                            @cursor.moveLeft()
-                        else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
-                            if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
-                    when key.right
-                        if (!mod)
-                            @cursor.moveRight()
-                        else if e.ctrlKey || e.shiftKey
-                            if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
-                    when key.down
-                        prevention = true
-                        if (!mod)
-                            @cursor.moveDown()
-                        else if (e.ctrlKey)
-                            if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
-                    when key.up
-                        prevention = true
-                        if (!mod)
-                            @cursor.moveUp()
-                        else if e.ctrlKey
-                            if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
-                    when key.backspace
+
+    $('#html5Save').click =>
+        # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+        @drawings[@getId()] = {grid: @image.screen, date: new Date(), name: $('#name').val()}
+        $.Storage.set("drawings", JSON.stringify(@drawings))
+        @toggleSaveDialog()
+
+    $('#PNGSave').click =>
+        window.open(@canvas.toDataURL("image/png"), 'ansiSave')
+        
+    $('#DropboxSave').click =>
+        @dbClient.writeFile 'ansi/' + $('#name').val(), @image.write(), (error, stat) =>
+            return @showError(error) if error
+            @toggleSaveDialog()
+
+
+    $('#load').click =>
+        @toggleLoadDialog()
+
+    $("#canvasscroller").scroll (e) => # Increase canvas side if user scrolls past edge of screen
+        if (e.target.clientHeight + @getScrollOffset() >= @height)
+            @setHeight(@height + @image.font.height)
+        @cursor.draw()
+        if @cursor.mousedown
+            $(this).trigger "moveblock"
+        $("#vgahighlight").css('top', @getScrollOffset() * @vga_scale)
+
+    $("body").bind "keyup", (e) =>
+        # is in block mode, shift has been released and a key other then shift is pressed
+        if @block.mode == 'on' && !e.shiftKey && e.which not in [key.shift, key.ctrl, key["delete"], key.backspace] 
+            $(this).trigger "endblock"
+
+    $("body").bind "keydown", (e) =>
+        prevention = false
+
+        if @block.mode and e.which in [key["delete"], key.backspace]
+            @delete()
+        else if (e.target.nodeName != "INPUT")
+            mod = e.altKey || e.ctrlKey
+            if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
+                if @block.mode == 'off'
+                    $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
+
+            switch e.which
+                when key.left
+                    if (!mod)
                         @cursor.moveLeft()
-                        if @cursor.mode == 'ovr'
-                            @putChar(32)
-                            @cursor.moveLeft()
-                        else
-                            oldrow = @image.screen[@cursor.y]
-                            @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
-                        e.preventDefault()
-                    when key.delete
+                    else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
+                        if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
+                when key.right
+                    if (!mod)
+                        @cursor.moveRight()
+                    else if e.ctrlKey || e.shiftKey
+                        if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
+                when key.down
+                    prevention = true
+                    if (!mod)
+                        @cursor.moveDown()
+                    else if (e.ctrlKey)
+                        if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
+                when key.up
+                    prevention = true
+                    if (!mod)
+                        @cursor.moveUp()
+                    else if e.ctrlKey
+                        if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
+                when key.backspace
+                    @cursor.moveLeft()
+                    if @cursor.mode == 'ovr'
+                        @putChar(32)
+                        @cursor.moveLeft()
+                    else
                         oldrow = @image.screen[@cursor.y]
                         @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
-                    when key.end
-                        @cursor.x = parseInt(@width / @image.font.width - 1)
-                    when key.home
+                    e.preventDefault()
+                when key.delete
+                    oldrow = @image.screen[@cursor.y]
+                    @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                when key.end
+                    @cursor.x = parseInt(@width / @image.font.width - 1)
+                when key.home
+                    @cursor.x = 0
+                when key.enter
+                    if @block.mode in ['copy', 'cut']
+                        @paste()
+                    else
                         @cursor.x = 0
-                    when key.enter
-                        if @block.mode in ['copy', 'cut']
-                            @paste()
-                        else
-                            @cursor.x = 0
-                            @cursor.y++
-                    when key.insert
-                        @cursor.change_mode()
-                    when key.escape
-                        if $( '#splash' ).is( ':visible' )
-                             $( '#splash' ).slideToggle 'slow'
-                        if $( '#drawings' ).is( ':visible' )
-                            $( '#drawings' ).slideToggle 'slow'
-                        if $( '#SaveDialog' ).is( ':visible' )
-                            $( '#SaveDialog' ).slideToggle 'slow'
-                        if $( '#ErrorDialog').is(':visible')
-                            $('#ErrorDialog').slideToggle 'slow'
-                        if @block.mode in ['copy', 'cut']
-                            if @block.mode is 'cut'
-                                @cancelCut()
-                            $( '#copy' ).remove()
-                            $(this).trigger("endblock")
-                    else 
-                        if e.which == key.h && e.altKey
-                            @toggleHelpDialog()
-                            e.preventDefault()
+                        @cursor.y++
+                when key.insert
+                    @cursor.change_mode()
+                when key.escape
+                    if $( '#splash' ).is( ':visible' )
+                         $( '#splash' ).slideToggle 'slow'
+                    if $( '#drawings' ).is( ':visible' )
+                        $( '#drawings' ).slideToggle 'slow'
+                    if $( '#SaveDialog' ).is( ':visible' )
+                        $( '#SaveDialog' ).slideToggle 'slow'
+                    if $( '#ErrorDialog').is(':visible')
+                        $('#ErrorDialog').slideToggle 'slow'
+                    if @block.mode in ['copy', 'cut']
+                        if @block.mode is 'cut'
+                            @cancelCut()
+                        $( '#copy' ).remove()
+                        $(this).trigger("endblock")
+                else 
+                    if e.which == key.h && e.altKey
+                        @toggleHelpDialog()
+                        e.preventDefault()
 
-                        if e.which == key.l && e.altKey
-                            @updateDrawingList()
-                            @toggleLoadDialog()
-                            e.preventDefault()
+                    if e.which == key.l && e.altKey
+                        @updateDrawingList()
+                        @toggleLoadDialog()
+                        e.preventDefault()
 
-                        if e.which == key.s && e.altKey
-                            @toggleSaveDialog()
-                            e.preventDefault()                       
+                    if e.which == key.s && e.altKey
+                        @toggleSaveDialog()
+                        e.preventDefault()                       
 
-                        else if e.which >= 112 && e.which <= 121
-                            if !e.altKey && !e.shiftKey && !e.ctrlKey
-                                @putChar(@sets.sets[ @sets.set ][e.which-112])
-                            else if e.altKey
-                                @sets.set = e.which - 112
-                                @sets.fadeSet()
-                            e.preventDefault()
+                    else if e.which >= 112 && e.which <= 121
+                        if !e.altKey && !e.shiftKey && !e.ctrlKey
+                            @putChar(@sets.sets[ @sets.set ][e.which-112])
+                        else if e.altKey
+                            @sets.set = e.which - 112
+                            @sets.fadeSet()
+                        e.preventDefault()
 
 
-                @updateCursorPosition()
-                if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home )) && @block.mode == 'on'
-                    $(this).trigger("moveblock")
-
-                @pal.draw()
-                @cursor.draw()
-
-                if (prevention)
-                    e.preventDefault
-                    return false
-
-        # fix for ie loading help on F1 keypress
-        if document.all
-            window.onhelp = () -> return false
-            document.onhelp = () -> return false
-
-        $(this).bind "startblock", (e, x, y, offset) =>
-            @block = {start: {x: x, y: y, offset: offset}, end: {x: x, y: y, offset: offset}, mode: 'on'}
-            $("#highlight").css('display', 'block')
-            $(this).trigger "moveblock"
-
-        $(this).bind "endblock", (e) =>
-            @block.mode = 'off'
-            $("#highlight").css('display', 'none')
-            @copyGrid = []
-
-        $(this).bind "moveblock", (e) =>
-            adjustedStartY = @block.start.y + @block.start.offset - @getLinesOffset()
-            $("#highlight").css('left', (if @cursor.x >= @block.start.x then @block.start.x else @cursor.x) * @image.font.width)
-            $("#highlight").css('top', ((if @cursor.y >= adjustedStartY then adjustedStartY else @cursor.y)  ) * @image.font.height)
-            $("#highlight").width (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
-            $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
-
-        $("body").bind "keypress", (e) =>       
-            if @block.mode is 'on' and e.ctrlKey
-                switch e.which
-                    when key.ctrlF # fill foreground
-                        @fillBlock(@pal.fg, null)
-                        @draw()
-                    when key.ctrlB # fill background
-                        @fillBlock(null, @pal.bg)
-                        @draw()            
-                    when key.ctrlX # cut
-                        @setBlockEnd()
-                        @cut()
-
-                    when key.ctrlC # copy
-                        @setBlockEnd()
-                        @copy()
-
-            else if e.target.nodeName != "INPUT"
-                char = String.fromCharCode(e.which)
-                pattern = ///
-                    [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
-                ///
-                if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
-                    @putChar(char.charCodeAt( 0 ) & 255);  
-
-        $('#' + @id).mousemove ( e ) =>
-            if @cursor.mousedown
-                @setMouseCoordinates(e)
-                @putChar(@sets.char, true) if @sets.locked
-                @updateCursorPosition()
-                if @block.mode == 'off' && !sets.locked
-                    $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
-                else if !@sets.locked
-                    $(this).trigger("moveblock")
-                return true
-            if @block.mode in ['copy', 'cut']
-                @setMouseCoordinates(e)
-                @positionCopy()
-
-
-        $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
-            return unless e.which == 1
-            @cursor.mousedown = true
-            @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @image.font.width ) 
-            @cursor.y = Math.floor( (e.pageY - $('#' + @id).offset().top ) / @image.font.height )
-            @putChar(@sets.char, true) if @sets.locked
-            @cursor.draw()
             @updateCursorPosition()
-            $(this).trigger("endblock") if @block.mode not in ['copy', 'cut']
+            if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home )) && @block.mode == 'on'
+                $(this).trigger("moveblock")
 
-            return true
-
-        $('#' + @id).bind 'touchstart', ( e ) =>            
-            e.preventDefault()
-            if (e.originalEvent.touches.length == 1)
-                return @putTouchChar(e.originalEvent.touches[0])
-            
-
-        $('#' + @id).bind 'touchmove', ( e ) =>
-            if (e.originalEvent.touches.length == 1) # Only if one finger
-                touch = e.originalEvent.touches[0] # Get the information for finger #1        
-                return @putTouchChar( touch )
-
-        $('body').mouseup ( e ) =>
-            if @block.mode in ['copy', 'cut']
-                @paste()
-
-            @cursor.mousedown = false
+            @pal.draw()
             @cursor.draw()
 
-        $(window).resize ( e ) =>
-            @width = @canvas.clientWidth
-            @height = @canvas.clientHeight
-            @canvas.setAttribute 'width', @width
-            @canvas.setAttribute 'height', @height
-            @draw() 
+            if (prevention)
+                e.preventDefault
+                return false
 
-    getScrollOffset: ->
-        $("#canvasscroller").scrollTop()
+      # fix for ie loading help on F1 keypress
+      if document.all
+          window.onhelp = () -> return false
+          document.onhelp = () -> return false
 
-    getLinesOffset: ->
-        Math.floor(@getScrollOffset() / @image.font.height)
+      $(this).bind "startblock", (e, x, y, offset) =>
+          @block = {start: {x: x, y: y, offset: offset}, end: {x: x, y: y, offset: offset}, mode: 'on'}
+          $("#highlight").css('display', 'block')
+          $(this).trigger "moveblock"
 
-    setHeight: (height, copy = true) ->
-        $('#canvaswrapper').height($(window).height())
-        $('#canvasscroller').height($(window).height())
+      $(this).bind "endblock", (e) =>
+          @block.mode = 'off'
+          $("#highlight").css('display', 'none')
+          @copyGrid = []
 
-        if (height < $(window).height() + @image.font.height)
-            height = $(window).height() + @image.font.height
+      $(this).bind "moveblock", (e) =>
+          adjustedStartY = @block.start.y + @block.start.offset - @getLinesOffset()
+          $("#highlight").css('left', (if @cursor.x >= @block.start.x then @block.start.x else @cursor.x) * @image.font.width)
+          $("#highlight").css('top', ((if @cursor.y >= adjustedStartY then adjustedStartY else @cursor.y)  ) * @image.font.height)
+          $("#highlight").width (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
+          $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
-        if (height > @height or !@height?)
-            @height = height
-            if (copy)
-                tempCanvas = @canvas.toDataURL("image/png")
-                tempImg = new Image()
-                tempImg.src = tempCanvas
-                $(tempImg).load =>
-                    @canvas.setAttribute 'height', @height
-                    @ctx.drawImage(tempImg, 0, 0)
-                    @renderCanvas()
-            else
-                @canvas.setAttribute 'height', @height
+      $("body").bind "keypress", (e) =>       
+          if @block.mode is 'on' and e.ctrlKey
+              switch e.which
+                  when key.ctrlF # fill foreground
+                      @fillBlock(@pal.fg, null)
+                      @draw()
+                  when key.ctrlB # fill background
+                      @fillBlock(null, @pal.bg)
+                      @draw()            
+                  when key.ctrlX # cut
+                      @setBlockEnd()
+                      @cut()
 
-            @vga_canvas.setAttribute 'height', @height
-            console.log("Height updated to " + @height + "px")
-            # @draw()
+                  when key.ctrlC # copy
+                      @setBlockEnd()
+                      @copy()
 
+          else if e.target.nodeName != "INPUT"
+              char = String.fromCharCode(e.which)
+              pattern = ///
+                  [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
+              ///
+              if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
+                  @putChar(char.charCodeAt( 0 ) & 255);  
 
-
-    setBlockEnd: ->
-        @block.end.y = @cursor.y
-        @block.end.x = @cursor.x
-
-
-    copy: ->
-        @block.mode = 'copy'
-        @copyOrCut()
-
-    cut: ->
-        @block.mode = 'cut'
-        @copyOrCut(true, true)
-
-    delete: ->
-        @copyOrCut(false, true)
-        $(this).trigger("endblock")
-
-
-    cancelCut: ->
-        if @block.end.y > @block.start.y 
-            starty = @block.start.y
-            endy = @block.end.y
-        else 
-            starty = @block.end.y
-            endy = @block.start.y
-
-        if @block.end.x > @block.start.x
-            startx = @block.start.x
-            endx = @block.end.x
-        else
-            startx = @block.end.x
-            endx = @block.start.x
-
-        yy = 0;
-        for y in [ starty .. endy ]
-            xx = 0;
-            for x in [ startx .. endx ]
-                # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
-                # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
-                @image.screen[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
-                xx++
-            yy++
-
-        $('#copy').remove()
-        @draw()
-
-    copyOrCut: (copy = true, cut=false)->
-        @copyGrid = []
-        if @cursor.y > @block.start.y 
-            starty = @block.start.y
-            endy = @cursor.y
-        else 
-            starty = @cursor.y
-            endy = @block.start.y
-
-        if @cursor.x > @block.start.x
-            startx = @block.start.x
-            endx = @cursor.x
-        else
-            startx = @cursor.x
-            endx = @block.start.x
-
-        if copy
-            adjustedStartY = @block.start.y + @block.start.offset 
-            adjustedY = @cursor.y + @getLinesOffset()
-            sourceWidth = (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
-            sourceHeight = (Math.abs(adjustedY - adjustedStartY) + 1) * @image.font.height
-
-            # make copy of portion of canvas
-            @copyCanvas = document.createElement('canvas')
-            @copyCanvas.id = 'copy'
-            @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
-            @copyCanvas.setAttribute 'width', sourceWidth 
-            @copyCanvas.setAttribute 'height', sourceHeight
-
-            @cursor.x = if @cursor.x >= @block.start.x then @block.start.x else @cursor.x
-            @cursor.y = if adjustedY >= adjustedStartY then adjustedStartY else adjustedY
-            sourceX = @cursor.x * @image.font.width 
-            sourceY = @cursor.y * @image.font.height 
-            @cursor.y -= @getLinesOffset()
-            destWidth = sourceWidth
-            destHeight = sourceHeight
-            destX = 0
-            destY = 0
-
-            @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-            $(@copyCanvas).insertBefore('#vga')
-
-        # make copy of drawing data
-
-        yy = 0;
-        for y in [ starty .. endy ]
-            xx = 0;
-            for x in [ startx .. endx ]
-                # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
-                # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
-
-                if !@copyGrid[yy]?
-                    @copyGrid[yy] = []
-                @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y][x]? and copy
-                @image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y][x]?)  # clear block if cutting
-                xx++
-            yy++
-
-        @draw() if cut
+      $('#' + @id).mousemove ( e ) =>
+          if @cursor.mousedown
+              @setMouseCoordinates(e)
+              @putChar(@sets.char, true) if @sets.locked
+              @updateCursorPosition()
+              if @block.mode == 'off' && !sets.locked
+                  $(this).trigger("startblock", [@cursor.x, @cursor.y, @getLinesOffset()])
+              else if !@sets.locked
+                  $(this).trigger("moveblock")
+              return true
+          if @block.mode in ['copy', 'cut']
+              @setMouseCoordinates(e)
+              @positionCopy()
 
 
-        @positionCopy()
+      $('#' + @id).mousedown ( e ) => # Pablo only moves the cursor on click, this feels a little better when used -- may need to re-evaluate for touch usage
+          return unless e.which == 1
+          @cursor.mousedown = true
+          @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @image.font.width ) 
+          @cursor.y = Math.floor( (e.pageY - $('#' + @id).offset().top ) / @image.font.height )
+          @putChar(@sets.char, true) if @sets.locked
+          @cursor.draw()
+          @updateCursorPosition()
+          $(this).trigger("endblock") if @block.mode not in ['copy', 'cut']
 
-    paste: ->
-        # place copy
-        stationaryY = @cursor.y
-        stationaryX = @cursor.x
+          return true
 
-        for y in [ 0 .. @copyGrid.length - 1]
-            continue if !@copyGrid[y]?
-            for x in [0 .. @copyGrid[y].length - 1]
-                continue if !@copyGrid[y][x]?
-                if !@image.screen[stationaryY + y]?
-                    @image.screen[stationaryY + y] = []
-                @image.screen[stationaryY + y][stationaryX + x] = { ch: @copyGrid[y][x].ch, attr: @copyGrid[y][x].attr } if @copyGrid[y][x]?
-        @draw()
+      $('#' + @id).bind 'touchstart', ( e ) =>            
+          e.preventDefault()
+          if (e.originalEvent.touches.length == 1)
+              return @putTouchChar(e.originalEvent.touches[0])
+          
 
-        $('#copy').remove()
-        $(this).trigger("endblock")
+      $('#' + @id).bind 'touchmove', ( e ) =>
+          if (e.originalEvent.touches.length == 1) # Only if one finger
+              touch = e.originalEvent.touches[0] # Get the information for finger #1        
+              return @putTouchChar( touch )
 
-    setMouseCoordinates: (e) ->
-        @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @image.font.width )
-        @cursor.y = Math.floor( e.pageY / @image.font.height )
+      $('body').mouseup ( e ) =>
+          if @block.mode in ['copy', 'cut']
+              @paste()
 
-    positionCopy: ->
-        $(@copyCanvas).css('left', @cursor.x  * @image.font.width)
-        $(@copyCanvas).css('top', (@cursor.y) * @image.font.height)
-            
-    fillBlock: (fg, bg) ->
-        for y in [@block.start.y..@cursor.y]
-            continue if !@image.screen[y]?
-            for x in [(@cursor.x)..@block.start.x]
-                continue if !@image.screen[y][x]?
-                @image.screen[y][x].attr = ( (if bg then bg  else ( @image.screen[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @image.screen[y][x].attr & 15
+          @cursor.mousedown = false
+          @cursor.draw()
 
+      $(window).resize ( e ) =>
+          @width = @canvas.clientWidth
+          @height = @canvas.clientHeight
+          @canvas.setAttribute 'width', @width
+          @canvas.setAttribute 'height', @height
+          @draw() 
 
-    setName: (name) ->
-        $('#name').val( name )
+  getScrollOffset: ->
+      $("#canvasscroller").scrollTop()
 
-    toggleSaveDialog: ->
-        unless $( '#SaveDialog' ).is( ':visible' )
-            $( '#drawings').slideUp 'slow'
-            $( '#splash' ).slideUp 'slow'
-        $( '#SaveDialog' ).slideToggle 'slow'
+  getLinesOffset: ->
+      Math.floor(@getScrollOffset() / @image.font.height)
 
-    toggleLoadDialog: ->
-        unless $( '#drawings' ).is( ':visible' )
-            @updateDrawingList()
-            $( '#SaveDialog').slideUp 'slow'
-            $( '#splash' ).slideUp 'slow'
-        $( '#drawings' ).slideToggle 'slow'
+  setHeight: (height, copy = true) ->
+      $('#canvaswrapper').height($(window).height())
+      $('#canvasscroller').height($(window).height())
 
-    toggleHelpDialog: ->
-        unless $( '#splash' ).is( ':visible' )
-            $( '#drawings').slideUp 'slow'
-            $( '#SaveDialog' ).slideUp 'slow'
-        $( '#splash' ).slideToggle 'slow'
+      if (height < $(window).height() + @image.font.height)
+          height = $(window).height() + @image.font.height
 
-    updateDrawingList: ->
-        $('#drawings #html5Files ol').empty()
-        @drawings =[] if !@drawings
-        @addDrawing drawing, i for drawing, i in @drawings
+      if (height > @height or !@height?)
+          @height = height
+          if (copy)
+              tempCanvas = @canvas.toDataURL("image/png")
+              tempImg = new Image()
+              tempImg.src = tempCanvas
+              $(tempImg).load =>
+                  @canvas.setAttribute 'height', @height
+                  @ctx.drawImage(tempImg, 0, 0)
+                  @renderCanvas()
+          else
+              @canvas.setAttribute 'height', @height
 
-        $('#drawings #html5Files li span.name').click (e) =>
-            @drawingId = $( e.currentTarget ).parent().attr( "nid" )
-            @image.screen = @drawings[ @drawingId ].grid
-            @height = 0
-            @setHeight(@image.screen.length * @image.font.height, false)
-            @draw()
-            @toggleLoadDialog()
-
-        $('#drawings #html5Files li span.delete').click (e) =>
-            answer = confirm 'Delete drawing?'
-            if (answer)
-                @drawings[$( e.currentTarget ).parent().attr("nid")] = null
-                $.Storage.set("drawings", JSON.stringify(@drawings))
-                @updateDrawingList()
-
-        if @dbClient.isAuthenticated()
-            $("#drawings #DropboxFiles").empty()
-            @dbClient.mkdir '/ansi', (error, stat) =>
-                # Issued mkdir so we always have a directory to read from.
-                # In most cases, this will fail, so don't bother checking for errors.
-                @dbClient.readdir '/ansi', (error, entries, dir_stat, entry_stats) =>
-                    #return @showError(error) if error
-                    console.log error if error and window.console                    
-                    $('#DropboxFiles').append("<li nid=\"#{entry.name}\"><span class=\"name\">#{entry.name}</span> <span class=\"delete\"></span>") for entry in entry_stats
-            
-                    $('#DropboxFiles span.name').click (e) =>
-                        @dbClient.readFile "ansi/#{$(e.target).text()}", arrayBuffer: true, (error, data) =>
-                            return @showError(error) if error
-                            @image.parse(@binaryArrayToString data)
-                            @setHeight(@image.getHeight() * @image.font.height, false)
-                            @draw()
-                            @toggleLoadDialog()
+          @vga_canvas.setAttribute 'height', @height
+          console.log("Height updated to " + @height + "px")
+          # @draw()
 
 
-    addDrawing: ( drawing, id ) ->
-        if drawing
-            $('#drawings #html5Files ol').append( '<li nid=' + id + '><span class="name">' + (if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a")) + '</span> <span class="delete">X</span></li>')
 
-    getId: ->
-        
-        return if @drawingId then @drawingId else @generateId()
+  setBlockEnd: ->
+      @block.end.y = @cursor.y
+      @block.end.x = @cursor.x
 
-    generateId: ->
-        return if @drawings then @drawings.length else 1
-            
-    updateCursorPosition: ->
-        $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
-   
 
-    putTouchChar: ( touch ) ->
-        node = touch.target
-        @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @image.font.width )
-        @cursor.y = Math.floor( (touch.pageY - $('#' + @id).offset().top )/ @image.font.height )
-        @putChar(@sets.char) if @sets.locked
-        @drawChar(@cursor.x, @cursor.y)
-        @updateCursorPosition()
-        return true
+  copy: ->
+      @block.mode = 'copy'
+      @copyOrCut()
 
-    putChar: (charCode, holdCursor = false) ->
-        @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
-        if @cursor.mode == 'ins'
-            # NOTE: this will push chars off the right-side of the canvas
-            # but will still have an entry in the grid
-            row = @image.screen[@cursor.y][@cursor.x..]
-            @image.screen[@cursor.y][@cursor.x + 1..] = row
-        @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
-        @drawChar(@cursor.x, @cursor.y)
-        unless holdCursor then @cursor.moveRight()
-        @updateCursorPosition()
+  cut: ->
+      @block.mode = 'cut'
+      @copyOrCut(true, true)
 
-    loadUrl: ( url ) ->
-        req = new XMLHttpRequest
-        req.open 'GET', url, false
-        if req.overrideMimeType
-            req.overrideMimeType 'text/plain; charset=x-user-defined'
-        req.send null
-        content = if req.status is 200 or req.status is 0 then req.responseText else ''
-        return content
+  delete: ->
+      @copyOrCut(false, true)
+      $(this).trigger("endblock")
 
-    loadFont: ->
-        return new ImageTextModeFont8x16
 
-    drawChar: (x, y, full = false) ->
-        if @image.screen[y][x]
-            px = x * @image.font.width
-            py = y * @image.font.height
+  cancelCut: ->
+      if @block.end.y > @block.start.y 
+          starty = @block.start.y
+          endy = @block.end.y
+      else 
+          starty = @block.end.y
+          endy = @block.start.y
 
-            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ ( @image.screen[y][x].attr & 240 ) >> 4 ] ) #bg
-            @ctx.fillRect px, py, 8, 16
+      if @block.end.x > @block.start.x
+          startx = @block.start.x
+          endx = @block.end.x
+      else
+          startx = @block.end.x
+          endx = @block.start.x
 
-            @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ @image.screen[y][x].attr & 15 ] ) #fg
-            chr = @image.font.chars[ @image.screen[y][x].ch.charCodeAt( 0 ) & 0xff  ]
-            for i in [ 0 .. @image.font.height - 1 ]
-                line = chr[ i ]
-                for j in [ 0 .. @image.font.width - 1 ]
-                    if line & ( 1 << 7 - j )
-                        @ctx.fillRect px + j, py + i, 1, 1
-            if !full #don't redraw on each character if it is a full canvas draw
-                @renderCanvas()
-        
-    draw: ->
-        @ctx.fillStyle = "#000000"
-        @ctx.fillRect 0, 0, @canvas.width, @canvas.height
-        for y in [0..@image.screen.length - 1]
-            continue if !@image.screen[y]?
-            for x in [0..@image.screen[y].length - 1]
-                continue if !@image.screen[y][x]?
-                @drawChar(x, y, true)
+      yy = 0;
+      for y in [ starty .. endy ]
+          xx = 0;
+          for x in [ startx .. endx ]
+              # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
+              # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
+              @image.screen[y][x] = { ch: @copyGrid[yy][xx].ch, attr: @copyGrid[yy][xx].attr } if @copyGrid[yy][xx]?
+              xx++
+          yy++
 
-        @renderCanvas()
+      $('#copy').remove()
+      @draw()
 
-    renderCanvas: ->
-        @ctx.fill()
-        @vga_ctx.fillStyle = "#000000"
-        @vga_ctx.fillRect 0, 0,  @canvas.width * @vga_scale, @canvas. height * @vga_scale
-        @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
-        highlight = $("#vgahighlight")
-        highlight.width(@vga_canvas.getAttribute 'width')
-        highlight.height($("#canvaswrapper").height() * @vga_scale)
-        $("#vgawrapper").css('left', $("#toolbar").width() + $("#canvas").width())
+  copyOrCut: (copy = true, cut=false)->
+      @copyGrid = []
+      if @cursor.y > @block.start.y 
+          starty = @block.start.y
+          endy = @cursor.y
+      else 
+          starty = @cursor.y
+          endy = @block.start.y
 
-    binaryArrayToString: (buf) ->
-        String.fromCharCode.apply null, new Uint8Array(buf)
+      if @cursor.x > @block.start.x
+          startx = @block.start.x
+          endx = @cursor.x
+      else
+          startx = @cursor.x
+          endx = @block.start.x
+
+      if copy
+          adjustedStartY = @block.start.y + @block.start.offset 
+          adjustedY = @cursor.y + @getLinesOffset()
+          sourceWidth = (Math.abs(@cursor.x - @block.start.x) + 1) * @image.font.width
+          sourceHeight = (Math.abs(adjustedY - adjustedStartY) + 1) * @image.font.height
+
+          # make copy of portion of canvas
+          @copyCanvas = document.createElement('canvas')
+          @copyCanvas.id = 'copy'
+          @copyCanvasContext = @copyCanvas.getContext '2d' if @copyCanvas.getContext                
+          @copyCanvas.setAttribute 'width', sourceWidth 
+          @copyCanvas.setAttribute 'height', sourceHeight
+
+          @cursor.x = if @cursor.x >= @block.start.x then @block.start.x else @cursor.x
+          @cursor.y = if adjustedY >= adjustedStartY then adjustedStartY else adjustedY
+          sourceX = @cursor.x * @image.font.width 
+          sourceY = @cursor.y * @image.font.height 
+          @cursor.y -= @getLinesOffset()
+          destWidth = sourceWidth
+          destHeight = sourceHeight
+          destX = 0
+          destY = 0
+
+          @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+          $(@copyCanvas).insertBefore('#vga')
+
+      # make copy of drawing data
+
+      yy = 0;
+      for y in [ starty .. endy ]
+          xx = 0;
+          for x in [ startx .. endx ]
+              # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
+              # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
+
+              if !@copyGrid[yy]?
+                  @copyGrid[yy] = []
+              @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y][x]? and copy
+              @image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y][x]?)  # clear block if cutting
+              xx++
+          yy++
+
+      @draw() if cut
+
+
+      @positionCopy()
+
+  paste: ->
+      # place copy
+      stationaryY = @cursor.y
+      stationaryX = @cursor.x
+
+      for y in [ 0 .. @copyGrid.length - 1]
+          continue if !@copyGrid[y]?
+          for x in [0 .. @copyGrid[y].length - 1]
+              continue if !@copyGrid[y][x]?
+              if !@image.screen[stationaryY + y]?
+                  @image.screen[stationaryY + y] = []
+              @image.screen[stationaryY + y][stationaryX + x] = { ch: @copyGrid[y][x].ch, attr: @copyGrid[y][x].attr } if @copyGrid[y][x]?
+      @draw()
+
+      $('#copy').remove()
+      $(this).trigger("endblock")
+
+  setMouseCoordinates: (e) ->
+      @cursor.x = Math.floor( ( e.pageX - $('#' + @id).offset().left ) / @image.font.width )
+      @cursor.y = Math.floor( e.pageY / @image.font.height )
+
+  positionCopy: ->
+      $(@copyCanvas).css('left', @cursor.x  * @image.font.width)
+      $(@copyCanvas).css('top', (@cursor.y) * @image.font.height)
+          
+  fillBlock: (fg, bg) ->
+      for y in [@block.start.y..@cursor.y]
+          continue if !@image.screen[y]?
+          for x in [(@cursor.x)..@block.start.x]
+              continue if !@image.screen[y][x]?
+              @image.screen[y][x].attr = ( (if bg then bg  else ( @image.screen[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @image.screen[y][x].attr & 15
+
+
+  setName: (name) ->
+      $('#name').val( name )
+
+  toggleSaveDialog: ->
+      unless $( '#SaveDialog' ).is( ':visible' )
+          $( '#drawings').slideUp 'slow'
+          $( '#splash' ).slideUp 'slow'
+      $( '#SaveDialog' ).slideToggle 'slow'
+
+  toggleLoadDialog: ->
+      unless $( '#drawings' ).is( ':visible' )
+          @updateDrawingList()
+          $( '#SaveDialog').slideUp 'slow'
+          $( '#splash' ).slideUp 'slow'
+      $( '#drawings' ).slideToggle 'slow'
+
+  toggleHelpDialog: ->
+      unless $( '#splash' ).is( ':visible' )
+          $( '#drawings').slideUp 'slow'
+          $( '#SaveDialog' ).slideUp 'slow'
+      $( '#splash' ).slideToggle 'slow'
+
+  updateDrawingList: ->
+      $('#drawings #html5Files ol').empty()
+      @drawings =[] if !@drawings
+      @addDrawing drawing, i for drawing, i in @drawings
+
+      $('#drawings #html5Files li span.name').click (e) =>
+          @drawingId = $( e.currentTarget ).parent().attr( "nid" )
+          @image.screen = @drawings[ @drawingId ].grid
+          @height = 0
+          @setHeight(@image.screen.length * @image.font.height, false)
+          @draw()
+          @toggleLoadDialog()
+
+      $('#drawings #html5Files li span.delete').click (e) =>
+          answer = confirm 'Delete drawing?'
+          if (answer)
+              @drawings[$( e.currentTarget ).parent().attr("nid")] = null
+              $.Storage.set("drawings", JSON.stringify(@drawings))
+              @updateDrawingList()
+
+      if @dbClient.isAuthenticated()
+          $("#drawings #DropboxFiles").empty()
+          @dbClient.mkdir '/ansi', (error, stat) =>
+              # Issued mkdir so we always have a directory to read from.
+              # In most cases, this will fail, so don't bother checking for errors.
+              @dbClient.readdir '/ansi', (error, entries, dir_stat, entry_stats) =>
+                  #return @showError(error) if error
+                  console.log error if error and window.console                    
+                  $('#DropboxFiles').append("<li nid=\"#{entry.name}\"><span class=\"name\">#{entry.name}</span> <span class=\"delete\"></span>") for entry in entry_stats
+          
+                  $('#DropboxFiles span.name').click (e) =>
+                      @dbClient.readFile "ansi/#{$(e.target).text()}", arrayBuffer: true, (error, data) =>
+                          return @showError(error) if error
+                          @image.parse(@binaryArrayToString data)
+                          @setHeight(@image.getHeight() * @image.font.height, false)
+                          @draw()
+                          @toggleLoadDialog()
+
+
+  addDrawing: ( drawing, id ) ->
+      if drawing
+          $('#drawings #html5Files ol').append( '<li nid=' + id + '><span class="name">' + (if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a")) + '</span> <span class="delete">X</span></li>')
+
+  getId: ->
+      
+      return if @drawingId then @drawingId else @generateId()
+
+  generateId: ->
+      return if @drawings then @drawings.length else 1
+          
+  updateCursorPosition: ->
+      $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
+ 
+
+  putTouchChar: ( touch ) ->
+      node = touch.target
+      @cursor.x = Math.floor( ( touch.pageX - $('#' + @id).offset().left )  / @image.font.width )
+      @cursor.y = Math.floor( (touch.pageY - $('#' + @id).offset().top )/ @image.font.height )
+      @putChar(@sets.char) if @sets.locked
+      @drawChar(@cursor.x, @cursor.y)
+      @updateCursorPosition()
+      return true
+
+  putChar: (charCode, holdCursor = false) ->
+      @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
+      if @cursor.mode == 'ins'
+          # NOTE: this will push chars off the right-side of the canvas
+          # but will still have an entry in the grid
+          row = @image.screen[@cursor.y][@cursor.x..]
+          @image.screen[@cursor.y][@cursor.x + 1..] = row
+      @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
+      @drawChar(@cursor.x, @cursor.y)
+      unless holdCursor then @cursor.moveRight()
+      @updateCursorPosition()
+
+  loadUrl: ( url ) ->
+      req = new XMLHttpRequest
+      req.open 'GET', url, false
+      if req.overrideMimeType
+          req.overrideMimeType 'text/plain; charset=x-user-defined'
+      req.send null
+      content = if req.status is 200 or req.status is 0 then req.responseText else ''
+      return content
+
+  loadFont: ->
+      return new ImageTextModeFont8x16
+
+  drawChar: (x, y, full = false) ->
+      if @image.screen[y][x]
+          px = x * @image.font.width
+          py = y * @image.font.height
+
+          @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ ( @image.screen[y][x].attr & 240 ) >> 4 ] ) #bg
+          @ctx.fillRect px, py, 8, 16
+
+          @ctx.fillStyle = @pal.toRgbaString( @image.palette.colors[ @image.screen[y][x].attr & 15 ] ) #fg
+          chr = @image.font.chars[ @image.screen[y][x].ch.charCodeAt( 0 ) & 0xff  ]
+          for i in [ 0 .. @image.font.height - 1 ]
+              line = chr[ i ]
+              for j in [ 0 .. @image.font.width - 1 ]
+                  if line & ( 1 << 7 - j )
+                      @ctx.fillRect px + j, py + i, 1, 1
+          if !full #don't redraw on each character if it is a full canvas draw
+              @renderCanvas()
+      
+  draw: ->
+      @ctx.fillStyle = "#000000"
+      @ctx.fillRect 0, 0, @canvas.width, @canvas.height
+      for y in [0..@image.screen.length - 1]
+          continue if !@image.screen[y]?
+          for x in [0..@image.screen[y].length - 1]
+              continue if !@image.screen[y][x]?
+              @drawChar(x, y, true)
+
+      @renderCanvas()
+
+  renderCanvas: ->
+      @ctx.fill()
+      @vga_ctx.fillStyle = "#000000"
+      @vga_ctx.fillRect 0, 0,  @canvas.width * @vga_scale, @canvas. height * @vga_scale
+      @vga_ctx.drawImage(@canvas, 0, 0, @canvas.width, @canvas.height, 0, 0, @canvas.width * @vga_scale, @canvas. height * @vga_scale);
+      highlight = $("#vgahighlight")
+      highlight.width(@vga_canvas.getAttribute 'width')
+      highlight.height($("#canvaswrapper").height() * @vga_scale)
+      $("#vgawrapper").css('left', $("#toolbar").width() + $("#canvas").width())
+
+  binaryArrayToString: (buf) ->
+      String.fromCharCode.apply null, new Uint8Array(buf)
 
 class Cursor
 
