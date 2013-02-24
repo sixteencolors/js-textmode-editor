@@ -19,7 +19,7 @@
     {{{help_footer}}}
 </div>
 <div id="drawings">
-    <div>
+    <div id="html5Files">
         <a class=close href=#>&times;</a>
         <h2>Your Drawings</h2>
         <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list</p>
@@ -37,6 +37,11 @@
             </div>
         </form>
     </div>
+    <div>
+        <h2>Dropbox Drawings</h2>
+        <a class="dropbox-login" href="#">Login to Dropbox</a>
+        <ol id="DropboxFiles"></ol>
+    </div>
 </div>
 <div id="SaveDialog">
     <a class=close href=#>&times;</a>
@@ -47,7 +52,7 @@
         <li><a href="#" id="html5Save">Save to Browser</a></li>
         <li id="DropboxContainer">
             <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save to Dropbox</a> as <span id="user-name" /></span>
-            <a href="#" id="DropboxLogin">Login to Dropbox</a>
+            <a href="#" class="dropbox-login">Login to Dropbox</a>
         </li>
     </ul>
 </div>

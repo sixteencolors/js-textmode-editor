@@ -39,31 +39,30 @@ class @Editor
 
     dbAuthenticate: ->
 
-        @dbClient.authenticate interactive: false, (error, client) ->
+        @dbClient.authenticate interactive: false, (error, client) =>
           return @showError(error) if error
           if client.isAuthenticated()
             $("#DropboxSaveContainer").show()
-            $("#DropboxLogin").hide()
+            $("#DropboxFiles").show()
+            $(".dropbox-login").hide()
             $('#user-name').text userInfo.name
           else
             $("#DropboxSaveContainer").hide()
-            $("#DropboxLogin").show()
-            $("#DropboxLogin").click =>
-                client.authenticate (error, client) ->
-                    #return handleError(error)  if error
+            $("#DropboxFiles").hide()
+            $(".dropbox-login").show()
+            $(".dropbox-login").click =>
+                client.authenticate (error, client) =>
+                    return @showError(error)  if error
                     
                     client.getUserInfo (error, userInfo) =>
                         #return showError(error) if error
                         console.log error if error and window.console
+                        $("#DropboxFiles").show()
                         $("#DropboxSaveContainer").show()
-                        $("#DropboxLogin").hide()
+                        $(".dropbox-login").hide()
                         $('#user-name').text userInfo.name
+                        @updateDrawingList()
                         console.log("authenticated to dropbox as #{userInfo.name}") if window.console
-          #@tasks = new Tasks @, @dbClient
-          #@tasks.load =>
-            #@wire()
-            #@render()
-            #@$root.removeClass 'hidden'        
 
     # Updates the UI to show that an error has occurred.
     showError: (error) ->
@@ -551,11 +550,11 @@ class @Editor
         $( '#splash' ).slideToggle 'slow'
 
     updateDrawingList: ->
-        $('#drawings ol').empty()
+        $('#drawings #html5Files ol').empty()
         @drawings =[] if !@drawings
         @addDrawing drawing, i for drawing, i in @drawings
 
-        $('#drawings li span.name').click (e) =>
+        $('#drawings #html5Files li span.name').click (e) =>
             @drawingId = $( e.currentTarget ).parent().attr( "nid" )
             @image.screen = @drawings[ @drawingId ].grid
             @height = 0
@@ -563,16 +562,35 @@ class @Editor
             @draw()
             @toggleLoadDialog()
 
-        $('#drawings li span.delete').click (e) =>
+        $('#drawings #html5Files li span.delete').click (e) =>
             answer = confirm 'Delete drawing?'
             if (answer)
                 @drawings[$( e.currentTarget ).parent().attr("nid")] = null
                 $.Storage.set("drawings", JSON.stringify(@drawings))
                 @updateDrawingList()
 
+        if @dbClient.isAuthenticated()
+            $("#drawings #DropboxFiles").empty()
+            @dbClient.mkdir '/ansi', (error, stat) =>
+                # Issued mkdir so we always have a directory to read from.
+                # In most cases, this will fail, so don't bother checking for errors.
+                @dbClient.readdir '/ansi', (error, entries, dir_stat, entry_stats) =>
+                    #return @showError(error) if error
+                    console.log error if error and window.console                    
+                    $('#DropboxFiles').append("<li nid=\"#{entry.name}\"><span class=\"name\">#{entry.name}</span> <span class=\"delete\"></span>") for entry in entry_stats
+            
+                    $('#DropboxFiles span.name').click (e) =>
+                        @dbClient.readFile "ansi/#{$(e.target).text()}", arrayBuffer: true, (error, data) =>
+                            return @showError(error) if error
+                            @image.parse(@binaryArrayToString data)
+                            @setHeight(@image.getHeight() * @image.font.height, false)
+                            @draw()
+                            @toggleLoadDialog()
+
+
     addDrawing: ( drawing, id ) ->
         if drawing
-            $('#drawings ol').append( '<li nid=' + id + '><span class="name">' + (if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a")) + '</span> <span class="delete">X</span></li>')
+            $('#drawings #html5Files ol').append( '<li nid=' + id + '><span class="name">' + (if drawing.name then drawing.name else $.format.date(drawing.date, "MM/dd/yyyy hh:mm:ss a")) + '</span> <span class="delete">X</span></li>')
 
     getId: ->
         
@@ -656,6 +674,9 @@ class @Editor
         highlight.width(@vga_canvas.getAttribute 'width')
         highlight.height($("#canvaswrapper").height() * @vga_scale)
         $("#vgawrapper").css('left', $("#toolbar").width() + $("#canvas").width())
+
+    binaryArrayToString: (buf) ->
+        String.fromCharCode.apply null, new Uint8Array(buf)
 
 class Cursor
 

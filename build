@@ -70,6 +70,9 @@ if( !@args ) {
     require File::Copy;
     File::Copy::copy( $src->file( 'favicon.ico' )->stringify, $outdir );    
 
+    # oauth receiver
+    File::Copy::copy( $src->file( 'oauth_receiver.html' )->stringify, $outdir );    
+
     # static folders, 1-to-1 copy
     require File::Copy::Recursive;
     for( qw( img js ) ) {
