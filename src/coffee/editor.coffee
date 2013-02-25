@@ -15,6 +15,7 @@ class @Editor
     f9: 120
     f10: 121
     backspace: 8
+    spacebar: 32
     delete: 46
     end: 35
     home: 36
@@ -27,7 +28,8 @@ class @Editor
     ctrlF: 6,
     ctrlB: 2,
     ctrlX: 24,
-    ctrlC: 3
+    ctrlC: 3,
+    ctrlZ: 26
 
   constructor: ( options ) ->
     @tabstop  = 8
@@ -73,8 +75,15 @@ class @Editor
   init: ->
     @image = new ImageTextModeANSI
     @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
-    @dbClient.authDriver(new Dropbox.Drivers.Popup({, rememberUser: true, receiverFile: "oauth_receiver.html"}));
+    @dbClient.authDriver(new Dropbox.Drivers.Popup({ rememberUser: true, receiverFile: "oauth_receiver.html"}));
     @dbAuthenticate()
+
+    @manager = new BufferedUndoManager buffer: 1000
+    @manager.on 'undo redo', () =>
+      @image.screen = []
+      $.extend @image.screen, @manager.state
+      @draw()
+
     # @dbClient.authDriver new Dropbox.Drivers.Redirect(rememberUser: true)
 
     @canvas = document.getElementById @id
@@ -102,12 +111,12 @@ class @Editor
     @draw()
 
     $('#clear').click =>
-        answer = confirm 'Clear canvas?'
-        if (answer)
-            @drawingId = null
-            @image.screen = []
-            @draw()
-            @setName("")
+      answer = confirm 'Clear canvas?'
+      if (answer)
+        @drawingId = null
+        @image.screen = []
+        @draw()
+        @setName("")
 
     $('#save').click =>
         @toggleSaveDialog()
@@ -182,6 +191,9 @@ class @Editor
                         @cursor.moveUp()
                     else if e.ctrlKey
                         if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
+                when key.spacebar
+                  @cursor.mvoeRight()
+                  e.preventDefault()
                 when key.backspace
                     @cursor.moveLeft()
                     if @cursor.mode == 'ovr'
@@ -277,29 +289,32 @@ class @Editor
           $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
       $("body").bind "keypress", (e) =>       
-          if @block.mode is 'on' and e.ctrlKey
-              switch e.which
-                  when key.ctrlF # fill foreground
-                      @fillBlock(@pal.fg, null)
-                      @draw()
-                  when key.ctrlB # fill background
-                      @fillBlock(null, @pal.bg)
-                      @draw()            
-                  when key.ctrlX # cut
-                      @setBlockEnd()
-                      @cut()
+        if @block.mode is 'on' and e.ctrlKey
+          switch e.which
+            when key.ctrlF # fill foreground
+              @fillBlock(@pal.fg, null)
+              @draw()
+            when key.ctrlB # fill background
+              @fillBlock(null, @pal.bg)
+              @draw()            
+            when key.ctrlX # cut
+              @setBlockEnd()
+              @cut()
+            when key.ctrlC # copy
+              @setBlockEnd()
+              @copy()
 
-                  when key.ctrlC # copy
-                      @setBlockEnd()
-                      @copy()
-
-          else if e.target.nodeName != "INPUT"
-              char = String.fromCharCode(e.which)
-              pattern = ///
-                  [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
-              ///
-              if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
-                  @putChar(char.charCodeAt( 0 ) & 255);  
+        else if e.target.nodeName != "INPUT"
+          char = String.fromCharCode(e.which)
+          pattern = ///
+            [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
+          ///
+          if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
+            @putChar(char.charCodeAt( 0 ) & 255);  
+          else if e.which == key.ctrlZ and !e.shiftKey
+            @manager.undo()
+          else if e.which == key.ctrlZ and e.shiftKey
+            @manager.redo()
 
       $('#' + @id).mousemove ( e ) =>
           if @cursor.mousedown
@@ -612,17 +627,26 @@ class @Editor
       @updateCursorPosition()
       return true
 
+  synchronize: ->
+    if @manager?
+      @image.screen = @manager.state
+      @draw()
+
   putChar: (charCode, holdCursor = false) ->
-      @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
-      if @cursor.mode == 'ins'
-          # NOTE: this will push chars off the right-side of the canvas
-          # but will still have an entry in the grid
-          row = @image.screen[@cursor.y][@cursor.x..]
-          @image.screen[@cursor.y][@cursor.x + 1..] = row
-      @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
-      @drawChar(@cursor.x, @cursor.y)
-      unless holdCursor then @cursor.moveRight()
-      @updateCursorPosition()
+    @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
+    if @cursor.mode == 'ins'
+        # NOTE: this will push chars off the right-side of the canvas
+        # but will still have an entry in the grid
+        row = @image.screen[@cursor.y][@cursor.x..]
+        @image.screen[@cursor.y][@cursor.x + 1..] = row
+    @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
+
+    screencopy = $.extend(true, {}, @image.screen)
+    @manager.update $.extend(true, {}, @image.screen)
+
+    @drawChar(@cursor.x, @cursor.y)
+    unless holdCursor then @cursor.moveRight()
+    @updateCursorPosition()
 
   loadUrl: ( url ) ->
       req = new XMLHttpRequest
@@ -657,6 +681,7 @@ class @Editor
   draw: ->
       @ctx.fillStyle = "#000000"
       @ctx.fillRect 0, 0, @canvas.width, @canvas.height
+      @image.screen = [] if !@image.screen?
       for y in [0..@image.screen.length - 1]
           continue if !@image.screen[y]?
           for x in [0..@image.screen[y].length - 1]
@@ -897,60 +922,60 @@ AbortParse = ->
     @reader.abort()
 
 ParseFile = ( file ) ->
-    @reader = new FileReader()
-    $( @reader ).load ( e ) ->
-        progress = $(".percent")
-        progress.width('100%')
-        progress.text('100%')
-        setTimeout("document.getElementById('progress_bar').className='';", 2000);
+  @reader = new FileReader()
+  $( @reader ).load ( e ) ->
+    progress = $(".percent")
+    progress.width('100%')
+    progress.text('100%')
+    setTimeout("document.getElementById('progress_bar').className='';", 2000);
 
-        editor.height = 0
-        content = e.target.result
-        start = new Date().getTime();
-        console.log 'Begin parsing'
-        progressIntervalID = setInterval ->
-            end = new Date().getTime()
-            console.log((end - start) + 's')
-        , 1000
+    editor.height = 0
+    content = e.target.result
+    start = new Date().getTime();
+    console.log 'Begin parsing'
+    progressIntervalID = setInterval ->
+      end = new Date().getTime()
+      console.log((end - start) + 's')
+    , 1000
 
-        editor.image.parse( content )
-        clearInterval(progressIntervalID)
-        console.log 'End parsing'
-        editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
-        editor.draw()
-        editor.toggleLoadDialog()
-        return true
+    editor.image.parse( content )
+    clearInterval(progressIntervalID)
+    console.log 'End parsing'
+    editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
+    editor.draw()
+    editor.toggleLoadDialog()
+    return true
 
-    $( @reader ).error ( e ) ->
-        switch e.target.error.code
-            when e.target.error.NOT_FOUND_ERR
-              alert "File Not Found!"
-            when evt.target.error.NOT_READABLE_ERR
-              alert "File is not readable"
-            when evt.target.error.ABORT_ERR
-            # noop
-            else
-              alert "An error occurred reading this file."
+  $( @reader ).error ( e ) ->
+    switch e.target.error.code
+      when e.target.error.NOT_FOUND_ERR
+        alert "File Not Found!"
+      when evt.target.error.NOT_READABLE_ERR
+        alert "File is not readable"
+      when evt.target.error.ABORT_ERR
+      # noop
+      else
+        alert "An error occurred reading this file."
 
-    $( @reader ).bind "progress", (e) ->
-      if e.lengthComputable
-        percentLoaded = Math.round((e.loaded / e.total) * 100)
-        
-        # Increase the progress bar length.
-        if percentLoaded < 100
-          progress.style.width = percentLoaded + "%"
-          progress.textContent = percentLoaded + "%"        
+  $( @reader ).bind "progress", (e) ->
+    if e.lengthComputable
+      percentLoaded = Math.round((e.loaded / e.total) * 100)
+      
+      # Increase the progress bar length.
+      if percentLoaded < 100
+        progress.style.width = percentLoaded + "%"
+        progress.textContent = percentLoaded + "%"        
 
-    $( @reader ).bind "abort", (e) ->
-        alert('File read cancelled')
+  $( @reader ).bind "abort", (e) ->
+    alert('File read cancelled')
 
-    $( @reader ).bind  "loadstart", (e) -> 
-        $("#progress_bar").addClass "loading"
-        console.log ("load started" )
+  $( @reader ).bind  "loadstart", (e) -> 
+    $("#progress_bar").addClass "loading"
+    console.log ("load started" )
 
-    editor.setName( file.name )
-    @reader.readAsBinaryString(file)
-    return false
+  editor.setName( file.name )
+  @reader.readAsBinaryString(file)
+  return false
 
 $( document ).ready ->
 
