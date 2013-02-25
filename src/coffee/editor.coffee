@@ -47,7 +47,9 @@ class @Editor
         $("#DropboxSaveContainer").show()
         $("#DropboxFiles").show()
         $(".dropbox-login").hide()
-        $('#user-name').text userInfo.name
+        client.getUserInfo (error, userInfo) =>
+          return @showError(error) if error
+          $('.user-name').text userInfo.name
       else
         $("#DropboxSaveContainer").hide()
         $("#DropboxFiles").hide()
@@ -57,14 +59,22 @@ class @Editor
             return @showError(error)  if error
             
             client.getUserInfo (error, userInfo) =>
-              #return showError(error) if error
-              console.log error if error and window.console
+              return @showError(error) if error
               $("#DropboxFiles").show()
               $("#DropboxSaveContainer").show()
               $(".dropbox-login").hide()
-              $('#user-name').text userInfo.name
+              $('.user-name').text userInfo.name
               @updateDrawingList()
               console.log "authenticated to dropbox as #{userInfo.name}" if window.console
+    $('.logout').click (event) => @onSignOut event
+
+  # Called when the user wants to sign out of the application.
+  onSignOut: (event, task) ->
+    @dbClient.signOut (error) =>
+      return @showError(error) if error
+      $("#DropboxSaveContainer").hide()
+      $("#DropboxFiles").hide()
+      $(".dropbox-login").show()
 
   # Updates the UI to show that an error has occurred.
   showError: (error) ->
