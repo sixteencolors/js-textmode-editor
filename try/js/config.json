@@ -1,0 +1,5 @@
+var config = {
+	dropbox: {
+		key: 'R8KLdNJyI6A=|MaJArlAxa03I70J3B3JtXmokq7PLDDwWWdooY1Voiw=='
+	}
+}
