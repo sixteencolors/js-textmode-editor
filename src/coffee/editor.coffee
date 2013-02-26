@@ -125,6 +125,7 @@ class @Editor
       if (answer)
         @drawingId = null
         @image.screen = []
+        @manager.reset()
         @draw()
         @setName("")
 
@@ -611,6 +612,7 @@ class @Editor
                       @dbClient.readFile "ansi/#{$(e.target).text()}", arrayBuffer: true, (error, data) =>
                           return @showError(error) if error
                           @image.parse(@binaryArrayToString data)
+                          @manager.reset($.extend(true, {}, @image.screen))
                           @setHeight(@image.getHeight() * @image.font.height, false)
                           @draw()
                           @toggleLoadDialog()
@@ -952,6 +954,7 @@ ParseFile = ( file ) ->
     , 1000
 
     editor.image.parse( content )
+    editor.manager.reset($.extend(true, {}, editor.image.screen))
     clearInterval(progressIntervalID)
     console.log 'End parsing'
     editor.setHeight(editor.image.getHeight() * editor.image.font.height, false)
