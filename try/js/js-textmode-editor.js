@@ -659,7 +659,7 @@
         destX = 0;
         destY = 0;
         this.copyCanvasContext.drawImage(this.canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
-        $(this.copyCanvas).insertBefore('#vga');
+        $(this.copyCanvas).insertBefore('#vgawrapper');
       }
       yy = 0;
       for (y = _i = starty; starty <= endy ? _i <= endy : _i >= endy; y = starty <= endy ? ++_i : --_i) {
