@@ -553,26 +553,29 @@ class @Editor
 
 
   setName: (name) ->
-      $('#name').val( name )
+    $('#name').val( name )
 
   toggleSaveDialog: ->
-      unless $( '#SaveDialog' ).is( ':visible' )
-          $( '#drawings').slideUp 'slow'
-          $( '#splash' ).slideUp 'slow'
-      $( '#SaveDialog' ).slideToggle 'slow'
+    unless $( '#SaveDialog' ).is( ':visible' )
+      $( '#drawings').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+    $( '#SaveDialog' ).slideToggle 'slow'
 
   toggleLoadDialog: ->
-      unless $( '#drawings' ).is( ':visible' )
-          @updateDrawingList()
-          $( '#SaveDialog').slideUp 'slow'
-          $( '#splash' ).slideUp 'slow'
-      $( '#drawings' ).slideToggle 'slow'
+    unless $( '#drawings' ).is( ':visible' )
+      @updateDrawingList()
+      $( '#SaveDialog').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+    $( '#drawings' ).slideToggle 'slow'
 
   toggleHelpDialog: ->
-      unless $( '#splash' ).is( ':visible' )
-          $( '#drawings').slideUp 'slow'
-          $( '#SaveDialog' ).slideUp 'slow'
-      $( '#splash' ).slideToggle 'slow'
+    unless $( '#splash' ).is( ':visible' )
+      $( '#drawings').slideUp 'slow'
+      $( '#SaveDialog' ).slideUp 'slow'
+    $( '#splash' ).slideToggle 'slow'
+
+  toggleErrorDialog: ->
+    $('#ErrorDialog').slideToggle 'slow'
 
   updateDrawingList: ->
       $('#drawings #html5Files ol').empty()
@@ -988,29 +991,32 @@ ParseFile = ( file ) ->
   return false
 
 $( document ).ready ->
+  editor.init()
 
-    editor.init()
-
+  editor.toggleHelpDialog()
+  $( '#splash .close' ).click ->
     editor.toggleHelpDialog()
-    $( '#splash .close' ).click ->
-        editor.toggleHelpDialog()
-        return false
+    return false
 
-    $( '#drawings .close' ).click ->
-        editor.toggleLoadDialog()
-        return false
+  $( '#drawings .close' ).click ->
+    editor.toggleLoadDialog()
+    return false
 
-    $( '#SaveDialog .close' ).click ->
-        editor.toggleSaveDialog()
-        return false
+  $( '#SaveDialog .close' ).click ->
+    editor.toggleSaveDialog()
+    return false
 
-    if (window.File && window.FileList && window.FileReader) 
-        fileselect = $("#fileselect")
-        # file select
-        fileselect.change ( e ) -> 
-            FileSelectHandler ( e )
+  $( '#ErrorDialog .close').click ->
+    editor.toggleErrorDialog()
+    return false
 
-        # is XHR2 available?
-        return false
+  if (window.File && window.FileList && window.FileReader) 
+    fileselect = $("#fileselect")
+    # file select
+    fileselect.change ( e ) -> 
+      FileSelectHandler ( e )
+
+    # is XHR2 available?
+    return false
 
 editor = new Editor
