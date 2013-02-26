@@ -500,7 +500,7 @@ class @Editor
           destY = 0
 
           @copyCanvasContext.drawImage(@canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-          $(@copyCanvas).insertBefore('#vga')
+          $(@copyCanvas).insertBefore('#vgawrapper')
 
       # make copy of drawing data
 
