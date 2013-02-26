@@ -21,6 +21,7 @@
       f9: 120,
       f10: 121,
       backspace: 8,
+      spacebar: 32,
       "delete": 46,
       end: 35,
       home: 36,
@@ -33,7 +34,8 @@
       ctrlF: 6,
       ctrlB: 2,
       ctrlX: 24,
-      ctrlC: 3
+      ctrlC: 3,
+      ctrlZ: 26
     };
 
     function Editor(options) {
@@ -52,7 +54,7 @@
 
     Editor.prototype.dbAuthenticate = function() {
       var _this = this;
-      return this.dbClient.authenticate({
+      this.dbClient.authenticate({
         interactive: false
       }, function(error, client) {
         if (error) {
@@ -62,7 +64,12 @@
           $("#DropboxSaveContainer").show();
           $("#DropboxFiles").show();
           $(".dropbox-login").hide();
-          return $('#user-name').text(userInfo.name);
+          return client.getUserInfo(function(error, userInfo) {
+            if (error) {
+              return _this.showError(error);
+            }
+            return $('.user-name').text(userInfo.name);
+          });
         } else {
           $("#DropboxSaveContainer").hide();
           $("#DropboxFiles").hide();
@@ -73,13 +80,13 @@
                 return _this.showError(error);
               }
               return client.getUserInfo(function(error, userInfo) {
-                if (error && window.console) {
-                  console.log(error);
+                if (error) {
+                  return _this.showError(error);
                 }
                 $("#DropboxFiles").show();
                 $("#DropboxSaveContainer").show();
                 $(".dropbox-login").hide();
-                $('#user-name').text(userInfo.name);
+                $('.user-name').text(userInfo.name);
                 _this.updateDrawingList();
                 if (window.console) {
                   return console.log("authenticated to dropbox as " + userInfo.name);
@@ -88,6 +95,21 @@
             });
           });
         }
+      });
+      return $('.logout').click(function(event) {
+        return _this.onSignOut(event);
+      });
+    };
+
+    Editor.prototype.onSignOut = function(event, task) {
+      var _this = this;
+      return this.dbClient.signOut(function(error) {
+        if (error) {
+          return _this.showError(error);
+        }
+        $("#DropboxSaveContainer").hide();
+        $("#DropboxFiles").hide();
+        return $(".dropbox-login").show();
       });
     };
 
@@ -111,6 +133,14 @@
         receiverFile: "oauth_receiver.html"
       }));
       this.dbAuthenticate();
+      this.manager = new BufferedUndoManager({
+        buffer: 1000
+      });
+      this.manager.on('undo redo', function() {
+        _this.image.screen = [];
+        $.extend(_this.image.screen, _this.manager.state);
+        return _this.draw();
+      });
       this.canvas = document.getElementById(this.id);
       this.width = this.image.font.width * this.columns;
       this.canvas.setAttribute('width', this.width);
@@ -149,6 +179,7 @@
         if (answer) {
           _this.drawingId = null;
           _this.image.screen = [];
+          _this.manager.reset();
           _this.draw();
           return _this.setName("");
         }
@@ -260,6 +291,10 @@
                   _this.pal.fg = 15;
                 }
               }
+              break;
+            case key.spacebar:
+              _this.cursor.mvoeRight();
+              e.preventDefault();
               break;
             case key.backspace:
               _this.cursor.moveLeft();
@@ -409,6 +444,10 @@
           pattern = /[\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>\/\?`~\-\s]/;
           if (char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which !== 13) {
             return _this.putChar(char.charCodeAt(0) & 255);
+          } else if (e.which === key.ctrlZ && !e.shiftKey) {
+            return _this.manager.undo();
+          } else if (e.which === key.ctrlZ && e.shiftKey) {
+            return _this.manager.redo();
           }
         }
       });
@@ -737,6 +776,10 @@
       return $('#splash').slideToggle('slow');
     };
 
+    Editor.prototype.toggleErrorDialog = function() {
+      return $('#ErrorDialog').slideToggle('slow');
+    };
+
     Editor.prototype.updateDrawingList = function() {
       var drawing, i, _i, _len, _ref,
         _this = this;
@@ -786,6 +829,7 @@
                   return _this.showError(error);
                 }
                 _this.image.parse(_this.binaryArrayToString(data));
+                _this.manager.reset($.extend(true, {}, _this.image.screen));
                 _this.setHeight(_this.image.getHeight() * _this.image.font.height, false);
                 _this.draw();
                 return _this.toggleLoadDialog();
@@ -835,8 +879,15 @@
       return true;
     };
 
+    Editor.prototype.synchronize = function() {
+      if (this.manager != null) {
+        this.image.screen = this.manager.state;
+        return this.draw();
+      }
+    };
+
     Editor.prototype.putChar = function(charCode, holdCursor) {
-      var row, _ref;
+      var row, screencopy, _ref;
       if (holdCursor == null) {
         holdCursor = false;
       }
@@ -851,6 +902,8 @@
         ch: String.fromCharCode(charCode),
         attr: (this.pal.bg << 4) | this.pal.fg
       };
+      screencopy = $.extend(true, {}, this.image.screen);
+      this.manager.update($.extend(true, {}, this.image.screen));
       this.drawChar(this.cursor.x, this.cursor.y);
       if (!holdCursor) {
         this.cursor.moveRight();
@@ -904,6 +957,9 @@
       var x, y, _i, _j, _ref, _ref1;
       this.ctx.fillStyle = "#000000";
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      if (!(this.image.screen != null)) {
+        this.image.screen = [];
+      }
       for (y = _i = 0, _ref = this.image.screen.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; y = 0 <= _ref ? ++_i : --_i) {
         if (!(this.image.screen[y] != null)) {
           continue;
@@ -1216,6 +1272,7 @@
         return console.log((end - start) + 's');
       }, 1000);
       editor.image.parse(content);
+      editor.manager.reset($.extend(true, {}, editor.image.screen));
       clearInterval(progressIntervalID);
       console.log('End parsing');
       editor.setHeight(editor.image.getHeight() * editor.image.font.height, false);
@@ -1273,6 +1330,10 @@
       editor.toggleSaveDialog();
       return false;
     });
+    $('#ErrorDialog .close').click(function() {
+      editor.toggleErrorDialog();
+      return false;
+    });
     if (window.File && window.FileList && window.FileReader) {
       fileselect = $("#fileselect");
       fileselect.change(function(e) {
@@ -1306,6 +1367,6 @@ templates['editor'] = template(function (Handlebars,depth0,helpers,partials,data
   if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
   else { stack1 = depth0.help_footer; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</div>\n<div id=\"drawings\">\n    <div id=\"html5Files\">\n        <a class=close href=#>&times;</a>\n        <h2>Your Drawings</h2>\n        <p class=\"alert\"><strong>Warning:</strong> clearing your cache will empty this list</p>\n        <ol></ol>\n    </div>\n    <div>\n        <h2>Upload Drawing</h2>\n        <form id=\"upload\" method=\"post\" enctype=\"multipart/form-data\">\n            <input type=\"hidden\" id=\"MAX_FILE_SIZE\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n            <div>\n                <label for=\"fileselect\">Drawing to upload: </label>\n                <input type=\"file\" id=\"fileselect\" name=\"fileselect\" />\n                <button onclick=\"abortRead();\">Cancel read</button>\n                <div id=\"progress_bar\"><div class=\"percent\">0%</div></div>\n            </div>\n        </form>\n    </div>\n    <div>\n        <h2>Dropbox Drawings</h2>\n        <a class=\"dropbox-login\" href=\"#\">Login to Dropbox</a>\n        <ol id=\"DropboxFiles\"></ol>\n    </div>\n</div>\n<div id=\"SaveDialog\">\n    <a class=close href=#>&times;</a>\n    <h2>Save</h2>\n    <label for=\"name\">Name (Optional)</label> <input id=name type=\"text\" />\n    <ul>\n        <li><a href=\"#\" id=\"PNGSave\">Save as PNG</a></li>\n        <li><a href=\"#\" id=\"html5Save\">Save to Browser</a></li>\n        <li id=\"DropboxContainer\">\n            <span id=\"DropboxSaveContainer\"><a href=\"#\" id=\"DropboxSave\">Save to Dropbox</a> as <span id=\"user-name\" /></span>\n            <a href=\"#\" class=\"dropbox-login\">Login to Dropbox</a>\n        </li>\n    </ul>\n</div>\n<div id=\"ErrorDialog\" class=\"dialog\">\n    <a class=\"close\" href=\"#\">&times;</a>\n    <h2>Error</h2>\n    <p class=\"message\" />\n</div>\n<div id=\"toolbar\">\n    <ul id=\"menu\">\n        <li id=\"save\">Save</li>\n        <li id=\"load\">Load</li>\n        <li id=\"clear\">Clear</li>\n    </ul>\n    <div id=\"cursorpos\">(1, 1)</div>\n    <div id=\"palette\">\n        <div id=fg class=selected>FG</div>\n        <div id=\"bg\">BG</div>\n        <div id=\"colors\"></div>\n        <div style=\"clear:both\"></div>\n    </div>\n    <div id=\"charsets\">\n        <ul id=\"sets\"></ul>\n        <div id=\"prev-set\">&#9668;</div>\n        <div id=\"next-set\">&#9658;</div>\n        <div id=\"char-lock\">Lock</div>\n    </div>\n</div>\n<div id=\"canvaswrapper\">\n    <div id=\"canvasscroller\">\n        <div id=\"highlight\" class=\"highlight\"></div>\n        <div id=\"cursor\"></div>\n        <canvas id=\"canvas\"></canvas>\n    </div>\n    <div id=\"vgawrapper\">\n        <div id=\"vgahighlight\" class=\"highlight\"></div>\n        <canvas id=\"vga\"></canvas>\n    </div>\n</div>";
+  buffer += "\n</div>\n<div id=\"drawings\">\n    <div id=\"html5Files\">\n        <a class=close href=#>&times;</a>\n        <h2>Your Drawings</h2>\n        <p class=\"alert\"><strong>Warning:</strong> clearing your cache will empty this list</p>\n        <ol></ol>\n    </div>\n    <div>\n        <h2>Upload Drawing</h2>\n        <form id=\"upload\" method=\"post\" enctype=\"multipart/form-data\">\n            <input type=\"hidden\" id=\"MAX_FILE_SIZE\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n            <div>\n                <label for=\"fileselect\">Drawing to upload: </label>\n                <input type=\"file\" id=\"fileselect\" name=\"fileselect\" />\n                <button onclick=\"abortRead();\">Cancel read</button>\n                <div id=\"progress_bar\"><div class=\"percent\">0%</div></div>\n            </div>\n        </form>\n    </div>\n    <div>\n        <h2>Dropbox Drawings</h2>\n        <div><span class=\"user-name\"></span> (<a href=\"#\" class=\"logout\">Logout</a>)</div>\n        <a class=\"dropbox-login\" href=\"#\">Login to Dropbox</a>\n        <ol id=\"DropboxFiles\"></ol>\n    </div>\n</div>\n<div id=\"SaveDialog\">\n    <a class=close href=#>&times;</a>\n    <h2>Save</h2>\n    <label for=\"name\">Name (Optional)</label> <input id=name type=\"text\" />\n    <ul>\n        <li><a href=\"#\" id=\"PNGSave\">Save as PNG</a></li>\n        <li><a href=\"#\" id=\"html5Save\">Save to Browser</a></li>\n        <li id=\"DropboxContainer\">\n            <span id=\"DropboxSaveContainer\"><a href=\"#\" id=\"DropboxSave\">Save to Dropbox</a> as <span class=\"user-name\" /> (<a href=\"#\" class=\"logout\">Logout</a>)</span>\n            <a href=\"#\" class=\"dropbox-login\">Login to Dropbox</a>\n        </li>\n    </ul>\n</div>\n<div id=\"ErrorDialog\" class=\"dialog\">\n    <a class=\"close\" href=\"#\">&times;</a>\n    <h2>Error</h2>\n    <p class=\"message\" />\n</div>\n<div id=\"toolbar\">\n    <ul id=\"menu\">\n        <li id=\"save\">Save</li>\n        <li id=\"load\">Load</li>\n        <li id=\"clear\">Clear</li>\n    </ul>\n    <div id=\"cursorpos\">(1, 1)</div>\n    <div id=\"palette\">\n        <div id=fg class=selected>FG</div>\n        <div id=\"bg\">BG</div>\n        <div id=\"colors\"></div>\n        <div style=\"clear:both\"></div>\n    </div>\n    <div id=\"charsets\">\n        <ul id=\"sets\"></ul>\n        <div id=\"prev-set\">&#9668;</div>\n        <div id=\"next-set\">&#9658;</div>\n        <div id=\"char-lock\">Lock</div>\n    </div>\n</div>\n<div id=\"canvaswrapper\">\n    <div id=\"canvasscroller\">\n        <div id=\"highlight\" class=\"highlight\"></div>\n        <div id=\"cursor\"></div>\n        <canvas id=\"canvas\"></canvas>\n    </div>\n    <div id=\"vgawrapper\">\n        <div id=\"vgahighlight\" class=\"highlight\"></div>\n        <canvas id=\"vga\"></canvas>\n    </div>\n</div>";
   return buffer;});
 })();
