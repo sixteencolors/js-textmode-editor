@@ -47,6 +47,7 @@ class @Editor
         $("#DropboxSaveContainer").show()
         $("#DropboxFiles").show()
         $(".dropbox-login").hide()
+        $("#LoadLogout").show()
         client.getUserInfo (error, userInfo) =>
           return @showError(error) if error
           $('.user-name').text userInfo.name
@@ -54,6 +55,7 @@ class @Editor
         $("#DropboxSaveContainer").hide()
         $("#DropboxFiles").hide()
         $(".dropbox-login").show()
+        $("#LoadLogout").hide()
         $(".dropbox-login").click =>
           client.authenticate (error, client) =>
             return @showError(error)  if error
@@ -73,6 +75,7 @@ class @Editor
     @dbClient.signOut (error) =>
       return @showError(error) if error
       $("#DropboxSaveContainer").hide()
+      $("#LoadLogout").hide()
       $("#DropboxFiles").hide()
       $(".dropbox-login").show()
 
