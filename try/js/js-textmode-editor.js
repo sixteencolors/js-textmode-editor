@@ -234,12 +234,14 @@
         var _ref;
         if (_this.block.mode === 'on' && !e.shiftKey && ((_ref = e.which) !== key.shift && _ref !== key.ctrl && _ref !== key["delete"] && _ref !== key.backspace)) {
           return $(_this).trigger("endblock");
+        } else if (e.which === key.backspace) {
+          return false;
         }
       });
       $("body").bind("keydown", function(e) {
         var mod, oldrow, prevention, _ref, _ref1, _ref2;
         prevention = false;
-        if (_this.block.mode && ((_ref = e.which) === key["delete"] || _ref === key.backspace)) {
+        if (_this.block.mode === 'on' && ((_ref = e.which) === key["delete"] || _ref === key.backspace)) {
           return _this["delete"]();
         } else if (e.target.nodeName !== "INPUT") {
           mod = e.altKey || e.ctrlKey;
@@ -296,10 +298,10 @@
               }
               break;
             case key.spacebar:
-              _this.cursor.mvoeRight();
+              _this.cursor.moveRight();
               e.preventDefault();
               break;
-            case key.backspace:
+            case key.backspace || key["delete"]:
               _this.cursor.moveLeft();
               if (_this.cursor.mode === 'ovr') {
                 _this.putChar(32);
@@ -309,7 +311,7 @@
                 _this.image.screen[_this.cursor.y] = oldrow.slice(0, +(_this.cursor.x - 1) + 1 || 9e9).concat(oldrow.slice(_this.cursor.x + 1, +(oldrow.length - 1) + 1 || 9e9));
               }
               e.preventDefault();
-              break;
+              return false;
             case key["delete"]:
               oldrow = _this.image.screen[_this.cursor.y];
               _this.image.screen[_this.cursor.y] = oldrow.slice(0, +(_this.cursor.x - 1) + 1 || 9e9).concat(oldrow.slice(_this.cursor.x + 1, +(oldrow.length - 1) + 1 || 9e9));
@@ -444,7 +446,7 @@
           }
         } else if (e.target.nodeName !== "INPUT") {
           char = String.fromCharCode(e.which);
-          pattern = /[\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>\/\?`~\-\s]/;
+          pattern = /[\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>\/\?`';~\-\s:"]/;
           if (char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which !== 13) {
             return _this.putChar(char.charCodeAt(0) & 255);
           } else if (e.which === key.ctrlZ && !e.shiftKey) {
@@ -541,7 +543,7 @@
       if (height < $(window).height() + this.image.font.height) {
         height = $(window).height() + this.image.font.height;
       }
-      if (height > this.height || !(this.height != null)) {
+      if (height > this.height || (this.height == null)) {
         this.height = height;
         if (copy) {
           tempCanvas = this.canvas.toDataURL("image/png");
@@ -665,7 +667,7 @@
       for (y = _i = starty; starty <= endy ? _i <= endy : _i >= endy; y = starty <= endy ? ++_i : --_i) {
         xx = 0;
         for (x = _j = startx; startx <= endx ? _j <= endx : _j >= endx; x = startx <= endx ? ++_j : --_j) {
-          if (!(this.copyGrid[yy] != null)) {
+          if (this.copyGrid[yy] == null) {
             this.copyGrid[yy] = [];
           }
           if ((this.image.screen[y][x] != null) && copy) {
@@ -695,14 +697,14 @@
       stationaryY = this.cursor.y;
       stationaryX = this.cursor.x;
       for (y = _i = 0, _ref = this.copyGrid.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; y = 0 <= _ref ? ++_i : --_i) {
-        if (!(this.copyGrid[y] != null)) {
+        if (this.copyGrid[y] == null) {
           continue;
         }
         for (x = _j = 0, _ref1 = this.copyGrid[y].length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
-          if (!(this.copyGrid[y][x] != null)) {
+          if (this.copyGrid[y][x] == null) {
             continue;
           }
-          if (!(this.image.screen[stationaryY + y] != null)) {
+          if (this.image.screen[stationaryY + y] == null) {
             this.image.screen[stationaryY + y] = [];
           }
           if (this.copyGrid[y][x] != null) {
@@ -732,14 +734,14 @@
       var x, y, _i, _ref, _ref1, _results;
       _results = [];
       for (y = _i = _ref = this.block.start.y, _ref1 = this.cursor.y; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; y = _ref <= _ref1 ? ++_i : --_i) {
-        if (!(this.image.screen[y] != null)) {
+        if (this.image.screen[y] == null) {
           continue;
         }
         _results.push((function() {
           var _j, _ref2, _ref3, _results1;
           _results1 = [];
           for (x = _j = _ref2 = this.cursor.x, _ref3 = this.block.start.x; _ref2 <= _ref3 ? _j <= _ref3 : _j >= _ref3; x = _ref2 <= _ref3 ? ++_j : --_j) {
-            if (!(this.image.screen[y][x] != null)) {
+            if (this.image.screen[y][x] == null) {
               continue;
             }
             _results1.push(this.image.screen[y][x].attr = ((bg ? bg : (this.image.screen[y][x].attr & 240) >> 4) << 4) | (fg ? fg : this.image.screen[y][x].attr & 15));
@@ -960,15 +962,15 @@
       var x, y, _i, _j, _ref, _ref1;
       this.ctx.fillStyle = "#000000";
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      if (!(this.image.screen != null)) {
+      if (this.image.screen == null) {
         this.image.screen = [];
       }
       for (y = _i = 0, _ref = this.image.screen.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; y = 0 <= _ref ? ++_i : --_i) {
-        if (!(this.image.screen[y] != null)) {
+        if (this.image.screen[y] == null) {
           continue;
         }
         for (x = _j = 0, _ref1 = this.image.screen[y].length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
-          if (!(this.image.screen[y][x] != null)) {
+          if (this.image.screen[y][x] == null) {
             continue;
           }
           this.drawChar(x, y, true);
@@ -1352,24 +1354,24 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
 templates['editor'] = template(function (Handlebars,depth0,helpers,partials,data) {
-  helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
+  this.compilerInfo = [2,'>= 1.0.0-rc.3'];
+helpers = helpers || Handlebars.helpers; data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
   buffer += "<div id=\"splash\">\n    <a class=\"close\" href=\"#\"ß>&times;</a>\n    <h1>";
-  foundHelper = helpers.title;
-  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
-  else { stack1 = depth0.title; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
-  buffer += escapeExpression(stack1) + "</h1>\n    ";
-  foundHelper = helpers.help_header;
-  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
-  else { stack1 = depth0.help_header; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.title; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h1>\n    ";
+  if (stack1 = helpers.help_header) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.help_header; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    <h2>Colors</h2>\n    <dl>\n        <dt>ctrl + up/ctrl + down</dt>\n        <dd>Change foreground color</dd>\n        <dt>ctrl + left/ctrl + right</dt>\n        <dd>Change background color</dd>\n    </dl>\n    <h2>Characters</h2>\n    <dl>\n        <dt>alt + [f1..f10]</dt>\n        <dd>Switch extended character set</dd>\n        <dt>[f1..f10]</dt>\n        <dd>Place extended character</dd>\n    </dl>\n    ";
-  foundHelper = helpers.help_footer;
-  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
-  else { stack1 = depth0.help_footer; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  if (stack1 = helpers.help_footer) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.help_footer; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n<div id=\"drawings\">\n    <div id=\"html5Files\">\n        <a class=close href=#>&times;</a>\n        <h2>Your Drawings</h2>\n        <p class=\"alert\"><strong>Warning:</strong> clearing your cache will empty this list</p>\n        <ol></ol>\n    </div>\n    <div>\n        <h2>Upload Drawing</h2>\n        <form id=\"upload\" method=\"post\" enctype=\"multipart/form-data\">\n            <input type=\"hidden\" id=\"MAX_FILE_SIZE\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n            <div>\n                <label for=\"fileselect\">Drawing to upload: </label>\n                <input type=\"file\" id=\"fileselect\" name=\"fileselect\" />\n                <button onclick=\"abortRead();\">Cancel read</button>\n                <div id=\"progress_bar\"><div class=\"percent\">0%</div></div>\n            </div>\n        </form>\n    </div>\n    <div>\n        <h2>Dropbox Drawings</h2>\n        <div id=\"LoadLogout\"><span class=\"user-name\"></span> (<a href=\"#\" class=\"logout\">Logout</a>)</div>\n        <a class=\"dropbox-login\" href=\"#\">Login to Dropbox</a>\n        <ol id=\"DropboxFiles\"></ol>\n    </div>\n</div>\n<div id=\"SaveDialog\">\n    <a class=close href=#>&times;</a>\n    <h2>Save</h2>\n    <label for=\"name\">Name (Optional)</label> <input id=name type=\"text\" />\n    <ul>\n        <li><a href=\"#\" id=\"PNGSave\">Save as PNG</a></li>\n        <li><a href=\"#\" id=\"html5Save\">Save to Browser</a></li>\n        <li id=\"DropboxContainer\">\n            <span id=\"DropboxSaveContainer\"><a href=\"#\" id=\"DropboxSave\">Save to Dropbox</a> as <span class=\"user-name\" /> (<a href=\"#\" class=\"logout\">Logout</a>)</span>\n            <a href=\"#\" class=\"dropbox-login\">Login to Dropbox</a>\n        </li>\n    </ul>\n</div>\n<div id=\"ErrorDialog\" class=\"dialog\">\n    <a class=\"close\" href=\"#\">&times;</a>\n    <h2>Error</h2>\n    <p class=\"message\" />\n</div>\n<div id=\"toolbar\">\n    <ul id=\"menu\">\n        <li id=\"save\">Save</li>\n        <li id=\"load\">Load</li>\n        <li id=\"clear\">Clear</li>\n    </ul>\n    <div id=\"cursorpos\">(1, 1)</div>\n    <div id=\"palette\">\n        <div id=fg class=selected>FG</div>\n        <div id=\"bg\">BG</div>\n        <div id=\"colors\"></div>\n        <div style=\"clear:both\"></div>\n    </div>\n    <div id=\"charsets\">\n        <ul id=\"sets\"></ul>\n        <div id=\"prev-set\">&#9668;</div>\n        <div id=\"next-set\">&#9658;</div>\n        <div id=\"char-lock\">Lock</div>\n    </div>\n</div>\n<div id=\"canvaswrapper\">\n    <div id=\"canvasscroller\">\n        <div id=\"highlight\" class=\"highlight\"></div>\n        <div id=\"cursor\"></div>\n        <canvas id=\"canvas\"></canvas>\n    </div>\n    <div id=\"vgawrapper\">\n        <div id=\"vgahighlight\" class=\"highlight\"></div>\n        <canvas id=\"vga\"></canvas>\n    </div>\n</div>";
-  return buffer;});
+  return buffer;
+  });
 })();
