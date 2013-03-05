@@ -321,7 +321,7 @@ class @Editor
         else if e.target.nodeName != "INPUT"
           char = String.fromCharCode(e.which)
           pattern = ///
-            [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`~\-\s]
+            [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`';~\-\s]
           ///
           if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
             @putChar(char.charCodeAt( 0 ) & 255);  
