@@ -170,11 +170,13 @@ class @Editor
         # is in block mode, shift has been released and a key other then shift is pressed
         if @block.mode == 'on' && !e.shiftKey && e.which not in [key.shift, key.ctrl, key["delete"], key.backspace] 
             $(this).trigger "endblock"
+        else if e.which == key.backspace 
+          return false
 
     $("body").bind "keydown", (e) =>
         prevention = false
 
-        if @block.mode and e.which in [key["delete"], key.backspace]
+        if @block.mode == 'on' and e.which in [key["delete"], key.backspace]
             @delete()
         else if (e.target.nodeName != "INPUT")
             mod = e.altKey || e.ctrlKey
@@ -206,9 +208,9 @@ class @Editor
                     else if e.ctrlKey
                         if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
                 when key.spacebar
-                  @cursor.mvoeRight()
+                  @cursor.moveRight()
                   e.preventDefault()
-                when key.backspace
+                when key.backspace || key["delete"]
                     @cursor.moveLeft()
                     if @cursor.mode == 'ovr'
                         @putChar(32)
@@ -217,6 +219,7 @@ class @Editor
                         oldrow = @image.screen[@cursor.y]
                         @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
                     e.preventDefault()
+                    return false
                 when key.delete
                     oldrow = @image.screen[@cursor.y]
                     @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
@@ -321,7 +324,7 @@ class @Editor
         else if e.target.nodeName != "INPUT"
           char = String.fromCharCode(e.which)
           pattern = ///
-            [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`';~\-\s]
+            [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`';~\-\s:"]
           ///
           if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
             @putChar(char.charCodeAt( 0 ) & 255);  
