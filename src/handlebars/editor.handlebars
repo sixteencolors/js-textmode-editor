@@ -44,7 +44,16 @@
         <ol id="DropboxFiles"></ol>
     </div>
 </div>
-<div id="SaveDialog">
+<div id="CharacterSetDialog" class="dialog">
+    <a class=close href=#>&times;</a>
+    <h2>Change Character Set</h2>
+    <ul>
+        <li><a href="#" data-font-set="8x16">80x25 ANSI</a></li>
+        <li><a href="#" data-font-set="8x8">80x50 ANSI</a></li>
+        <li><a href="#" data-font-set="Amiga">Amiga Font</a></li>        
+    </ul>
+</div>
+<div id="SaveDialog" class="dialog">
     <a class=close href=#>&times;</a>
     <h2>Save</h2>
     <label for="name">Name (Optional)</label> <input id=name type="text" />

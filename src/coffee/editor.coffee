@@ -25,6 +25,7 @@ class @Editor
     h: 72
     l: 76
     s: 83,
+    f: 70,
     ctrlF: 6,
     ctrlB: 2,
     ctrlX: 24,
@@ -87,6 +88,7 @@ class @Editor
 
   init: ->
     @image = new ImageTextModeANSI
+    @image.font = new ImageTextModeFont8x16
     @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
     @dbClient.authDriver(new Dropbox.Drivers.Popup({ rememberUser: true, receiverFile: "oauth_receiver.html"}));
     @dbAuthenticate()
@@ -244,6 +246,8 @@ class @Editor
                         $( '#SaveDialog' ).slideToggle 'slow'
                     if $( '#ErrorDialog').is(':visible')
                         $('#ErrorDialog').slideToggle 'slow'
+                    if $('#CharacterSetDialog').is(':visible')
+                        $('#CharacterSetDialog').slideToggle 'slow'
                     if @block.mode in ['copy', 'cut']
                         if @block.mode is 'cut'
                             @cancelCut()
@@ -251,17 +255,18 @@ class @Editor
                         $(this).trigger("endblock")
                 else 
                     if e.which == key.h && e.altKey
-                        @toggleHelpDialog()
-                        e.preventDefault()
-
+                      @toggleHelpDialog()
+                      e.preventDefault()
                     if e.which == key.l && e.altKey
-                        @updateDrawingList()
-                        @toggleLoadDialog()
-                        e.preventDefault()
-
+                      @updateDrawingList()
+                      @toggleLoadDialog()
+                      e.preventDefault()
+                    if e.which == key.f && e.altKey
+                      @toggleCharacterSetDialog()
+                      e.preventDefault()
                     if e.which == key.s && e.altKey
-                        @toggleSaveDialog()
-                        e.preventDefault()                       
+                      @toggleSaveDialog()
+                      e.preventDefault()                       
 
                     else if e.which >= 112 && e.which <= 121
                         if !e.altKey && !e.shiftKey && !e.ctrlKey
@@ -561,6 +566,13 @@ class @Editor
 
   setName: (name) ->
     $('#name').val( name )
+
+  toggleCharacterSetDialog: ->
+    unless $('#CharacterSetDialog').is(':visible')
+      $( '#drawings').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+      $( '#SaveDialog').slideUp 'slow'
+    $('#CharacterSetDialog').slideToggle('slow')
 
   toggleSaveDialog: ->
     unless $( '#SaveDialog' ).is( ':visible' )
@@ -1013,6 +1025,10 @@ $( document ).ready ->
 
   $( '#SaveDialog .close' ).click ->
     editor.toggleSaveDialog()
+    return false
+
+  $( '#CharacterSetDialog .close' ).click ->
+    editor.toggleCharacterSetDialog()
     return false
 
   $( '#ErrorDialog .close').click ->
