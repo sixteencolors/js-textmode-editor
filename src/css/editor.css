@@ -354,3 +354,9 @@ a:hover {
     height: auto;
     width: 0;
 }
+
+label.error {
+    color: red;
+    font-weight: bold;
+    padding-left: 1em;
+}

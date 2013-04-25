@@ -149,11 +149,20 @@ class @Editor
     $('#PNGSave').click =>
         window.open(@canvas.toDataURL("image/png"), 'ansiSave')
         
+
     $('#DropboxSave').click =>
-        @dbClient.writeFile 'ansi/' + $('#name').val(), @image.write(), (error, stat) =>
+      $('#Save').validate 
+        rules:
+          name: "required"
+        submitHandler: =>
+          filename = $('#name').val()
+          filename += ".ans" unless filename.search(/\.[0-9a-z]{1,3}$/i) > -1
+
+          @dbClient.writeFile 'ansi/' + filename, @image.write(), (error, stat) =>
             return @showError(error) if error
             @toggleSaveDialog()
-
+      console.log $('#name').valid()   
+      $('#Save').submit()
 
     $('#load').click =>
         @toggleLoadDialog()
