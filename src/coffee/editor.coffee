@@ -208,7 +208,7 @@ class @Editor
                     else if e.ctrlKey
                         if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
                 when key.spacebar
-                  @cursor.moveRight()
+                  @putChar(32)
                   e.preventDefault()
                 when key.backspace || key["delete"]
                     @cursor.moveLeft()
@@ -757,10 +757,6 @@ class Cursor
     moveRight: ->
         if @x < @editor.width / @editor.image.font.width - 1
             @x++
-        else if @y < @editor.height / @editor.image.font.height - 1
-            @x =0
-            @y++
-
         @move()
 
 
