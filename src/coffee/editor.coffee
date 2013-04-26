@@ -22,13 +22,22 @@ class @Editor
     enter: 13
     escape: 27
     insert: 45
-    h: 72
-    l: 76
-    s: 83,
-    ctrlF: 6,
-    ctrlB: 2,
-    ctrlX: 24,
-    ctrlC: 3,
+    a: 97
+    b: 98
+    c: 99 
+    d: 100
+    e: 101
+    f: 102
+    m: 109
+    x: 120
+    y: 121
+    altH: 72
+    altL: 76
+    altS: 83
+    ctrlF: 6
+    ctrlB: 2
+    ctrlX: 24
+    ctrlC: 3
     ctrlZ: 26
 
   constructor: ( options ) ->
@@ -259,16 +268,16 @@ class @Editor
                         $( '#copy' ).remove()
                         $(this).trigger("endblock")
                 else 
-                    if e.which == key.h && e.altKey
+                    if e.which == key.altH && e.altKey
                         @toggleHelpDialog()
                         e.preventDefault()
 
-                    if e.which == key.l && e.altKey
+                    if e.which == key.altL && e.altKey
                         @updateDrawingList()
                         @toggleLoadDialog()
                         e.preventDefault()
 
-                    if e.which == key.s && e.altKey
+                    if e.which == key.altS && e.altKey
                         @toggleSaveDialog()
                         e.preventDefault()                       
 
@@ -315,7 +324,7 @@ class @Editor
           $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
       $("body").bind "keypress", (e) =>       
-        if @block.mode is 'on' and e.ctrlKey
+        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c])
           switch e.which
             when key.ctrlF # fill foreground
               @fillBlock(@pal.fg, null)
@@ -323,10 +332,10 @@ class @Editor
             when key.ctrlB # fill background
               @fillBlock(null, @pal.bg)
               @draw()            
-            when key.ctrlX # cut
+            when key.ctrlX, key.m # cut
               @setBlockEnd()
               @cut()
-            when key.ctrlC # copy
+            when key.ctrlC, key.c # copy
               @setBlockEnd()
               @copy()
 
