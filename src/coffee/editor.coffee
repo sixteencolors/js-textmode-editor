@@ -236,6 +236,7 @@ class @Editor
                     else
                         oldrow = @image.screen[@cursor.y]
                         @image.screen[@cursor.y] = oldrow[0..@cursor.x-1].concat(oldrow[@cursor.x+1..oldrow.length-1])
+                    @updateCursorPosition()
                     e.preventDefault()
                     return false
                 when key.delete
@@ -792,8 +793,8 @@ class Cursor
         if @y > 0                            
           @y--
 
-        if @y * @editor.image.font.height < @getScrollOffset()
-            $("#canvasscroller").scrollTop(@getScrollOffset() - @editor.image.font.height)
+        if @y * @editor.image.font.height < @editor.getScrollOffset()
+            $("#canvasscroller").scrollTop(@editor.getScrollOffset() - @editor.image.font.height)
 
         @move()
 
