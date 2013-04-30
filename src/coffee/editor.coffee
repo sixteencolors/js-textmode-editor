@@ -194,7 +194,7 @@ class @Editor
     $("body").bind "keydown", (e) =>
         prevention = false
 
-        if @block.mode == 'on' and e.which in [key["delete"], key.backspace]
+        if @block.mode == 'on' and e.which in [key["delete"], key.backspace, key.d, key.e]
             @delete()
         else if (e.target.nodeName != "INPUT")
             mod = e.altKey || e.ctrlKey
@@ -325,7 +325,7 @@ class @Editor
           $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
       $("body").bind "keypress", (e) =>       
-        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c, key.x, key.y])
+        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c, key.x, key.y, key.d, key.e])
           switch e.which
             when key.ctrlF # fill foreground
               @fillBlock(@pal.fg, null)
@@ -339,6 +339,8 @@ class @Editor
             when key.ctrlC, key.c # copy
               @setBlockEnd()
               @copy()
+            when key.e, key.d
+              @delete()
             when key.x #flip horizontally
               @flip('x')
             when key.y
@@ -498,7 +500,10 @@ class @Editor
       for y in [ 0 .. endy - starty]
         @image.screen[endy - y] = [] if !@copyGrid[y]? 
         for x in [0 .. endx - startx]
-          @image.screen[endy - y][startx + x] = @copyGrid[y][x]
+          if !@copyGrid[y]? 
+            @image.screen[endy - y][startx + x] = []
+          else
+            @image.screen[endy - y][startx + x] = @copyGrid[y][x]
 
     @draw()
 
@@ -583,8 +588,8 @@ class @Editor
 
               if !@copyGrid[yy]?
                   @copyGrid[yy] = []
-              @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y][x]? and copy
-              @image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y][x]?)  # clear block if cutting
+              @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y]? and @image.screen[y][x]? and copy
+              @image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y]? and @image.screen[y][x]?)  # clear block if cutting
               xx++
           yy++
 
