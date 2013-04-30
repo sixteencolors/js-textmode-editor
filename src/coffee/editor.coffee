@@ -29,6 +29,7 @@ class @Editor
     e: 101
     f: 102
     m: 109
+    s: 115
     x: 120
     y: 121
     altH: 72
@@ -195,7 +196,7 @@ class @Editor
         prevention = false
 
         if @block.mode == 'on' and e.which in [key["delete"], key.backspace, key.d, key.e]
-            @delete()
+          @delete()
         else if (e.target.nodeName != "INPUT")
             mod = e.altKey || e.ctrlKey
             if e.shiftKey && ((e.which >= key.left &&  e.which <= key.down) || (e.which >= key.end && e.which <= key.home ))
@@ -282,7 +283,7 @@ class @Editor
                       @toggleSaveDialog()
                       e.preventDefault()                       
 
-                    else if e.which >= 112 && e.which <= 121
+                    else if e.which >= 112 && e.which <= 121 and !(@block.mode in ['cut', 'copy'] and e.which == key.s)
                       if !e.altKey && !e.shiftKey && !e.ctrlKey
                         @putChar(@sets.sets[ @sets.set ][e.which-112])
                       else if e.altKey
@@ -339,19 +340,20 @@ class @Editor
             when key.ctrlC, key.c # copy
               @setBlockEnd()
               @copy()
-            when key.e, key.d
+            when key.e, key.d # delete
               @delete()
-            when key.x #flip horizontally
+            when key.x # flip horizontally
               @flip('x')
             when key.y
-              @flip('y') #flip vertically
-
+              @flip('y') # flip vertically
+        else if @block.mode in ['cut', 'copy'] and e.which == key.s
+          @paste()
         else if e.target.nodeName != "INPUT"
           char = String.fromCharCode(e.which)
           pattern = ///
             [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`';~\-\s:"]
           ///
-          if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
+          if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13 
             @putChar(char.charCodeAt( 0 ) & 255);  
           else if e.which == key.ctrlZ and !e.shiftKey
             @manager.undo()
