@@ -22,6 +22,7 @@ class @Editor
     enter: 13
     escape: 27
     insert: 45
+    shift: 16
     a: 97
     b: 98
     c: 99 
@@ -283,9 +284,13 @@ class @Editor
                       @toggleSaveDialog()
                       e.preventDefault()                       
 
-                    else if e.which >= 112 && e.which <= 121 and !(@block.mode in ['cut', 'copy'] and e.which == key.s)
+                    else if e.which >= key.f1 && e.which <= key.f10 and !(@block.mode in ['cut', 'copy'] and e.which == key.s) and !(@block.mode == 'fill' and e.which in [key.b, key.a])
                       if !e.altKey && !e.shiftKey && !e.ctrlKey
-                        @putChar(@sets.sets[ @sets.set ][e.which-112])
+                        char = @sets.sets[ @sets.set ][e.which-112]
+                        if @block.mode != 'fillchar'
+                          @putChar(char)
+                        else
+                          @fillChar(char)
                       else if e.altKey
                         @sets.set = e.which - 112
                         @sets.fadeSet()
@@ -326,7 +331,7 @@ class @Editor
           $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
       $("body").bind "keypress", (e) =>       
-        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c, key.x, key.y, key.d, key.e])
+        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c, key.x, key.y, key.d, key.e, key.f])
           switch e.which
             when key.ctrlF # fill foreground
               @fillBlock(@pal.fg, null)
@@ -337,6 +342,9 @@ class @Editor
             when key.ctrlX, key.m # cut
               @setBlockEnd()
               @cut()
+            when key.f # fill
+              @block.mode = 'fill'
+              @setBlockEnd()
             when key.ctrlC, key.c # copy
               @setBlockEnd()
               @copy()
@@ -348,13 +356,20 @@ class @Editor
               @flip('y') # flip vertically
         else if @block.mode in ['cut', 'copy'] and e.which == key.s
           @paste()
+        else if @block.mode == 'fill' and e.which == key.a # fill background and foreground with currently selected colors
+          @fillBlock(@pal.fg, @pal.bg)
+        else if @block.mode == 'fill' and e.which == key.b # fill with next pressed character with matching color attributes to current selection
+          @block.mode = 'fillchar'
         else if e.target.nodeName != "INPUT"
           char = String.fromCharCode(e.which)
           pattern = ///
             [\w!@\#$%^&*()_+=\\|\[\]\{\},\.<>/\?`';~\-\s:"]
           ///
-          if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13 
-            @putChar(char.charCodeAt( 0 ) & 255);  
+          if char.match(pattern) && e.which <= 255 && !e.ctrlKey && e.which != 13
+            if (@block.mode != 'fillchar')
+              @putChar(char.charCodeAt( 0 ) & 255);  
+            else
+              @fillChar(char.charCodeAt( 0) & 255);
           else if e.which == key.ctrlZ and !e.shiftKey
             @manager.undo()
           else if e.which == key.ctrlZ and e.shiftKey
@@ -626,12 +641,22 @@ class @Editor
       $(@copyCanvas).css('top', (@cursor.y) * @image.font.height)
           
   fillBlock: (fg, bg) ->
-      for y in [@block.start.y..@cursor.y]
-          continue if !@image.screen[y]?
-          for x in [(@cursor.x)..@block.start.x]
-              continue if !@image.screen[y][x]?
-              @image.screen[y][x].attr = ( (if bg then bg  else ( @image.screen[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @image.screen[y][x].attr & 15
+    for y in [@block.start.y..@cursor.y]
+      continue if !@image.screen[y]?
+      for x in [(@cursor.x)..@block.start.x]
+        continue if !@image.screen[y][x]?
+        @image.screen[y][x].attr = ( (if bg then bg  else ( @image.screen[y][x].attr & 240 ) >> 4 )<< 4 ) | if fg then fg else @image.screen[y][x].attr & 15
+    @draw()
+    $(this).trigger("endblock")
 
+  fillChar: (char) ->
+    $(this).trigger("endblock")
+    console.log('load up the characters!')
+    for y in [@block.start.y .. @block.end.y]      
+      @image.screen[y] = [] if !@image.screen[y]?
+      for x in [@block.end.x .. @block.start.x]
+        @putChar(char, false, x, y)
+    @draw()
 
   setName: (name) ->
     $('#name').val( name )
@@ -727,19 +752,22 @@ class @Editor
       @image.screen = @manager.state
       @draw()
 
-  putChar: (charCode, holdCursor = false) ->
-    @image.screen[@cursor.y] = [] if !@image.screen[@cursor.y]
+  putChar: (charCode, holdCursor = false, x = null, y = null) ->
+    x = @cursor.x if !x?
+    y = @cursor.y if !y?
+    console.log('(' + x + ', ' + y + ')')
+    @image.screen[y] = [] if !@image.screen[y]
     if @cursor.mode == 'ins'
         # NOTE: this will push chars off the right-side of the canvas
         # but will still have an entry in the grid
-        row = @image.screen[@cursor.y][@cursor.x..]
-        @image.screen[@cursor.y][@cursor.x + 1..] = row
-    @image.screen[@cursor.y][@cursor.x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
+        row = @image.screen[y][x..]
+        @image.screen[y][x + 1..] = row
+    @image.screen[y][x] = { ch: String.fromCharCode( charCode ), attr: ( @pal.bg << 4 ) | @pal.fg }
 
     screencopy = $.extend(true, {}, @image.screen)
     @manager.update $.extend(true, {}, @image.screen)
 
-    @drawChar(@cursor.x, @cursor.y)
+    @drawChar(x, y)
     unless holdCursor then @cursor.moveRight()
     @updateCursorPosition()
 
