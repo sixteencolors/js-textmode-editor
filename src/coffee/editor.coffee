@@ -270,25 +270,25 @@ class @Editor
                         $(this).trigger("endblock")
                 else 
                     if e.which == key.altH && e.altKey
-                        @toggleHelpDialog()
-                        e.preventDefault()
+                      @toggleHelpDialog()
+                      e.preventDefault()
 
                     if e.which == key.altL && e.altKey
-                        @updateDrawingList()
-                        @toggleLoadDialog()
-                        e.preventDefault()
+                      @updateDrawingList()
+                      @toggleLoadDialog()
+                      e.preventDefault()
 
                     if e.which == key.altS && e.altKey
-                        @toggleSaveDialog()
-                        e.preventDefault()                       
+                      @toggleSaveDialog()
+                      e.preventDefault()                       
 
                     else if e.which >= 112 && e.which <= 121
-                        if !e.altKey && !e.shiftKey && !e.ctrlKey
-                            @putChar(@sets.sets[ @sets.set ][e.which-112])
-                        else if e.altKey
-                            @sets.set = e.which - 112
-                            @sets.fadeSet()
-                        e.preventDefault()
+                      if !e.altKey && !e.shiftKey && !e.ctrlKey
+                        @putChar(@sets.sets[ @sets.set ][e.which-112])
+                      else if e.altKey
+                        @sets.set = e.which - 112
+                        @sets.fadeSet()
+                      e.preventDefault()
 
 
             @updateCursorPosition()
@@ -325,7 +325,7 @@ class @Editor
           $("#highlight").height (Math.abs(@cursor.y - adjustedStartY) + 1) * @image.font.height
 
       $("body").bind "keypress", (e) =>       
-        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c])
+        if @block.mode is 'on' and (e.ctrlKey or e.which in [key.m, key.c, key.x, key.y])
           switch e.which
             when key.ctrlF # fill foreground
               @fillBlock(@pal.fg, null)
@@ -339,6 +339,10 @@ class @Editor
             when key.ctrlC, key.c # copy
               @setBlockEnd()
               @copy()
+            when key.x #flip horizontally
+              @flip('x')
+            when key.y
+              @flip('y') #flip vertically
 
         else if e.target.nodeName != "INPUT"
           char = String.fromCharCode(e.which)
@@ -453,6 +457,50 @@ class @Editor
       @copyOrCut(false, true)
       $(this).trigger("endblock")
 
+  flip: (axis ='x') ->
+    @copyGrid = []
+    if @cursor.y > @block.start.y 
+      starty = @block.start.y
+      endy = @cursor.y
+    else 
+      starty = @cursor.y
+      endy = @block.start.y
+
+    if @cursor.x > @block.start.x
+      startx = @block.start.x
+      endx = @cursor.x
+    else
+      startx = @cursor.x
+      endx = @block.start.x 
+
+    yy = 0;
+    for y in [ starty .. endy ]
+        xx = 0;
+        for x in [ startx .. endx ]
+            # adjustedY = y - Math.abs(@cursor.y - @block.start.y)
+            # adjustedX = x - Math.abs(@cursor.x - @block.start.x)
+
+            if !@copyGrid[yy]?
+                @copyGrid[yy] = []
+            @copyGrid[yy][xx] = { ch: @image.screen[y][x].ch, attr: @image.screen[y][x].attr } if @image.screen[y]? and @image.screen[y][x]? 
+            #@image.screen[y][x] = { ch: ' ', attr: ( 0 << 4 ) | 0 } if (cut && @image.screen[y][x]?)  # clear block if cutting
+            xx++
+        yy++
+    if axis == 'y'
+      for y in [ 0 .. endy - starty]
+        if !@copyGrid[y]?
+          @image.screen[starty + y] = []
+        else 
+          for x in [0 .. endx - startx]
+            @image.screen[starty + y] = [] if !@image.screen[starty + y]? 
+            @image.screen[starty + y][endx - x] = @copyGrid[y][x]
+    else
+      for y in [ 0 .. endy - starty]
+        @image.screen[endy - y] = [] if !@copyGrid[y]? 
+        for x in [0 .. endx - startx]
+          @image.screen[endy - y][startx + x] = @copyGrid[y][x]
+
+    @draw()
 
   cancelCut: ->
       if @block.end.y > @block.start.y 
