@@ -206,27 +206,35 @@ class @Editor
 
             switch e.which
                 when key.left
-                    if (!mod)
-                        @cursor.moveLeft()
-                    else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
-                        if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
+                  if (!mod)
+                    @cursor.moveLeft()
+                  else if e.ctrlKey || e.shiftKey #for now, mac os x has command for ctrl-right
+                    if @pal.bg < 7 then @pal.bg++ else @pal.bg = 0
+                  else if e.altKey
+                    @adjustLine('y', -1)
                 when key.right
-                    if (!mod)
-                        @cursor.moveRight()
-                    else if e.ctrlKey || e.shiftKey
-                        if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
+                  if (!mod)
+                    @cursor.moveRight()
+                  else if e.ctrlKey || e.shiftKey
+                    if @pal.bg > 0 then @pal.bg-- else @pal.bg = 7
+                  else if e.altKey
+                    @adjustLine('y', 1)
                 when key.down
-                    prevention = true
-                    if (!mod)
-                        @cursor.moveDown()
-                    else if (e.ctrlKey)
-                        if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
+                  prevention = true
+                  if (!mod)
+                    @cursor.moveDown()
+                  else if (e.ctrlKey)
+                    if @pal.fg < 15 then @pal.fg++ else @pal.fg = 0
+                  else if e.altKey
+                    @adjustLine('x', 1)
                 when key.up
-                    prevention = true
-                    if (!mod)
-                        @cursor.moveUp()
-                    else if e.ctrlKey
-                        if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
+                  prevention = true
+                  if (!mod)
+                    @cursor.moveUp()
+                  else if e.ctrlKey
+                    if @pal.fg > 0 then @pal.fg-- else @pal.fg = 15
+                  else if e.altKey
+                    @adjustLine('x', -1)
                 when key.spacebar
                   @putChar(32)
                   e.preventDefault()
@@ -524,6 +532,28 @@ class @Editor
 
     @draw()
 
+  adjustLine: (axis = 'x', direction = 1) ->
+    if axis == 'x'
+      @image.screen[y] = @image.screen[y + 1]
+      if direction == -1
+        for y in [ @cursor.y .. Math.floor(@canvas.height / @image.font.height) ]
+          @image.screen[y] = @image.screen[y + 1]
+      else
+        for y in [Math.floor(@canvas.height / @image.font.height) .. @cursor.y ]
+          @image.screen[y] = @image.screen[y - 1]
+        @image.screen[@cursor.y] = []
+    else if axis == 'y'
+      for y in [0 .. Math.floor(@canvas.height / @image.font.height)]
+        continue if !@image.screen[y]?
+        if direction == -1
+          for x in [@cursor.x .. @columns - 1]
+            @image.screen[y][x] = @image.screen[y][x + 1]
+        else
+          for x in [@columns - 1 .. @cursor.x + 1]
+            @image.screen[y][x] = @image.screen[y][x - 1]
+          @image.screen[y][@cursor.x] = []
+    @draw()
+
   cancelCut: ->
       if @block.end.y > @block.start.y 
           starty = @block.start.y
@@ -651,7 +681,6 @@ class @Editor
 
   fillChar: (char) ->
     $(this).trigger("endblock")
-    console.log('load up the characters!')
     for y in [@block.start.y .. @block.end.y]      
       @image.screen[y] = [] if !@image.screen[y]?
       for x in [@block.end.x .. @block.start.x]
@@ -755,7 +784,6 @@ class @Editor
   putChar: (charCode, holdCursor = false, x = null, y = null) ->
     x = @cursor.x if !x?
     y = @cursor.y if !y?
-    console.log('(' + x + ', ' + y + ')')
     @image.screen[y] = [] if !@image.screen[y]
     if @cursor.mode == 'ins'
         # NOTE: this will push chars off the right-side of the canvas
@@ -784,7 +812,7 @@ class @Editor
       return new ImageTextModeFont8x16
 
   drawChar: (x, y, full = false) ->
-      if @image.screen[y][x]
+      if @image.screen[y][x]? and @image.screen[y][x].ch?
           px = x * @image.font.width
           py = y * @image.font.height
 
@@ -1051,7 +1079,7 @@ ParseFile = ( file ) ->
     editor.height = 0
     content = e.target.result
     start = new Date().getTime();
-    console.log 'Begin parsing'
+    vmw 'Begin parsing'
     progressIntervalID = setInterval ->
       end = new Date().getTime()
       console.log((end - start) + 's')
