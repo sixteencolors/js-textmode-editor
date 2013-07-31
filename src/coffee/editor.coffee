@@ -1079,7 +1079,7 @@ ParseFile = ( file ) ->
     editor.height = 0
     content = e.target.result
     start = new Date().getTime();
-    vmw 'Begin parsing'
+    console.log 'Begin parsing'
     progressIntervalID = setInterval ->
       end = new Date().getTime()
       console.log((end - start) + 's')
