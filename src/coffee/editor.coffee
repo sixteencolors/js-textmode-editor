@@ -98,9 +98,10 @@ class @Editor
 
   init: ->
     @image = new ImageTextModeANSI
-    @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
-    @dbClient.authDriver(new Dropbox.Drivers.Popup({ rememberUser: true, receiverFile: "oauth_receiver.html"}));
-    @dbAuthenticate()
+    if Dropbox?
+      @dbClient = new Dropbox.Client(key: config.dropbox.key, sandbox: true)
+      @dbClient.authDriver(new Dropbox.Drivers.Popup({ rememberUser: true, receiverFile: "oauth_receiver.html"}));
+      @dbAuthenticate()
 
     @manager = new BufferedUndoManager buffer: 1000
     @manager.on 'undo redo', () =>
