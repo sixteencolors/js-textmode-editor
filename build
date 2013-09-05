@@ -75,7 +75,7 @@ if( !@args ) {
 
     # static folders, 1-to-1 copy
     require File::Copy::Recursive;
-    for( qw( img js ) ) {
+    for( qw( font img js ) ) {
         my $d = $outdir->subdir( $_ );
         $d->mkpath;
         File::Copy::Recursive::rcopy_glob( $src->subdir( $_ )->stringify . '/*.*', $d );

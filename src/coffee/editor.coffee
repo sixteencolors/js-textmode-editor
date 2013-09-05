@@ -648,7 +648,7 @@ class @Editor
       return if @drawings then @drawings.length else 1
           
   updateCursorPosition: ->
-      $( '#cursorpos' ).text '(' + (@cursor.x + 1) + ', ' + (@cursor.y + 1) + ')'
+      $( '#cursorpos' ).text '[ L:' + (@cursor.y + 1) + ' C:' + (@cursor.x + 1) + ' ]'
  
 
   putTouchChar: ( touch ) ->

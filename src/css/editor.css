@@ -1,3 +1,11 @@
+@font-face {  
+    font-family: '8x16';
+    src: url('../font/dos437-webfont.eot');
+    src: local('â˜º'), url('../font/dos437-webfont.woff') format('woff'), url('../font/dos437-webfont.ttf') format('truetype'), url('../font/dos437-webfont.svg#webfontpVS4iJcr') format('svg');
+    font-weight: normal;
+    font-style: normal;
+} 
+
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +14,9 @@
 html, body {
     height: 100%;
     overflow: hidden;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    background: #333;
+    background: #000;
+    font-family: '8x16';
+    font-size: 8px;
 }
 
 /* DRAWINGS (SAVE/LOAD) */
@@ -94,6 +102,17 @@ a:hover {
 
 /* TOOLBAR */
 
+#meta {
+    overflow: auto;
+}
+
+#meta h2 {
+    color: rgb(85, 85, 85);
+    text-align: center;
+    width: 70em;
+    float: left;
+}
+
 #toolbar {
     float: left;
     width: 51px;
@@ -101,20 +120,58 @@ a:hover {
     background: #555;
 }
 
-#menu {
-    list-style-type: none;
+header {
+    color: #ababab;
+    float: left;
+    line-height: 34px;
+    margin-left: 1em;
 }
 
-#cursorpos, #menu li {
+header:before {
+    content: '\00FE';
+}
+
+header h1 {
+    display: inline;
+    margin-left: 1em;
     color: #fff;
+    margin-right: 3em;
+}
+
+#menu {
+    list-style-type: none;
+    overflow: auto;
+}
+
+#menu li:after {
+    content: ' |';
+    color: rgb(85, 85, 85);
+}
+
+#menu li:last-child:after {
+    content: '';
+}
+
+
+#cursorpos, #menu li {
+    color: #ababab;
     text-align: center;
     line-height: 34px;
 }
 
+#cursorpos {
+    color: rgb(85, 85, 85);
+    float: left;
+    min-width: 11em;
+    width: 20em;
+    text-align: right;
+}
+
 #menu li {
-    width: 100%;
     display: block;
     cursor: pointer;
+    float: left;
+    margin-left: 1em;
 }
 
 #menu li:hover {
