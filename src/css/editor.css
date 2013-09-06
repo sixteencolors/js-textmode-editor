@@ -182,25 +182,38 @@ header h1 {
 /* PALETTE */
 
 #colors ul {
-    background: #000;
     float: left;
-    width: 25px;
     list-style-type: none;
     padding-top: 1px;
-}
-
-#colors ul.first {
-    padding-right: 1px;
+    z-index: 10;
+    position: relative;
 }
 
 #colors li {
-    width: 25px;
-    height: 25px;
-    margin-bottom: 1px;
+    width: 2em;
+    height: 2em;
 }
 
 #fg, #bg, #colors li {
     cursor: pointer;
+}
+
+#colors li.fg_selected:before {
+    content: 'f ';
+}
+
+#colors li.bg_selected:before {
+    content: 'b';
+    padding-left: 1em;
+}
+
+#colors li.bg_selected.fg_selected:before {
+    content: 'fb';
+    padding: 0;
+}
+
+#colors li.bg_selected.invert, #colors li.fg_selected.invert {
+    color: rgb(85, 85, 85);
 }
 
 #fg, #bg {
@@ -223,6 +236,10 @@ header h1 {
     left: 8px;
     top: -8px;
     position: relative;
+}
+
+.fg_selected {
+    content: 'f ';
 }
 
 /* #palette .selected {

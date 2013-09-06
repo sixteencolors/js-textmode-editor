@@ -922,12 +922,21 @@ class Palette
             block = $( '<li>' )
             block.data 'color', i
             block.css 'background', @toRgbaString editor.image.palette.colors[ i ]
+            if editor.image.palette.colors[ i ][ 0 ] == 0 and editor.image.palette.colors[ i ][ 1 ] == 0
+              block.css 'color', @toRgbaString @invertColors editor.image.palette.colors[ i ]
+
             block.click ( e ) =>
-                @[ indicators.filter( '.selected' ).attr 'id' ] = $( e.target ).data 'color'
+                @[ indicators.filter( '#fg' ).attr 'id' ] = $( e.target ).data 'color'
+                $('#colors ul li').each ->
+                  $(this).removeClass "fg_selected"
+                $(e.target).addClass('fg_selected');
                 @draw()
 
             block.bind "contextmenu", (e) =>
                 @[ indicators.filter( '#bg' ).attr 'id' ] = $( e.target ).data 'color'
+                $('#colors ul li').each ->
+                  $(this).removeClass "bg_selected"
+                $(e.target).addClass('bg_selected');
                 @draw()
                 return false
 
@@ -936,13 +945,17 @@ class Palette
 
     draw: ->
         $( '#fg' ).css 'background-color', @toRgbaString editor.image.palette.colors[ @fg ]
-        $( '#fg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @fg > 8 then 0 else 15 ]
+        # $( '#fg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @fg > 8 then 0 else 15 ]
         $( '#bg' ).css 'background-color', @toRgbaString editor.image.palette.colors[ @bg ]
-        $( '#bg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @bg > 8 then 0 else 15 ]
+        # $( '#bg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @bg > 8 then 0 else 15 ]
         return true
 
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)'
+
+    invertColors: (color) ->
+      $.map color, (value, i) ->
+        (value + 85)# % 255 # attempt to invert the colors for text on black/etc, may be very hacky
 
 
 FileSelectHandler = ( e ) ->
