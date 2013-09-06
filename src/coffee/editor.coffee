@@ -857,8 +857,10 @@ class CharacterSets
                             ctx.fillRect x, y, 1, 1
 
                 charwrap = $( '<li>' )
+                charidentifier = $('<span>' + ( if j == 0 then 'F' else ' ' ) +  (j + 1) + ' </span>')
                 charwrap.data 'char', c
                 charwrap.data 'pos', j
+                charwrap.append charidentifier
                 charwrap.append char
                 chars.append charwrap
 
@@ -924,6 +926,12 @@ class Palette
             block.css 'background', @toRgbaString editor.image.palette.colors[ i ]
             if editor.image.palette.colors[ i ][ 0 ] == 0 and editor.image.palette.colors[ i ][ 1 ] == 0
               block.css 'color', @toRgbaString @invertColors editor.image.palette.colors[ i ]
+
+            # set initial selections
+            if i == @fg
+              block.addClass "fg_selected"
+            if i == @bg
+              block.addClass "bg_selected"
 
             block.click ( e ) =>
                 @[ indicators.filter( '#fg' ).attr 'id' ] = $( e.target ).data 'color'
