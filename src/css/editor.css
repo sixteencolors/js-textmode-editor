@@ -117,7 +117,8 @@ a:hover {
     float: left;
     width: 51px;
     height: 100%;
-    background: #555;
+    background: #000;
+    margin-left: 4em;
 }
 
 header {
@@ -203,19 +204,32 @@ header h1 {
 }
 
 #fg, #bg {
-    margin: 0 15px 3px 0;
-    line-height: 25px;
-    padding: 0 10px;
-    color: #fff;    
-    text-align: center;
-    font-weight: bold;
+    text-transform: lowercase;
+    color: rgb(85, 85, 85);    
+    margin-left: 0;
+    position: relative;
+    width: 32px;
+    height: 24px;
 }
 
-#palette .selected {
+#fg {
+    text-indent: -3em;
+    z-index: 10;
+}
+
+#bg {
+    text-indent: 5em;
+    z-index: 1;
+    left: 8px;
+    top: -8px;
+    position: relative;
+}
+
+/* #palette .selected {
     margin-right: 0;
     cursor: default;
     text-align: right;
-}
+}*/
 
 /* CHARSETS */
 
