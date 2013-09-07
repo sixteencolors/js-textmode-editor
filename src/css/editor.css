@@ -115,12 +115,14 @@ a:hover {
 
 #toolbar {
     float: left;
-    width: 51px;
     height: 100%;
     background: #000;
     margin-left: 4em;
 }
 
+.expanded #toolbar {
+    width: 1000px;
+}
 header {
     color: #ababab;
     float: left;
@@ -182,25 +184,38 @@ header h1 {
 /* PALETTE */
 
 #colors ul {
-    background: #000;
     float: left;
-    width: 25px;
     list-style-type: none;
     padding-top: 1px;
-}
-
-#colors ul.first {
-    padding-right: 1px;
+    z-index: 10;
+    position: relative;
 }
 
 #colors li {
-    width: 25px;
-    height: 25px;
-    margin-bottom: 1px;
+    width: 2em;
+    height: 2em;
 }
 
 #fg, #bg, #colors li {
     cursor: pointer;
+}
+
+#colors li.fg_selected:before {
+    content: 'f ';
+}
+
+#colors li.bg_selected:before {
+    content: 'b';
+    padding-left: 1em;
+}
+
+#colors li.bg_selected.fg_selected:before {
+    content: 'fb';
+    padding: 0;
+}
+
+#colors li.bg_selected.invert, #colors li.fg_selected.invert {
+    color: rgb(85, 85, 85);
 }
 
 #fg, #bg {
@@ -225,6 +240,10 @@ header h1 {
     position: relative;
 }
 
+.fg_selected {
+    content: 'f ';
+}
+
 /* #palette .selected {
     margin-right: 0;
     cursor: default;
@@ -236,31 +255,45 @@ header h1 {
 #charsets {
     text-align: center;
     margin-top: 8px;
+    position: relative;
+    z-index: 100;
+}
+
+#charsets > div {
+    color: #ababab;
 }
 
 #sets ul {
     list-style-type: none;
-    border-top: 1px solid #000;
 }
 
 #sets ul li {
     cursor: pointer;
     height: 16px;
-    padding: 4px 0;
-    border-bottom: 1px solid #000;
+    padding: 1.5em 0;
+    text-align: right;
+    width: 4em;
+    color: rgb(85, 85, 85);
 }
 
-#sets .selected {
+#sets ul li.selected span {
     background: #ababab;
 }
 
+#sets ul li.selected span:before {
+    content: ''; /* weird hacky situation where this makes the prepended space show up */
+}
+
+#sets ul li span {
+    vertical-align: top;
+    width: 2em;
+}
 #prev-set, #next-set {
-    margin: 8px 0;
     text-align: center;
-    width: 25px;
-    line-height: 25px;
+    width: 2em;
     cursor: pointer;
-    color: #fff;
+    color: #000;
+    background: #ababab;
 }
 
 #prev-set {
@@ -271,7 +304,7 @@ header h1 {
     margin-left: 26px;
 }
 
-#char-lock {
+#char-lock, #expand {
     text-align: center;
     cursor: pointer;
 }
@@ -280,11 +313,15 @@ header h1 {
     color: #fff;
 }
 
+.expanded #sets ul {
+    float: left;
+}
+
 /* CANVAS + CURSOR */
 
 #canvaswrapper {
     position: relative;
-    margin-left: 51px;
+    margin-left: 100px;
 }
 
 #canvasscroller {
@@ -342,6 +379,15 @@ header h1 {
     right: 20px;
     margin-right: 8px;
     
+}
+
+#vgawrapper h2 {
+    top: -3em;
+    width: 160px;
+    color: rgb(85,85,85);
+    text-transform: uppercase;
+    text-align: center;
+    position: relative;
 }
 
 #vga {

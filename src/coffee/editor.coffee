@@ -857,13 +857,17 @@ class CharacterSets
                             ctx.fillRect x, y, 1, 1
 
                 charwrap = $( '<li>' )
+                charidentifier = $('<span>' + ( if j == 0 then 'F' else ' ' ) +  (j + 1) + ' </span>')
                 charwrap.data 'char', c
                 charwrap.data 'pos', j
+                charwrap.append charidentifier
                 charwrap.append char
                 chars.append charwrap
 
             set.append chars
             $( '#sets' ).append set
+        $( '#expand' ).click ( e ) =>
+          @showAllSets()
 
         $( '#next-set' ).click ( e ) =>
             @set++
@@ -882,6 +886,10 @@ class CharacterSets
         $( '#sets ul li' ).click ( e ) =>
             @char = $( e.currentTarget ).data 'char'
             @charpos = $( e.currentTarget ).data 'pos'
+            $(@sets).each (i) ->
+              @set = i  if $.inArray(@char, this)
+            @hideSets()
+            @fadeSet()            
             @draw()
 
         @draw()
@@ -894,6 +902,12 @@ class CharacterSets
         set.find( 'li' ).removeClass( 'selected' )
         set.find( 'li:nth-child(' + ( @charpos + 1 ) + ')' ).addClass( 'selected' )
         
+    hideSets: ->
+      $('#toolbar').parent().removeClass('expanded')
+
+    showAllSets: ->
+      $('#toolbar').parent().addClass('expanded')
+      $('#sets > li').fadeIn( 'fast')
 
     fadeSet: ->
         $('#sets > li:visible' ).fadeOut( 'fast', () =>
@@ -922,12 +936,27 @@ class Palette
             block = $( '<li>' )
             block.data 'color', i
             block.css 'background', @toRgbaString editor.image.palette.colors[ i ]
+            if editor.image.palette.colors[ i ][ 0 ] == 0 and editor.image.palette.colors[ i ][ 1 ] == 0
+              block.css 'color', @toRgbaString @invertColors editor.image.palette.colors[ i ]
+
+            # set initial selections
+            if i == @fg
+              block.addClass "fg_selected"
+            if i == @bg
+              block.addClass "bg_selected"
+
             block.click ( e ) =>
-                @[ indicators.filter( '.selected' ).attr 'id' ] = $( e.target ).data 'color'
+                @[ indicators.filter( '#fg' ).attr 'id' ] = $( e.target ).data 'color'
+                $('#colors ul li').each ->
+                  $(this).removeClass "fg_selected"
+                $(e.target).addClass('fg_selected');
                 @draw()
 
             block.bind "contextmenu", (e) =>
                 @[ indicators.filter( '#bg' ).attr 'id' ] = $( e.target ).data 'color'
+                $('#colors ul li').each ->
+                  $(this).removeClass "bg_selected"
+                $(e.target).addClass('bg_selected');
                 @draw()
                 return false
 
@@ -936,13 +965,17 @@ class Palette
 
     draw: ->
         $( '#fg' ).css 'background-color', @toRgbaString editor.image.palette.colors[ @fg ]
-        $( '#fg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @fg > 8 then 0 else 15 ]
+        # $( '#fg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @fg > 8 then 0 else 15 ]
         $( '#bg' ).css 'background-color', @toRgbaString editor.image.palette.colors[ @bg ]
-        $( '#bg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @bg > 8 then 0 else 15 ]
+        # $( '#bg' ).css 'color', @toRgbaString editor.image.palette.colors[ if @bg > 8 then 0 else 15 ]
         return true
 
     toRgbaString: ( color ) ->
         return 'rgba(' + color.join( ',' ) + ',1)'
+
+    invertColors: (color) ->
+      $.map color, (value, i) ->
+        (value + 85)# % 255 # attempt to invert the colors for text on black/etc, may be very hacky
 
 
 FileSelectHandler = ( e ) ->
