@@ -866,6 +866,8 @@ class CharacterSets
 
             set.append chars
             $( '#sets' ).append set
+        $( '#expand' ).click ( e ) =>
+          @showAllSets()
 
         $( '#next-set' ).click ( e ) =>
             @set++
@@ -884,6 +886,10 @@ class CharacterSets
         $( '#sets ul li' ).click ( e ) =>
             @char = $( e.currentTarget ).data 'char'
             @charpos = $( e.currentTarget ).data 'pos'
+            $(@sets).each (i) ->
+              @set = i  if $.inArray(@char, this)
+            @hideSets()
+            @fadeSet()            
             @draw()
 
         @draw()
@@ -896,6 +902,12 @@ class CharacterSets
         set.find( 'li' ).removeClass( 'selected' )
         set.find( 'li:nth-child(' + ( @charpos + 1 ) + ')' ).addClass( 'selected' )
         
+    hideSets: ->
+      $('#toolbar').parent().removeClass('expanded')
+
+    showAllSets: ->
+      $('#toolbar').parent().addClass('expanded')
+      $('#sets > li').fadeIn( 'fast')
 
     fadeSet: ->
         $('#sets > li:visible' ).fadeOut( 'fast', () =>

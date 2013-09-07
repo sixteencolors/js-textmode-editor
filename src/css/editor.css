@@ -120,6 +120,9 @@ a:hover {
     margin-left: 4em;
 }
 
+.expanded #toolbar {
+    width: 1000px;
+}
 header {
     color: #ababab;
     float: left;
@@ -252,6 +255,12 @@ header h1 {
 #charsets {
     text-align: center;
     margin-top: 8px;
+    position: relative;
+    z-index: 100;
+}
+
+#charsets > div {
+    color: #ababab;
 }
 
 #sets ul {
@@ -295,13 +304,17 @@ header h1 {
     margin-left: 26px;
 }
 
-#char-lock {
+#char-lock, #expand {
     text-align: center;
     cursor: pointer;
 }
 
 #char-lock.on {
     color: #fff;
+}
+
+.expanded #sets ul {
+    float: left;
 }
 
 /* CANVAS + CURSOR */
