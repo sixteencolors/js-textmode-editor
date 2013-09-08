@@ -907,11 +907,13 @@ class CharacterSets
       @fadeSet()
       $('#toolbar').parent().removeClass('expanded')
       @expanded = false
+      $('#next-set, #prev-set, #char-lock').show()
       # $('body').off('click', '#expand', @hideSets)
       # $('body').on('click', '#expand', @showAllSets)
 
     showAllSets: ->
       if !@expanded
+        $('#next-set, #prev-set, #char-lock').hide()
         $('#toolbar').parent().addClass('expanded')
         $('#sets > li').fadeIn( 'fast')
         @expanded = true
