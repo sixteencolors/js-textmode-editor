@@ -121,7 +121,7 @@ a:hover {
 }
 
 .expanded #toolbar {
-    width: 1000px;
+    width: 64em;
 }
 header {
     color: #ababab;
@@ -270,7 +270,7 @@ header h1 {
 #sets ul li {
     cursor: pointer;
     height: 16px;
-    padding: 1.5em 0;
+    padding: 1em 0;
     text-align: right;
     width: 4em;
     color: rgb(85, 85, 85);
@@ -288,25 +288,58 @@ header h1 {
     vertical-align: top;
     width: 2em;
 }
-#prev-set, #next-set {
+#charsets > div#prev-set, #charsets > div#next-set {
     text-align: center;
     width: 2em;
     cursor: pointer;
     color: #000;
     background: #ababab;
-}
-
-#prev-set {
     float: left;
 }
 
+#prev-set {
+    clear: both;
+}
+
 #next-set {
-    margin-left: 26px;
+    margin-left: 1em;
 }
 
 #char-lock, #expand {
+    clear: both;    
     text-align: center;
     cursor: pointer;
+}
+
+#char-lock {
+    padding-top: 1em;
+}
+
+#expand {
+    text-indent: -7em;
+    width: 2em;
+    float: left;
+    position: relative;
+    top: -30em;
+    left: 5em;
+    color: #000;
+    background: #ababab;
+    overflow: hidden;
+    height: 3em;
+    padding-top: 1em;
+}
+
+#expand:after {
+    color: #000;
+    content: ' > ';
+}
+
+.expanded #expand {
+    left: 62em;
+}
+
+.expanded #expand:after {
+    content: ' < ';
 }
 
 #char-lock.on {
@@ -315,6 +348,14 @@ header h1 {
 
 .expanded #sets ul {
     float: left;
+}
+
+.expanded #sets > li:nth-child(1) span {
+    display: inline;
+}
+
+.expanded #sets > li span {
+    display: none;
 }
 
 /* CANVAS + CURSOR */

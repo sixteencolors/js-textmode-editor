@@ -39,6 +39,7 @@ class @Editor
     @vga_scale = '.25'
     @columns = 80
     this[k] = v for own k, v of options
+    @expanded = false
 
   dbAuthenticate: ->
 
@@ -886,8 +887,8 @@ class CharacterSets
         $( '#sets ul li' ).click ( e ) =>
             @char = $( e.currentTarget ).data 'char'
             @charpos = $( e.currentTarget ).data 'pos'
-            $(@sets).each (i) ->
-              @set = i  if $.inArray(@char, this)
+            $(@sets).each (i, set) =>
+              @set = i if $.inArray(_this.char, set) > -1
             @hideSets()
             @fadeSet()            
             @draw()
@@ -903,11 +904,22 @@ class CharacterSets
         set.find( 'li:nth-child(' + ( @charpos + 1 ) + ')' ).addClass( 'selected' )
         
     hideSets: ->
+      @fadeSet()
       $('#toolbar').parent().removeClass('expanded')
+      @expanded = false
+      # $('body').off('click', '#expand', @hideSets)
+      # $('body').on('click', '#expand', @showAllSets)
 
     showAllSets: ->
-      $('#toolbar').parent().addClass('expanded')
-      $('#sets > li').fadeIn( 'fast')
+      if !@expanded
+        $('#toolbar').parent().addClass('expanded')
+        $('#sets > li').fadeIn( 'fast')
+        @expanded = true
+      else 
+        @hideSets()
+      # $('body').on('click', '#expand', @hideSets)
+      # $('body').off('click', '#expand', @showAllSets)
+
 
     fadeSet: ->
         $('#sets > li:visible' ).fadeOut( 'fast', () =>
