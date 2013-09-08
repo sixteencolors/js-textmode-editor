@@ -329,6 +329,10 @@ header h1 {
     padding-top: 1em;
 }
 
+.expanded #expand {
+    top: -24em;
+}
+
 #expand:after {
     color: #000;
     content: ' > ';
