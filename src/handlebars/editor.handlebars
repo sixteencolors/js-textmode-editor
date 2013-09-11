@@ -53,22 +53,24 @@
         <li><a href="#" data-font-set="Amiga">Amiga Font</a></li>        
     </ul>
 </div>
-<div id="SaveDialog" class="dialog">
-    <a class=close href=#>Close</a>
-    <h2>Save</h2>    
-    <label for="name">Name</label> <input id=name type="text" />
-    <section>
-        <div id="DropboxContainer" class="method">
-            <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a> as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
-            <a href="#" class="dropbox-login">Login to Dropbox</a>
-        </div>
-        <div>
-            <em>(Make sure pop-up blocker is disabled)</em>
-            <span>OR</span>
-        </div>
-        <div class="method"><a href="#" id="html5Save">Save to Browser Cache</a></div>
-        <div class="method"><a href="#" id="PNGSave">Export Image (PNG)</a></div>
-    </section>
+<div class="dialog" id="SaveDialog">
+    <div class="dialoginternal">
+        <a class=close href=#>Close</a>
+        <h2>Save</h2>    
+        <label for="name">Name</label> <input id=name type="text" />
+        <section>
+            <div id="DropboxContainer" class="method">
+                <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a> as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
+                <a href="#" class="dropbox-login">Login to Dropbox</a>
+            </div>
+            <div>
+                <em>(Make sure pop-up blocker is disabled)</em>
+                <span>OR</span>
+            </div>
+            <div class="method"><a href="#" id="html5Save">Save to Browser Cache</a></div>
+            <div class="method"><a href="#" id="PNGSave">Export Image (PNG)</a></div>
+        </section>
+    </div>
 </div>
 <div id="ErrorDialog" class="dialog">
     <a class="close" href="#">&times;</a>

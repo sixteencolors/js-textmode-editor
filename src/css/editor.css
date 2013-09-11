@@ -38,9 +38,15 @@ html, body {
     margin-left: -200px;
     margin-top: -150px;
     background: #000;
+    padding: 2em 1.5em 4em 1.5em;    
+}
+
+.dialoginternal {
+    background: #000;
     border: 1px solid rgb(85,85,85);
     padding: 8px;
     color: rgb(85, 85, 85);
+    height: 100%;
 }
 
 .dialog h2 {
@@ -104,6 +110,10 @@ html, body {
     font-weight: normal;
 }
 
+.dialog section div.method a:active {
+    color: #ababab;
+}
+
 .dialog h2:before {
     padding-right: 1em;
     background: #000;
@@ -118,6 +128,7 @@ html, body {
     margin-top: 1em;
     left: 3em;
 }
+
 
 h1 {
     font-size: 18px;
@@ -165,9 +176,13 @@ a.close {
     display: block;
     color: #999;
     text-decoration: none;
-    top: 4px;
-    right: 8px;
+    top: 2.5em;
+    right: 3em;
     visibility: hidden;
+}
+
+a.close:hover {
+    color: #ababab;
 }
 
 a.close:after {
@@ -183,7 +198,7 @@ a.close:after {
 }
 
 a:hover {
-    color: #000 !important;
+    color: #000;
 }
 
 /* TOOLBAR */
@@ -264,7 +279,7 @@ header h1 {
 }
 
 #menu li:hover {
-    background: #ababab;
+    color: #fff;
 }
 
 /* PALETTE */
