@@ -945,8 +945,43 @@ class Palette
 
         $( '#colors' ).children().empty()
         $( '#colors' ).append '<ul class=first></ul>', '<ul></ul>'
+        # d p
+        # 0 0
+        # 1 8
+        # 2 4
+        # 3 12
+        # 4 2
+        # 5 10
+        # 6 6
+        # 7 14
+        # 8 1
+        # 9 9
+        # 10  5
+        # 11  13
+        # 12  3
+        # 13  11
+        # 14  7
+        # 15  15   
 
-        for i in [ 0 .. editor.image.palette.colors.length - 1 ]
+        map = [ 0,
+                8,
+                4,
+                12,
+                2,
+                10,
+                6,
+                14,
+                1,
+                9,
+                5,
+                13,
+                3,
+                11,
+                7,
+                15, 
+        ];
+        for o in [ 0 .. editor.image.palette.colors.length - 1 ]
+            i = map[ o ]
             block = $( '<li>' )
             block.data 'color', i
             block.css 'background', @toRgbaString editor.image.palette.colors[ i ]

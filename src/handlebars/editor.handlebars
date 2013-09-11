@@ -54,17 +54,21 @@
     </ul>
 </div>
 <div id="SaveDialog" class="dialog">
-    <a class=close href=#>&times;</a>
-    <h2>Save</h2>
-    <label for="name">Name (Optional)</label> <input id=name type="text" />
-    <ul>
-        <li><a href="#" id="PNGSave">Save as PNG</a></li>
-        <li><a href="#" id="html5Save">Save to Browser</a></li>
-        <li id="DropboxContainer">
-            <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save to Dropbox</a> as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
+    <a class=close href=#>Close</a>
+    <h2>Save</h2>    
+    <label for="name">Name</label> <input id=name type="text" />
+    <section>
+        <div id="DropboxContainer" class="method">
+            <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a> as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
             <a href="#" class="dropbox-login">Login to Dropbox</a>
-        </li>
-    </ul>
+        </div>
+        <div>
+            <em>(Make sure pop-up blocker is disabled)</em>
+            <span>OR</span>
+        </div>
+        <div class="method"><a href="#" id="html5Save">Save to Browser Cache</a></div>
+        <div class="method"><a href="#" id="PNGSave">Export Image (PNG)</a></div>
+    </section>
 </div>
 <div id="ErrorDialog" class="dialog">
     <a class="close" href="#">&times;</a>
@@ -103,7 +107,9 @@
     <div id="canvasscroller">
         <div id="highlight" class="highlight"></div>
         <div id="cursor"></div>
-        <canvas id="canvas"></canvas>
+        <div id="actualcanvaswrapper">
+            <canvas id="canvas"></canvas>
+        </div>
     </div>
     <div id="vgawrapper">
         <h2>VGA Preview</h2>
