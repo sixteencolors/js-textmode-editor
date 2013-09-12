@@ -1,57 +1,73 @@
-<div id="splash">
-    <a class="close" href="#"ß>&times;</a>
-    <h1>{{title}}</h1>
-    {{{help_header}}}
-    <h2>Colors</h2>
-    <dl>
-        <dt>ctrl + up/ctrl + down</dt>
-        <dd>Change foreground color</dd>
-        <dt>ctrl + left/ctrl + right</dt>
-        <dd>Change background color</dd>
-    </dl>
-    <h2>Characters</h2>
-    <dl>
-        <dt>alt + [f1..f10]</dt>
-        <dd>Switch extended character set</dd>
-        <dt>[f1..f10]</dt>
-        <dd>Place extended character</dd>
-    </dl>
-    {{{help_footer}}}
+<div id="splash" class="dialog">
+    <div class="dialoginternal">
+        <a class="close" href="#">Close</a>
+        <h2>{{title}} <span>Help</span></h2>
+        <div id="help_header">{{{help_header}}}</div>
+        <h3>Keyboard Shortcuts</h3>
+        <h4>Characters</h4>
+        <dl>
+            <dt>F1..F10 (function keys)</dt>
+            <dd>Place/Draw characters.</dd>
+            <dt>ALT + [F1..F10]</dt>
+            <dd>Switch character set.</dd>
+        </dl>        
+        <p>If you are a Mac user, you need to set your kebyoard preferences to:</p>
+        <p><em>Use all F1,F2,etc. keys as standard functional keys</em></p>
+        <h4>Colors</h4>
+        <dl>
+            <dt>CTRL + UP or DOWN</dt>
+            <dd>Change foreground color.</dd>
+            <dt>CTRL + RIGHT or LEFT</dt>
+            <dd>Change background color.</dd>
+        </dl>
+        <h3>Saving Files</h3>
+        <h4>Dropbox</h4>
+        <p>You need a <a href="http://dropbox.com">Dropbox</a> account to save and export .ANS files. Just choose <em>Save to Dropbox</em> and login to authorize the {{title}} app. Files will be stored on your dropbox online folder under <em>Apps > {{title}} > ANSIs</em>.</p>
+        <h4>{{title}} Cache</h4>
+        <p>Files are saved locally on your browser cache and will be deleted if the cache is cleared.</p>
+        <p>Press ALT + H at any time to return to this screen.</p>
+        <div id="help_footer">{{{help_footer}}}</div>
+    </div>
 </div>
-<div id="drawings">
-    <div id="html5Files">
-        <a class=close href=#>&times;</a>
-        <h2>Your Drawings</h2>
-        <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list</p>
-        <ol></ol>
-    </div>
-    <div>
-        <h2>Upload Drawing</h2>
-        <form id="upload" method="post" enctype="multipart/form-data">
-            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-            <div>
-                <label for="fileselect">Drawing to upload: </label>
-                <input type="file" id="fileselect" name="fileselect" />
-                <button onclick="abortRead();">Cancel read</button>
-                <div id="progress_bar"><div class="percent">0%</div></div>
-            </div>
-        </form>
-    </div>
-    <div>
-        <h2>Dropbox Drawings</h2>
-        <div id="LoadLogout"><span class="user-name"></span> (<a href="#" class="logout">Logout</a>)</div>
-        <a class="dropbox-login" href="#">Login to Dropbox</a>
-        <ol id="DropboxFiles"></ol>
+<div id="drawings" class="dialog">
+    <div class="dialoginternal">
+        <a class="close" href="#">Close</a>
+        <section>
+            <form id="upload" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+                <div>
+                    <label for="fileselect">Upload file</label>
+                    <input type="file" id="fileselect" name="fileselect" />
+                    <button onclick="abortRead();">Cancel read</button>
+                    <div id="progress_bar"><div class="percent">0%</div></div>
+                </div>
+            </form>
+            <div><span>OR</span></div>
+        </section>
+        <section>
+            <h3>Load from Dropbox</h3>
+            <div id="LoadLogout"><span class="user-name"></span> (<a href="#" class="logout">Logout</a>)</div>
+            <div><a class="dropbox-login" href="#">Login to Dropbox</a></div>
+            <ol id="DropboxFiles"></ol>
+        </section>
+        <section id="html5Files">
+            <h3>Load from {{title}} Cache</h3>
+            <p class="alert"><strong>Warning:</strong> clearing your cache will empty this list.</p>
+            <ol></ol>
+        </section>
     </div>
 </div>
 <div id="CharacterSetDialog" class="dialog">
-    <a class=close href=#>&times;</a>
-    <h2>Change Character Set</h2>
-    <ul>
-        <li><a href="#" data-font-set="8x16">80x25 ANSI</a></li>
-        <li><a href="#" data-font-set="8x8">80x50 ANSI</a></li>
-        <li><a href="#" data-font-set="Amiga">Amiga Font</a></li>        
-    </ul>
+    <div class="dialoginternal">
+
+        <a class="close" href=#>Close</a>
+        <h2>Change Character Set</h2>
+        <ul>
+            <li><a href="#" data-font-set="8x16">80x25 ANSI</a></li>
+            <li><a href="#" data-font-set="8x8">80x50 ANSI</a></li>
+            <li><a href="#" data-font-set="Amiga">Amiga Font</a></li>        
+        </ul>
+    </div>
 </div>
 <div class="dialog" id="SaveDialog">
     <div class="dialoginternal">
@@ -67,15 +83,18 @@
                 <em>(Make sure pop-up blocker is disabled)</em>
                 <span>OR</span>
             </div>
-            <div class="method"><a href="#" id="html5Save">Save to Browser Cache</a></div>
+            <div class="method"><a href="#" id="html5Save">Save to {{title}} Cache</a></div>
             <div class="method"><a href="#" id="PNGSave">Export Image (PNG)</a></div>
         </section>
     </div>
 </div>
 <div id="ErrorDialog" class="dialog">
-    <a class="close" href="#">&times;</a>
-    <h2>Error</h2>
-    <p class="message" />
+    <div class="dialoginternal">
+
+        <a class="close" href="#">Close</a>
+        <h2>Error</h2>
+        <p class="message" />
+    </div>
 </div>
 <header>
     <h1>{{title}}</h1>

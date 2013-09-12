@@ -27,24 +27,52 @@ html, body {
 
 /* SPLASH SCREEN */
 
+#splash.dialog h2 span {
+    text-transform: uppercase;
+}
+
+#splash.dialog h2 {
+    text-transform: none;
+    width: auto;
+    margin-right: 10em;
+}
+
+#splash dd:before {
+    content: '= ';
+}
+
 #splash, #drawings, #SaveDialog, .dialog {
     display: none;
     z-index: 2;
     position: absolute;
-    width: 400px;
-    height: 330px;
+    width: 57em;
+    min-height: 42em;
     top: 50%;
-    left: 52em;
-    margin-left: -200px;
-    margin-top: -150px;
+    left: 12em;
+    margin-left: 12em;
+    margin-top: -25%;
     background: #000;
     padding: 2em 1.5em 4em 1.5em;    
+}
+
+#help_header {
+    padding-bottom: 1em;
+}
+
+.dialog p {
+    color: #ababab;
+    padding-bottom: 1em;
+}
+
+.dialog p em {
+    text-transform: uppercase;
+    color: #ababab;
 }
 
 .dialoginternal {
     background: #000;
     border: 1px solid rgb(85,85,85);
-    padding: 8px;
+    padding: 8px 16px;
     color: rgb(85, 85, 85);
     height: 100%;
 }
@@ -65,6 +93,28 @@ html, body {
     margin: 0 auto;
     font-size: 8px;
     text-align: center;
+}
+
+#drawings section {
+    border-top: 1px solid rgb(85, 85, 85);
+}
+
+#drawings p.alert {
+    color: rgb(85, 85, 85);
+}
+
+#drawings p.alert strong {
+    text-transform: uppercase;
+}
+
+#drawings section h3 {
+    color: #fff;
+    top: -1em;
+    position: relative;
+    background: #000;
+    display: inline-block;
+    text-transform: none;
+    padding: 0 2em;
 }
 
 .dialog section div.method {
@@ -88,7 +138,7 @@ html, body {
 
 .dialog input, .dialog section div.method {
     display: block;
-    width: 30em;
+    width: 34em;
     background: #000;
     border: 2px solid rgb(85,85,85);
     height: 1em;
@@ -129,6 +179,29 @@ html, body {
     left: 3em;
 }
 
+.dialog h4 {
+    color: #fff;
+    padding-bottom: 1em;
+}
+
+.dialog h3 {
+    color: #ababab;
+    text-transform: uppercase;
+    padding-bottom: 1em;
+}
+
+.dialog dt {
+    color: #ababab;
+    width: 24em;
+}
+
+.dialog dd {
+    color: #ababab;
+}
+
+.dialog dl {
+    padding-bottom: 1em;
+}
 
 h1 {
     font-size: 18px;
@@ -167,7 +240,7 @@ ul li {
 }
 
 a, #drawings li {
-    color: #666;
+    color: #ababab;
     text-decoration: none;
 }
 
@@ -198,7 +271,7 @@ a.close:after {
 }
 
 a:hover {
-    color: #000;
+    color: #fff;
 }
 
 /* TOOLBAR */
@@ -556,7 +629,12 @@ header h1 {
 }
 
 #drawings li span.name:hover {
-    color: #000;
+    color: #fff;
+}
+
+#drawings ol {
+    overflow: auto;
+    padding-bottom: 3em;
 }
 
 #drawings li span.delete:hover {
@@ -564,8 +642,12 @@ header h1 {
 }
 
 #drawings li {
-    margin-left: 3em;   
+    text-align: left;
+    float: left;
+    width: 40%;
+    margin-left: 3em;
 }
+
 
 /* UPLOAD */
 #filedrag

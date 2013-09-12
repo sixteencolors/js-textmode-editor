@@ -126,6 +126,9 @@ class @Editor
 
     @draw()
 
+    $('#help').click =>
+      @toggleSplash()
+
     $('#clear').click =>
       answer = confirm 'Clear canvas?'
       if (answer)
@@ -575,6 +578,13 @@ class @Editor
       $( '#SaveDialog').slideUp 'slow'
     $('#CharacterSetDialog').slideToggle('slow')
 
+  toggleSplash: ->
+    unless $('#splash').is(':visible')
+      $( '#drawings').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+      $( '#SaveDialog').slideUp 'slow'
+    $('#splash').slideToggle('slow')
+    
   toggleSaveDialog: ->
     unless $( '#SaveDialog' ).is( ':visible' )
       $( '#drawings').slideUp 'slow'
