@@ -437,6 +437,11 @@ header h1 {
     color: #ababab;
 }
 
+#sets {
+    overflow: auto;
+    background: #000;
+}
+
 #sets ul {
     list-style-type: none;
 }
@@ -539,7 +544,7 @@ header h1 {
 /* CANVAS + CURSOR */
 
 #canvaswrapper {
-    position: relative;
+    position: absolute;
     margin-left: 100px;
 }
 
