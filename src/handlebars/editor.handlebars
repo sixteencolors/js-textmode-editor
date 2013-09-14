@@ -2,31 +2,33 @@
     <div class="dialoginternal">
         <a class="close" href="#">Close</a>
         <h2>{{title}} <span>Help</span></h2>
-        <div id="help_header">{{{help_header}}}</div>
-        <h3>Keyboard Shortcuts</h3>
-        <h4>Characters</h4>
-        <dl>
-            <dt>F1..F10 (function keys)</dt>
-            <dd>Place/Draw characters.</dd>
-            <dt>ALT + [F1..F10]</dt>
-            <dd>Switch character set.</dd>
-        </dl>        
-        <p>If you are a Mac user, you need to set your kebyoard preferences to:</p>
-        <p><em>Use all F1,F2,etc. keys as standard functional keys</em></p>
-        <h4>Colors</h4>
-        <dl>
-            <dt>CTRL + UP or DOWN</dt>
-            <dd>Change foreground color.</dd>
-            <dt>CTRL + RIGHT or LEFT</dt>
-            <dd>Change background color.</dd>
-        </dl>
-        <h3>Saving Files</h3>
-        <h4>Dropbox</h4>
-        <p>You need a <a href="http://dropbox.com">Dropbox</a> account to save and export .ANS files. Just choose <em>Save to Dropbox</em> and login to authorize the {{title}} app. Files will be stored on your dropbox online folder under <em>Apps > {{title}} > ANSIs</em>.</p>
-        <h4>{{title}} Cache</h4>
-        <p>Files are saved locally on your browser cache and will be deleted if the cache is cleared.</p>
-        <p>Press ALT + H at any time to return to this screen.</p>
-        <div id="help_footer">{{{help_footer}}}</div>
+        <section class="contents">
+            <div id="help_header">{{{help_header}}}</div>
+            <h3>Keyboard Shortcuts</h3>
+            <h4>Characters</h4>
+            <dl>
+                <dt>F1..F10 (function keys)</dt>
+                <dd>Place/Draw characters.</dd>
+                <dt>ALT + [F1..F10]</dt>
+                <dd>Switch character set.</dd>
+            </dl>        
+            <p>If you are a Mac user, you need to set your kebyoard preferences to:</p>
+            <p><em>Use all F1,F2,etc. keys as standard functional keys</em></p>
+            <h4>Colors</h4>
+            <dl>
+                <dt>CTRL + UP or DOWN</dt>
+                <dd>Change foreground color.</dd>
+                <dt>CTRL + RIGHT or LEFT</dt>
+                <dd>Change background color.</dd>
+            </dl>
+            <h3>Saving Files</h3>
+            <h4>Dropbox</h4>
+            <p>You need a <a href="http://dropbox.com">Dropbox</a> account to save and export .ANS files. Just choose <em>Save to Dropbox</em> and login to authorize the {{title}} app. Files will be stored on your dropbox online folder under <em>Apps > {{title}} > ANSIs</em>.</p>
+            <h4>{{title}} Cache</h4>
+            <p>Files are saved locally on your browser cache and will be deleted if the cache is cleared.</p>
+            <p>Press ALT + H at any time to return to this screen.</p>
+            <div id="help_footer">{{{help_footer}}}</div>
+        </div>
     </div>
 </div>
 <div id="drawings" class="dialog">
@@ -37,7 +39,10 @@
                 <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
                 <div>
                     <label for="fileselect">Upload file</label>
-                    <input type="file" id="fileselect" name="fileselect" />
+                    <span class="file-upload">
+                        <label class="button file-upload"><span>Choose file from computer</span></label>
+                        <input type="file" id="fileselect" name="fileselect" />
+                    </span>
                     <button onclick="abortRead();">Cancel read</button>
                     <div id="progress_bar"><div class="percent">0%</div></div>
                 </div>
@@ -76,8 +81,11 @@
         <label for="name">Name</label> <input id=name type="text" />
         <section>
             <div id="DropboxContainer" class="method">
-                <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a> as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
+                <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a>
                 <a href="#" class="dropbox-login">Login to Dropbox</a>
+            </div>
+            <div id="LoggedIn">
+                Logged in as <span class="user-name" /> (<a href="#" class="logout">Logout</a>)</span>
             </div>
             <div>
                 <em>(Make sure pop-up blocker is disabled)</em>

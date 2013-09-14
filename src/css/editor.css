@@ -88,6 +88,10 @@ html, body {
     color: #fff;
 }
 
+.dialog section.contents {
+    text-align: center;
+}
+
 .dialog section {
     font-family: '8x16';
     margin: 0 auto;
@@ -292,6 +296,7 @@ a:hover {
     height: 100%;
     background: #000;
     margin-left: 4em;
+    position: absolute;
 }
 
 .expanded #toolbar {
@@ -544,7 +549,7 @@ header h1 {
 /* CANVAS + CURSOR */
 
 #canvaswrapper {
-    position: absolute;
+    position: relative;
     margin-left: 100px;
 }
 
