@@ -23,7 +23,7 @@
             </dl>
             <h3>Saving Files</h3>
             <h4>Dropbox</h4>
-            <p>You need a <a href="http://dropbox.com">Dropbox</a> account to save and export .ANS files. Just choose <em>Save to Dropbox</em> and login to authorize the {{title}} app. Files will be stored on your dropbox online folder under <em>Apps > {{title}} > ANSIs</em>.</p>
+            <p>You need a <a href="http://dropbox.com">Dropbox</a> account to save and export .ANS files. Just choose <em>Save to Dropbox</em> and login to authorize the {{title}} app. Files will be stored on your dropbox online folder under <em>Apps > {{title}} > ANSIs</em></p>
             <h4>{{title}} Cache</h4>
             <p>Files are saved locally on your browser cache and will be deleted if the cache is cleared.</p>
             <p>Press ALT + H at any time to return to this screen.</p>
@@ -39,15 +39,14 @@
                 <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
                 <div>
                     <label for="fileselect">Upload file</label>
-                    <span class="file-upload">
-                        <label class="button file-upload"><span>Choose file from computer</span></label>
+                    <span class="file-wrapper">
                         <input type="file" id="fileselect" name="fileselect" />
+                        <span class="button">Choose file from computer</span>
                     </span>
-                    <button onclick="abortRead();">Cancel read</button>
                     <div id="progress_bar"><div class="percent">0%</div></div>
                 </div>
             </form>
-            <div><span>OR</span></div>
+            <div><span class="or">OR</span></div>
         </section>
         <section>
             <h3>Load from Dropbox</h3>
@@ -89,7 +88,7 @@
             </div>
             <div>
                 <em>(Make sure pop-up blocker is disabled)</em>
-                <span>OR</span>
+                <span class="or">or</span>
             </div>
             <div class="method"><a href="#" id="html5Save">Save to {{title}} Cache</a></div>
             <div class="method"><a href="#" id="PNGSave">Export Image (PNG)</a></div>
