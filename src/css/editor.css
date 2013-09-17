@@ -318,6 +318,8 @@ header {
     float: left;
     line-height: 34px;
     margin-left: 1em;
+    z-index: 1000;
+    background: #000;
 }
 
 header:before {
@@ -762,4 +764,26 @@ header h1 {
     background-color: #99ccff;
     height: auto;
     width: 0;
+}
+
+.dropit-submenu li {
+    line-height: 2em;
+    margin-left: 1em;
+    text-indent: -1em;
+    padding-bottom: 1em;
+}
+
+.dropit {
+    background: #000;
+    z-index: 1000;
+    display: inline-block;
+}
+
+.dropit .dropit-submenu {
+    position: absolute;
+    background: #000;
+    border: 1px solid #ababab;
+    padding: 1em;
+    margin: 1em;
+
 }

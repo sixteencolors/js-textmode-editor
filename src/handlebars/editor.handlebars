@@ -77,7 +77,7 @@
     <div class="dialoginternal">
         <a class=close href=#>Close</a>
         <h2>Save</h2>    
-        <label for="name">Name</label> <input id=name type="text" />
+        <label for="name">Filename</label> <input id=name type="text" />
         <section>
             <div id="DropboxContainer" class="method">
                 <span id="DropboxSaveContainer"><a href="#" id="DropboxSave">Save ANSI file to Dropbox</a>
@@ -95,6 +95,22 @@
         </section>
     </div>
 </div>
+
+<!-- <div id="AboutDialog" class="dialog">
+    <div class="dialoginternal">
+        <div>{{title}} is an open source ANSI Art editor created by the <a href="http://sixteencolors.net">Sixteen Colors ANSI and ASCII Art Archive</a>.</div>
+        <div><strong>Version: 1.2.2</strong> (25 APR 2013)</div>
+        <div class="notes">[ Click to view the Release Notes ]</div>
+        <h2>Credits</h2>
+        <div>Coding by <a href="http://twitter.com/lordscarlet">Doug Moore</a> and <a href="http://twitter.com/bricas">Brian Cassidy</a></div>
+        <div>UX/UI Design &amp; Art by enz0 (<a href="http://blocktronics.org">blocktronics.org</a>)<div>
+        <h2>Source Code</h2>
+        <div>You can download the {{title}} source code on <a href="http://github.com/sixteencolors/js-textmode-editor">GitHub</a></div>
+        <h2>Feedback</h2>
+        <div>If you would like to become a project contributor, report bugs, or give us suggestions, contact us on twitter: <a href="http://twitter.com/sixteencolors">@sixteencolors</a></div>
+    </div>
+</div>
+-->
 <div id="ErrorDialog" class="dialog">
     <div class="dialoginternal">
 
@@ -104,7 +120,16 @@
     </div>
 </div>
 <header>
-    <h1>{{title}}</h1>
+    <ul class="menu">
+        <li>
+            <h1><a href="#">{{title}}</a></h1>
+            <ul>
+                <li><a id="about" href="#">About {{title}}</a></li>
+                <li><a id="notes" href="#">Release Notes</a></li>
+            </ul>
+        </li>
+    </ul>
+
 </header>
 <ul id="menu">
     <li id="clear">New</li>

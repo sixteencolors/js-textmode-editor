@@ -584,7 +584,7 @@ class @Editor
       $( '#splash' ).slideUp 'slow'
       $( '#SaveDialog').slideUp 'slow'
     $('#splash').slideToggle('slow')
-    
+
   toggleSaveDialog: ->
     unless $( '#SaveDialog' ).is( ':visible' )
       $( '#drawings').slideUp 'slow'
@@ -1105,6 +1105,8 @@ ParseFile = ( file ) ->
 
 $( document ).ready ->
   editor.init()
+
+  $('.menu').dropit({action:'hover', triggerEl: 'h1'});
 
   editor.toggleHelpDialog()
   $( '#splash .close' ).click ->
