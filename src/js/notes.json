@@ -1,0 +1,81 @@
+{
+    "releases": [
+        {
+            "major": 1,
+            "minor": 2,
+            "build": 3,
+            "date": "5/6/2013",
+            "notes": [
+                "Made block commands function as they do in <a href=\"http://picoe.ca/products/pablodraw/\" target=\"_blank\">PabloDraw</a> (see <a href=\"https://github.com/sixteencolors/js-textmode-editor/issues/68\" target=\"_blank\">#68</a>)"
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 2,
+            "build": 2,
+            "date": "4/25/2013",
+            "notes": [
+                "Made filename required to prevent errors when saving to Dropbox",
+                "Automatically append \".ans\" if no filename specified",
+                "Make [Spacebar] place space at current position, rather than simply moving cursor to the right",
+                "Stop cursor at last column, rather than wrapping to next line",
+                "Removed \"highlight\" over VGA preview"
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 2,
+            "build": 1,
+            "date": "3/5/2013",
+            "notes": [
+                "Fixed usage of characters: :\"';",
+                "Using [Backspace] on the canvas no longer navigates in your browser history",
+                "Make [Spacebar] place space at current position, rather than simply moving cursor to the right",
+                "Using the [Spacebar] will no longer scroll the page"
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 2,
+            "build": 0,
+            "date": "3/25/2013",
+            "notes": [
+                "Added undo/redo. Ctrl-z to undo, Ctrl-Shift-z to redo."
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 1,
+            "build": 0,
+            "date": "3/24/2013",
+            "notes": [
+                "Added ability to save to and load from <a href=\"https://www.dropbox.com/home\">Dropbox</a>"
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 0,
+            "build": 1,
+            "date": "3/21/2013",
+            "notes": [
+                "Added basic block commands. Ctrl-x cuts, ctrl-c copies, del deletes, ctrl-f f, to fill foreground, ctrl-f b to fill background (BUG: Fills with foreground color). Enter/click places copied/cut block, escape cancels copy/cut.",
+                "Automatically append \".ans\" if no filename specified",
+                "Move to fixed width (80 column canvas) to build stability",
+                "Infinite length canvas, scroll to grow",
+                "VGA Preview denotes browser position",
+                "Some integration with <a href=\"https://github.com/sixteencolors/js-image-textmode\">js-image-textmode</a>"
+            ]
+        },
+        {
+            "major": 1,
+            "minor": 0,
+            "build": 0,
+            "date": "5/21/2012",
+            "notes": [
+                "Fixed bug when placing character with mouse",
+                "Added ability to load ANSI from a local file",
+                "Fixed bug when placing character with mouse"
+            ]
+        }
+    ]
+}

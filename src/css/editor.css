@@ -27,14 +27,35 @@ html, body {
 
 /* SPLASH SCREEN */
 
-#splash.dialog h2 span {
+#splash.dialog h2 span, #AboutDialog.dialog h2 span {
     text-transform: uppercase;
 }
 
-#splash.dialog h2 {
+#splash.dialog h2, #AboutDialog.dialog h2 {
     text-transform: none;
     width: auto;
     margin-right: 10em;
+}
+
+#AboutDialog .dialoginternal {
+    color: #ababab;
+}
+
+#AboutDialog .dialoginternal > div {
+    padding-bottom: 1em;
+}
+
+#AboutDialog h3, #AboutDialog a {
+    color: #fff;
+    text-transform: none;
+}
+
+#AboutDialog h3 {
+    padding-bottom: 2em;
+}
+
+.dialog strong {
+    color: #fff;
 }
 
 #splash dd:before {

@@ -145,6 +145,11 @@ class @Editor
 
         @dbAuthenticate()
 
+    $('#about').click =>
+      @toggleAboutDialog()
+
+    $('#notes').click =>
+      @toggleReleaseNotesDialog()
 
     $('#html5Save').click =>
         # window.open(@canvas.toDataURL("image/png"), 'ansiSave')
@@ -250,6 +255,10 @@ class @Editor
                         $( '#SaveDialog' ).slideToggle 'slow'
                     if $( '#ErrorDialog').is(':visible')
                         $('#ErrorDialog').slideToggle 'slow'
+                    if $( '#AboutDialog').is(':visible')
+                      $('#AboutDialog').slideToggle 'slow'
+                    if $( '#ReleaseNotesDialog').slideToggle 'slow'
+                      $('#ReleaseNotesDialog').slideToggle 'slow'
                     if $('#CharacterSetDialog').is(':visible')
                         $('#CharacterSetDialog').slideToggle 'slow'
                     if @block.mode in ['copy', 'cut']
@@ -576,6 +585,8 @@ class @Editor
       $( '#drawings').slideUp 'slow'
       $( '#splash' ).slideUp 'slow'
       $( '#SaveDialog').slideUp 'slow'
+      $( '#AboutDialog' ).slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
     $('#CharacterSetDialog').slideToggle('slow')
 
   toggleSplash: ->
@@ -583,12 +594,16 @@ class @Editor
       $( '#drawings').slideUp 'slow'
       $( '#splash' ).slideUp 'slow'
       $( '#SaveDialog').slideUp 'slow'
+      $( '#AboutDialog' ).slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
     $('#splash').slideToggle('slow')
 
   toggleSaveDialog: ->
     unless $( '#SaveDialog' ).is( ':visible' )
       $( '#drawings').slideUp 'slow'
       $( '#splash' ).slideUp 'slow'
+      $( '#AboutDialog' ).slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
     $( '#SaveDialog' ).slideToggle 'slow'
 
   toggleLoadDialog: ->
@@ -596,13 +611,33 @@ class @Editor
       @updateDrawingList()
       $( '#SaveDialog').slideUp 'slow'
       $( '#splash' ).slideUp 'slow'
+      $( '#AboutDialog' ).slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
     $( '#drawings' ).slideToggle 'slow'
 
   toggleHelpDialog: ->
     unless $( '#splash' ).is( ':visible' )
       $( '#drawings').slideUp 'slow'
       $( '#SaveDialog' ).slideUp 'slow'
+      $( '#AboutDialog' ).slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
     $( '#splash' ).slideToggle 'slow'
+
+  toggleAboutDialog: ->
+    unless $( '#AboutDialog' ).is(':visible' )
+      $( '#drawings').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+      $( '#SaveDialog').slideUp 'slow'
+      $( '#ReleaseNotesDialog').slideUp 'slow'
+    $( '#AboutDialog' ).slideToggle 'slow'      
+
+  toggleReleaseNotesDialog: ->
+    unless $( '#ReleaseNotesDialog' ).is(':visible' )
+      $( '#drawings').slideUp 'slow'
+      $( '#splash' ).slideUp 'slow'
+      $( '#SaveDialog').slideUp 'slow'
+      $( '#AboutDialog').slideUp 'slow'
+    $( '#ReleaseNotesDialog' ).slideToggle 'slow'      
 
   toggleErrorDialog: ->
     $('#ErrorDialog').slideToggle 'slow'
@@ -1119,6 +1154,14 @@ $( document ).ready ->
 
   $( '#SaveDialog .close' ).click ->
     editor.toggleSaveDialog()
+    return false
+
+  $( '#AboutDialog .close' ).click ->
+    editor.toggleAboutDialog()
+    return false
+
+  $( '#ReleaseNotesDialog .close' ).click ->
+    editor.toggleReleaseNotesDialog()
     return false
 
   $( '#CharacterSetDialog .close' ).click ->

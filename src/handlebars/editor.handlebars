@@ -96,21 +96,31 @@
     </div>
 </div>
 
-<!-- <div id="AboutDialog" class="dialog">
+<div id="AboutDialog" class="dialog">
     <div class="dialoginternal">
+        <a class=close href="#">Close</a>
+        <h2> <em>About</em> {{title}}</h2>
         <div>{{title}} is an open source ANSI Art editor created by the <a href="http://sixteencolors.net">Sixteen Colors ANSI and ASCII Art Archive</a>.</div>
         <div><strong>Version: 1.2.2</strong> (25 APR 2013)</div>
         <div class="notes">[ Click to view the Release Notes ]</div>
-        <h2>Credits</h2>
+        <h3>Credits</h3>
         <div>Coding by <a href="http://twitter.com/lordscarlet">Doug Moore</a> and <a href="http://twitter.com/bricas">Brian Cassidy</a></div>
-        <div>UX/UI Design &amp; Art by enz0 (<a href="http://blocktronics.org">blocktronics.org</a>)<div>
-        <h2>Source Code</h2>
+        <div>UX/UI Design &amp; Art by enz0 (<a href="http://blocktronics.org">blocktronics.org</a>)</div>
+        <h3>Source Code</h3>
         <div>You can download the {{title}} source code on <a href="http://github.com/sixteencolors/js-textmode-editor">GitHub</a></div>
-        <h2>Feedback</h2>
+        <h3>Feedback</h3>
         <div>If you would like to become a project contributor, report bugs, or give us suggestions, contact us on twitter: <a href="http://twitter.com/sixteencolors">@sixteencolors</a></div>
+        <h3>Visit Our Website</h3>
+        <div><a href="http://sixteencolors.net">http://sixteencolors.net</a></div>
     </div>
 </div>
--->
+<div id="ReleaseNotesDialog" class="dialog">
+    <div class="dialoginternal">
+        <a class=close href="#">Close</a>
+        Hello, world.
+    </div>
+</div>
+
 <div id="ErrorDialog" class="dialog">
     <div class="dialoginternal">
 
@@ -120,22 +130,15 @@
     </div>
 </div>
 <header>
-    <ul class="menu">
-        <li>
-            <h1><a href="#">{{title}}</a></h1>
-            <ul>
-                <li><a id="about" href="#">About {{title}}</a></li>
-                <li><a id="notes" href="#">Release Notes</a></li>
-            </ul>
-        </li>
-    </ul>
-
+    <h1><a href="#">{{title}}</a></h1>
 </header>
 <ul id="menu">
     <li id="clear">New</li>
     <li id="load">Open</li>
     <li id="save">Save</li>
     <li id="help">Help</li>
+    <li id="about">About</li>
+    <li id="notes">Release Notes</li>
 </ul>
 <div id="meta">
     <h2>FILENAME.ANS</h2>
