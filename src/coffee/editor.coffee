@@ -774,8 +774,8 @@ class Cursor
         height = @editor.image.font.height
         @selector.css 'width', width
         @selector.css 'height', height
-        @selector.css 'left', @x * width
-        @selector.css 'top', @y * height - @editor.getScrollOffset()
+        @selector.css 'left', @x * width + 4 # 4 to accomodate border width
+        @selector.css 'top', @y * height - @editor.getScrollOffset() + 4 # 4 to accomodate border width
 
     moveRight: ->
         if @x < @editor.width / @editor.image.font.width - 1
